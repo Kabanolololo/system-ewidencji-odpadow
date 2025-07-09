@@ -1,0 +1,12 @@
+SELECT * FROM users;
+SELECT * FROM vehicles;
+SELECT * FROM wastes;
+SELECT * FROM waste_records;
+SELECT * FROM contractors;
+SELECT * FROM driver;
+
+
+for /R %f in (*) do (
+  echo ==== %f ====
+  type "%f"
+)
