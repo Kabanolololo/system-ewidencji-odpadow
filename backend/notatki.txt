@@ -4,6 +4,9 @@ SELECT * FROM wastes;
 SELECT * FROM waste_records;
 SELECT * FROM contractors;
 SELECT * FROM driver;
+SELECT * FROM destinations;
+SELECT * FROM audit_logs;
+
 
 
 for /R %f in (*) do (

@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 from database import Base
 from datetime import datetime
 
+# Tabela Kierowca
 class Driver(Base):
     __tablename__ = "drivers"
 

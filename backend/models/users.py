@@ -19,3 +19,5 @@ class User(Base):
 
     # Relacja 1:n  Users -> Wasterecords
     waste_records = relationship("WasteRecord", back_populates="user")
+    # Relacja 1:n  Users -> AuditLog
+    audit_logs = relationship("AuditLog", back_populates="user")
