@@ -29,6 +29,4 @@ class WasteRecord(Base):
     waste = relationship("Waste", back_populates="waste_records")
     vehicle = relationship("Vehicle", back_populates="waste_records")
     driver = relationship("Driver", back_populates="waste_records")
-
-
-
+    destination = relationship("Destination", back_populates="waste_records")

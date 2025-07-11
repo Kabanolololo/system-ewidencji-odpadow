@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-# from apis.notes import router as notes_router
+from api.waste import router as waste_router
 from database import SessionLocal, engine, Base
 import models
 
@@ -8,7 +8,15 @@ import models
 Base.metadata.create_all(bind=engine)
 
 # Tworzymy aplikację FastAPI
-app = FastAPI()
+app = FastAPI(
+    title="Waste Records API",
+    description="API for managing waste records, enabling CRUD operations for items, categories, and disposal tracking.",
+    version="1.0.0",
+    contact={
+        "name": "Paweł Muszyński",
+        "email": "dsw48770@student.dsw.edu.pl"
+    }
+)
 
 # Dodajemy middleware CORS
 origins = [
@@ -27,5 +35,4 @@ app.add_middleware(
 )
 
 # Routers dla zapytań API
-#app.include_router(users_router, tags=["users"])
-
+app.include_router(waste_router, prefix="/waste", tags=["waste"])

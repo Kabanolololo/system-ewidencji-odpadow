@@ -19,6 +19,3 @@ class Destination(Base):
 
     # Relacja 1:n  Destination -> Wasterecord
     waste_records = relationship("WasteRecord", back_populates="destination")
-
-
-
