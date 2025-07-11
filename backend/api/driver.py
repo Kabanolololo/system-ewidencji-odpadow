@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from schema.driver import DriverBase, DriverCreate, DriverUpdate
+from schema.driver import DriverBase, DriverCreate, DriverUpdate, DriverOut
 from crud.driver import get_all_drivers, get_one_driver, created_driver, updated_driver, deleted_driver
 from api.dependencies import get_db
 
 router = APIRouter()
 
 # Endpoint do pobierania wszystkich elementów
-@router.get("/", response_model=List[DriverBase])
+@router.get("/", response_model=List[DriverOut])
 def list_drivers(db: Session = Depends(get_db)):
     return get_all_drivers(db=db)
 

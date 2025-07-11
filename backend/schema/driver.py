@@ -15,3 +15,10 @@ class DriverCreate(DriverBase):
 class DriverUpdate(DriverBase):
     name: Optional[str] = "Edyta"
     surname: Optional[str] = "Miłoszewska"
+
+# Schemat do zwracania na GET
+class DriverOut(DriverBase):
+    id: int
+
+    class Config:
+        orm_mode = True

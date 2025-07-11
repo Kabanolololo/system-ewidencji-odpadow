@@ -8,7 +8,7 @@ from api.dependencies import get_db
 router = APIRouter()
 
 # Endpoint do pobierania wszystkich elementów
-@router.get("/", response_model=List[WasteBase])
+@router.get("/", response_model=List[WasteOut])
 def list_wastes(db: Session = Depends(get_db)):
     return get_all_waste(db=db)
 

@@ -18,11 +18,9 @@ class WasteUpdate(BaseModel):
     name: str = "Folia"
     notes: Optional[str] = None
 
-# schemat wyświetlanie odpadu
+# Schemat do zwracania na GET
 class WasteOut(WasteBase):
     id: int
-    created_at: datetime
-    edited_at: datetime
 
     class Config:
         orm_mode = True
