@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from api.waste import router as waste_router
+from api.driver import router as driver_router
+from api.vehicles import router as vehicle_router
 from database import SessionLocal, engine, Base
 import models
 
@@ -35,4 +37,6 @@ app.add_middleware(
 )
 
 # Routers dla zapytań API
+app.include_router(vehicle_router, prefix="/vehicle", tags=["vehicle"])
+app.include_router(driver_router, prefix="/driver", tags=["driver"])
 app.include_router(waste_router, prefix="/waste", tags=["waste"])

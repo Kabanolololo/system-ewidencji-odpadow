@@ -6,7 +6,7 @@ from schema.waste import WasteBase, WasteCreate, WasteUpdate, WasteOut
 
 # Funkcja do pobierania wszystkich odpadów
 def get_all_waste(db: Session):
-    wastes = db.query(Waste).all()
+    wastes = db.query(Waste).order_by(Waste.code).all()
     if not wastes:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brak danych odpadów w systemie")
     return wastes
@@ -16,6 +16,7 @@ def get_one_waste(waste_id: int, db: Session):
     # Walidacja czy podajemy poprawną liczbę
     if waste_id < 1:
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    
     waste = db.query(Waste).filter(Waste.id == waste_id).first()
     if not waste:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono odpadu")
@@ -61,6 +62,10 @@ def created_waste(waste: WasteCreate, db: Session):
 
 # Funkcja do aktualizacji odpadu
 def updated_waste(waste_id: int, waste: WasteUpdate, db: Session):
+    # Walidacja czy podajemy poprawną liczbę
+    if waste_id < 1:
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    
     # Walidacja czy istnieje taki odpad
     existing_waste = db.query(Waste).filter(Waste.id == waste_id).first()
     
