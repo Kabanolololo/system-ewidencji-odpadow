@@ -1,14 +1,12 @@
-\###############################################
 
 # README - FastAPI Project Setup & Run Guide
 
-\###############################################
 
 Thank you for using this FastAPI project! Below you will find instructions on how to install, run, and develop with FastAPI.
 
-\===============================================
+---
 
-1. Requirements ===============================================
+1. Requirements 
 
 Make sure you have the following installed:
 
@@ -16,7 +14,9 @@ Make sure you have the following installed:
 - Git
 - Virtual environment tool (optional but recommended)
 
-# =============================================== 2. Clone the Repository
+---
+
+# 2. Clone the Repository
 
 Open your terminal or command line and run:
 
@@ -24,8 +24,9 @@ Open your terminal or command line and run:
 git clone https://github.com/Kabanolololo/system-ewidencji-odpadow
 cd backend
 ```
+---
 
-# =============================================== 3. Create and Activate Virtual Environment
+3. Create and Activate Virtual Environment
 
 #### Linux / macOS:
 
@@ -40,16 +41,18 @@ source venv/bin/activate
 python -m venv venv
 venv\Scripts\activate
 ```
+---
 
-# =============================================== 4. Install Dependencies
+# 4. Install Dependencies
 
 Install required packages from `requirements.txt`:
 
 ```
 pip install -r requirements.txt
 ```
+---
 
-# =============================================== 5. Run the Application
+# 5. Run the Application
 
 You can start the FastAPI server with:
 
