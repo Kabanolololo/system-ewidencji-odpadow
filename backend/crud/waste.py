@@ -84,6 +84,14 @@ def updated_waste(waste_id: int, waste: WasteUpdate, db: Session):
             detail="Kod odpadu musi być liczbą."
         )
     
+    # Walidacja unikalności kodu
+    existing_code_waste = db.query(Waste).filter(Waste.code == waste.code).first()
+    if existing_code_waste:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ten kod odpadu znajduje się już w bazie danych"
+        )
+    
     # Aktualizacja pól
     existing_waste.code = waste.code
     existing_waste.name = waste.name

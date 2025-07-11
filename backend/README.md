@@ -26,7 +26,7 @@ cd backend
 ```
 ---
 
-3. Create and Activate Virtual Environment
+# 3. Create and Activate Virtual Environment
 
 #### Linux / macOS:
 
