@@ -2,14 +2,36 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.waste import Waste
-from schema.waste import WasteBase, WasteCreate, WasteUpdate, WasteOut
+from schema.waste import WasteBase, WasteCreate, WasteUpdate, WasteOut, WasteFilterParams
 
 # Funkcja do pobierania wszystkich odpadów
-def get_all_waste(db: Session):
-    wastes = db.query(Waste).order_by(Waste.code).all()
-    if not wastes:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brak danych odpadów w systemie")
-    return wastes
+def get_all_waste(filters: WasteFilterParams,db: Session):
+    query = db.query(Waste)
+    
+    # Filtrowanie po kodzie odpadu
+    if filters.code:
+        query = query.filter(Waste.code.ilike(f"%{filters.code}%"))
+    
+    # Sortowanie zmusza po kodzie odpadu
+    if filters.sort_by:
+        if filters.sort_by == "code":
+            column = Waste.code
+        else:
+            raise HTTPException(status_code=400, detail="Nieprawidłowe pole sortowania")
+        
+        # Sortowanie asc/desc
+        if filters.sort_order == "desc":
+            column = column.desc()
+        else:
+            column = column.asc()
+        
+        query = query.order_by(column)
+        
+    waste = query.all()
+    
+    if not waste:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brak pojazdów w systemie")
+    return waste
 
 # Funckja do pobrania konkretnego odpadu
 def get_one_waste(waste_id: int, db: Session):
@@ -29,21 +51,21 @@ def created_waste(waste: WasteCreate, db: Session):
     if existing_waste:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Odpady z kodem '{waste.code}' już istnieją."
+            detail=f"Odpady z kodem '{waste.code}' już istnieją"
         )
     
     # Walidacja długości kodu
     if len(waste.code) != 6:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Kod odpadu musi mieć dokładnie 6 znaków."
+            detail="Kod odpadu musi mieć dokładnie 6 znaków"
         )
     
     # Walidacja typu danych
     if not waste.code.isdigit():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Kod odpadu musi być liczbą."
+            detail="Kod odpadu musi być liczbą"
         )
     
     # Dodanie kodu do bazy danych
@@ -57,7 +79,7 @@ def created_waste(waste: WasteCreate, db: Session):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Błąd integralności danych podczas tworzenia odpadu."
+            detail="Błąd integralności danych podczas tworzenia odpadu"
         ) from e
 
 # Funkcja do aktualizacji odpadu
@@ -79,14 +101,14 @@ def updated_waste(waste_id: int, waste: WasteUpdate, db: Session):
     if len(waste.code) != 6:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Kod odpadu musi mieć dokładnie 6 znaków."
+            detail="Kod odpadu musi mieć dokładnie 6 znaków"
         )
     
     # Walidacja typu danych
     if not waste.code.isdigit():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Kod odpadu musi być liczbą."
+            detail="Kod odpadu musi być liczbą"
         )
     
     # Walidacja unikalności kodu
@@ -110,7 +132,7 @@ def updated_waste(waste_id: int, waste: WasteUpdate, db: Session):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Błąd integralności danych podczas aktualizacji odpadu."
+            detail="Błąd integralności danych podczas aktualizacji odpadu"
         ) from e
 
 # Funkcja do usunięcia odpadu

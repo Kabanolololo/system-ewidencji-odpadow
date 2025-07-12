@@ -2,13 +2,43 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.driver import Driver
-from schema.driver import DriverBase, DriverCreate, DriverUpdate
+from schema.driver import DriverBase, DriverCreate, DriverUpdate, DriverFilterParams
 
-# Funkcja do pobierania wszystkich kierowców
-def get_all_drivers(db: Session):
-    drivers = db.query(Driver).all()
+# Funkcja do pobierania wszystkich kierowców wraz z sortowaniem
+def get_all_drivers(filters: DriverFilterParams, db: Session):
+    query = db.query(Driver)
+
+    # Filtrowanie po imieniu/nazwisku
+    if filters.name:
+        query = query.filter(Driver.name.ilike(f"%{filters.name}%"))
+    if filters.surname:
+        query = query.filter(Driver.surname.ilike(f"%{filters.surname}%"))
+        
+    # Sortowanie wybor czy imie/nazwisko
+    if filters.sort_by:
+        if filters.sort_by == "name":
+            column = Driver.name
+        elif filters.sort_by == "surname":
+            column = Driver.surname
+        else:
+            raise HTTPException(status_code=400, detail="Nieprawidłowe pole sortowania")
+        
+        # Sortowanie asc/desc
+        if filters.sort_order == "desc":
+            column = column.desc()
+        else:
+            column = column.asc()
+
+        query = query.order_by(column)
+
+    drivers = query.all()
+
     if not drivers:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brak kierowców w systemie")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Brak kierowców w systemie"
+        )
+
     return drivers
 
 # Funckja do pobrania konkretnego kierowcy
@@ -29,7 +59,7 @@ def created_driver(driver: DriverCreate, db: Session):
     if not driver.name.isalpha() or not driver.surname.isalpha():
         raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Imię i nazwisko powinny zawierać tylko litery."
+        detail="Imię i nazwisko powinny zawierać tylko litery"
     )
         
     # Dodanie kierowcy do bazy danych
@@ -43,7 +73,7 @@ def created_driver(driver: DriverCreate, db: Session):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Błąd integralności danych podczas tworzenia kierowcy."
+            detail="Błąd integralności danych podczas tworzenia kierowcy"
         ) from e
 
 # Funkcja do aktualizacji kierowcy
@@ -65,7 +95,7 @@ def updated_driver(driver_id: int, driver: DriverUpdate, db: Session):
     if not driver.name.isalpha() or not driver.surname.isalpha():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Imię i nazwisko powinny zawierać tylko litery."
+            detail="Imię i nazwisko powinny zawierać tylko litery"
         )
     
     # Aktualizacja pól
@@ -79,7 +109,7 @@ def updated_driver(driver_id: int, driver: DriverUpdate, db: Session):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Wystąpił błąd podczas aktualizacji kierowcy."
+            detail="Wystąpił błąd podczas aktualizacji kierowcy"
         )
     
     return db_driver

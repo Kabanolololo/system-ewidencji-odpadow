@@ -2,14 +2,36 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.vehicles import Vehicle
-from schema.vehicles import VehicleBase, VehicleCreate, VehicleUpdate
+from schema.vehicles import VehicleBase, VehicleCreate, VehicleUpdate, VehicleFilterParams
 
 # Funkcja do pobierania wszystkich samochodów
-def get_all_cars(db: Session):
-    cars = db.query(Vehicle).all()
-    if not cars:
+def get_all_cars(filters: VehicleFilterParams,db: Session):
+    query = db.query(Vehicle)
+    
+    # Filtrowanie po rejestracji
+    if filters.registration_number:
+        query = query.filter(Vehicle.registration_number.ilike(f"%{filters.registration_number}%"))
+    
+    # Sortowanie zmusza po rejestracji
+    if filters.sort_by:
+        if filters.sort_by == "registration_number":
+            column = Vehicle.registration_number
+        else:
+            raise HTTPException(status_code=400, detail="Nieprawidłowe pole sortowania")
+        
+        # Sortowanie asc/desc
+        if filters.sort_order == "desc":
+            column = column.desc()
+        else:
+            column = column.asc()
+        
+        query = query.order_by(column)
+        
+    drivers = query.all()
+    
+    if not drivers:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brak pojazdów w systemie")
-    return cars
+    return drivers
 
 # Funckja do pobrania konkretnego samochodu
 def get_one_car(car_id: int, db: Session):
@@ -19,7 +41,7 @@ def get_one_car(car_id: int, db: Session):
     
     car = db.query(Vehicle).filter(Vehicle.id == car_id).first()
     if not car:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono pojazdu.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono pojazdu")
     return car
 
 # Funkcja tworzenia samochodu
@@ -41,7 +63,7 @@ def created_car(car: VehicleCreate, db: Session):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Błąd integralności danych podczas tworzenia pojazdu."
+            detail="Błąd integralności danych podczas tworzenia pojazdu"
         ) from e
 
 # Funkcja do aktualizacji samochodu
@@ -58,7 +80,7 @@ def updated_car(car_id: int, car: VehicleUpdate, db: Session):
     if not existing_car:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nie znaleziono pojazdu o ID {car_id}."
+            detail=f"Nie znaleziono pojazdu o ID {car_id}"
         )
 
     # Walidacja czy tablica rejestracyjna już istnieje w innym samochodzie
@@ -69,7 +91,7 @@ def updated_car(car_id: int, car: VehicleUpdate, db: Session):
     if plate:
         raise HTTPException(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
-            detail="Podana tablica rejestracyjna jest już w systemie."
+            detail="Podana tablica rejestracyjna jest już w systemie"
         )
 
     # Aktualizacja pól
@@ -84,7 +106,7 @@ def updated_car(car_id: int, car: VehicleUpdate, db: Session):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Wystąpił błąd podczas aktualizacji pojazdu."
+            detail="Wystąpił błąd podczas aktualizacji pojazdu"
         )
     
     return existing_car
@@ -103,7 +125,7 @@ def deleted_car(car_id: int, db: Session):
     if not existing_car:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nie znaleziono pojazdu o ID {car_id}."
+            detail=f"Nie znaleziono pojazdu o ID {car_id}"
         )
     
     # Usuniecie samochodu
