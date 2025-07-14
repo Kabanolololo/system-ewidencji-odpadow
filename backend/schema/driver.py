@@ -20,7 +20,9 @@ class DriverUpdate(DriverBase):
 # Schemat do zwracania na GET
 class DriverOut(DriverBase):
     id: int
-
+    created_at: datetime
+    edited_at: datetime
+    
     class Config:
         orm_mode = True
 

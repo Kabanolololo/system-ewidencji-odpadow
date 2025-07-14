@@ -13,3 +13,9 @@ for /R %f in (*) do (
   echo ==== %f ====
   type "%f"
 )
+
+DOCKER:
+docker compose build
+docker build -t myfastapi .
+docker compose up
+docker run -p 8000:8000 myfastapi

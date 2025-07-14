@@ -22,7 +22,9 @@ class WasteUpdate(BaseModel):
 # Schemat do zwracania na GET
 class WasteOut(WasteBase):
     id: int
-
+    created_at: datetime
+    edited_at: datetime
+    
     class Config:
         orm_mode = True
 

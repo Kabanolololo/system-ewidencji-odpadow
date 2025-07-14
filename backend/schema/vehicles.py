@@ -22,7 +22,9 @@ class VehicleUpdate(VehicleBase):
 # Schemat do zwracania na GET
 class VechicleOut(VehicleBase):
     id: int
-
+    created_at: datetime
+    edited_at: datetime
+    
     class Config:
         orm_mode = True
 

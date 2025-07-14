@@ -33,3 +33,15 @@ INSERT INTO wastes (code, name, notes, created_at, edited_at) VALUES
 ('150108', 'Mieszane odpady komunalne', 'Odpady komunalne różnego rodzaju', NOW(), NOW()),
 ('150109', 'Zużyte baterie i akumulatory', 'Baterie i akumulatory do utylizacji', NOW(), NOW()),
 ('150110', 'Oleje i tłuszcze', 'Zużyte oleje silnikowe i tłuszcze', NOW(), NOW());
+
+INSERT INTO destinations (country, voivodeship, city, postal_code, address, created_at, edited_at) VALUES
+('Poland', 'Mazowieckie', 'Warsaw', '00-001', 'Aleje Jerozolimskie 123', NOW(), NOW()),
+('Poland', 'Małopolskie', 'Kraków', '30-002', 'ul. Floriańska 10', NOW(), NOW()),
+('Poland', 'Dolnośląskie', 'Wrocław', '50-003', 'ul. Piłsudskiego 45', NOW(), NOW()),
+('Poland', 'Pomorskie', 'Gdańsk', '80-004', 'ul. Długa 20', NOW(), NOW()),
+('Poland', 'Śląskie', 'Katowice', '40-005', 'ul. Mariacka 7', NOW(), NOW()),
+('Poland', 'Wielkopolskie', 'Poznań', '60-006', 'ul. Główna 3', NOW(), NOW()),
+('Poland', 'Łódzkie', 'Łódź', '90-007', 'ul. Piotrkowska 100', NOW(), NOW()),
+('Poland', 'Lubelskie', 'Lublin', '20-008', 'ul. Krakowskie Przedmieście 5', NOW(), NOW()),
+('Poland', 'Podlaskie', 'Białystok', '15-009', 'ul. Lipowa 2', NOW(), NOW()),
+('Poland', 'Zachodniopomorskie', 'Szczecin', '70-010', 'ul. Wojska Polskiego 55', NOW(), NOW());
