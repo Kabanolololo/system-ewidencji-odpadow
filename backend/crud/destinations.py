@@ -5,10 +5,54 @@ from models.destinations import Destination
 from schema.destinations import DestinationBase, DestinationCreate, DestinationUpdate, DestinationOut,DestinationFilterParams
 import re
 
-# Funkcja do pobierania wszystkich destynacji
-def get_all_destinations(db: Session):
-    query = db.query(Destination).all()
-    return query
+# Funkcja do pobierania wszystkich destynacji wraz z filtrowaniem
+def get_all_destinations(filters: DestinationFilterParams, db: Session):
+    query = db.query(Destination)
+    
+    # Filtrowanie po kraj/wojewodztwo/miasto/kod pocztowy/adres
+    if filters.country:
+        query = query.filter(Destination.country.ilike(f"%{filters.country}%"))
+    if filters.voivodeship:
+        query = query.filter(Destination.voivodeship.ilike(f"%{filters.voivodeship}%"))
+    if filters.city:
+        query = query.filter(Destination.city.ilike(f"%{filters.city}%"))
+    if filters.postal_code:
+        query = query.filter(Destination.postal_code.ilike(f"%{filters.postal_code}%"))
+    if filters.address:
+        query = query.filter(Destination.address.ilike(f"%{filters.address}%"))
+        
+    # Sortowanie wybor kraj/wojewodztwo/miasto/kod pocztowy/adres
+    if filters.sort_by:
+        if filters.sort_by == "country":
+            column = Destination.country
+        elif filters.sort_by == "voivodeship":
+            column = Destination.voivodeship
+        elif filters.sort_by == "city":
+            column = Destination.city
+        elif filters.sort_by == "postal_code":
+            column = Destination.postal_code
+        elif filters.sort_by == "address":
+            column = Destination.address
+        else:
+            raise HTTPException(status_code=400, detail="Nieprawidłowe pole sortowania")
+        
+        # Sortowanie asc/desc
+        if filters.sort_order == "desc":
+            column = column.desc()
+        else:
+            column = column.asc()
+        
+        query = query.order_by(column)
+        
+    drivers = query.all()
+    
+    if not drivers:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Brak kierowców w systemie"
+        )
+    
+    return drivers
 
 # Funckja do pobrania konkretnej destynacji
 def get_one_destination(destination_id: int, db: Session):

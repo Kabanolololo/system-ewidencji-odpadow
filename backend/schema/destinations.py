@@ -38,5 +38,6 @@ class DestinationFilterParams(BaseModel):
     voivodeship: Optional[str] = Query(None)
     city: Optional[str] = Query(None)
     postal_code: Optional[str] = Query(None)
-    sort_by: Optional[Literal["country", "voivodeship", "city", "postal_code"]] = Query("country")
+    address: Optional[str] = Query(None)
+    sort_by: Optional[Literal["country", "voivodeship", "city", "postal_code","address"]] = Query("country")
     sort_order: Optional[Literal["asc", "desc"]] = Query("asc")

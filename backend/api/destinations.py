@@ -9,8 +9,8 @@ router = APIRouter()
 
 # Endpoint do pobierania wszystkich elementów
 @router.get("/", response_model=List[DestinationOut])
-def list_destinations(db: Session = Depends(get_db)):
-    return get_all_destinations(db=db)
+def list_destinations(filters: DestinationFilterParams = Depends(), db: Session = Depends(get_db)):
+    return get_all_destinations(filters=filters, db=db)
 
 # Endpoint do pobierania pojedynczego elementu
 @router.get("/{destination_id}", response_model=DestinationOut)
