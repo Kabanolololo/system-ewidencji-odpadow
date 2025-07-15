@@ -7,7 +7,7 @@ import re
 import datetime
 import httpx
 
-# Funkcja do pobierania wszystkich firm
+# Funkcja do pobierania wszystkich firm wraz z filtrowaniem
 def get_all_contractors(filters: ContractorFilterParams, db: Session):
     query = db.query(Contractor)
     

@@ -15,7 +15,8 @@ for /R %f in (*) do (
 )
 
 DOCKER:
-docker compose build
-docker build -t myfastapi .
-docker compose up
-docker run -p 8000:8000 myfastapi
+cd /ścieżka/do/projektu
+docker compose down -v      
+docker compose up --build
+# czekaj, aż backend się uruchomi
+# odwiedź http://localhost:8000 w przeglądarce

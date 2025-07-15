@@ -75,3 +75,27 @@ Docs (Swagger UI):
 ```
 http://127.0.0.1:8000/docs
 ```
+
+---
+
+# 6. Run with Docker
+
+You can also run the application using Docker and Docker Compose. This can simplify setup and environment management.
+
+To stop and remove any running containers and volumes:
+
+```bash
+docker compose down -v
+```
+
+To build the Docker image and start the application:
+
+```bash
+docker compose up --build
+```
+
+The API will then be available at:
+
+```
+http://127.0.0.1:8000
+```
