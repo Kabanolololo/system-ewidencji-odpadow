@@ -45,3 +45,15 @@ INSERT INTO destinations (country, voivodeship, city, postal_code, address, crea
 ('Poland', 'Lubelskie', 'Lublin', '20-008', 'ul. Krakowskie Przedmieście 5', NOW(), NOW()),
 ('Poland', 'Podlaskie', 'Białystok', '15-009', 'ul. Lipowa 2', NOW(), NOW()),
 ('Poland', 'Zachodniopomorskie', 'Szczecin', '70-010', 'ul. Wojska Polskiego 55', NOW(), NOW());
+
+INSERT INTO contractors (nip, regon, name, address, created_at, edited_at) VALUES
+('1234567890', '123456789', 'Example Company Sp. z o.o.', 'ul. Przykładowa 1, 00-000 Warszawa', NOW(), NOW()),
+('9876543210', '987654321', 'Tech Solutions S.A.', 'ul. Technologiczna 5, 01-234 Kraków', NOW(), NOW()),
+('4567891230', '456789123', 'Budowa i Remonty Sp. z o.o.', 'ul. Budowlana 12, 02-345 Poznań', NOW(), NOW()),
+('6543219870', '654321987', 'Transport Polska Sp. z o.o.', 'ul. Transportowa 8, 03-456 Gdańsk', NOW(), NOW()),
+('3216549870', '321654987', 'Handel Detaliczny S.A.', 'ul. Handlowa 3, 04-567 Wrocław', NOW(), NOW()),
+('7891234560', '789123456', 'Produkcja Mebli Sp. z o.o.', 'ul. Meblowa 10, 05-678 Lublin', NOW(), NOW()),
+('1472583690', '147258369', 'Usługi Informatyczne Sp. z o.o.', 'ul. Informatyczna 15, 06-789 Białystok', NOW(), NOW()),
+('9638527410', '963852741', 'Firma Sprzątająca Sp. z o.o.', 'ul. Czysta 20, 07-890 Rzeszów', NOW(), NOW()),
+('8527419630', '852741963', 'Ogrodnictwo Polska S.A.', 'ul. Zielona 25, 08-901 Opole', NOW(), NOW()),
+('7419638520', '741963852', 'Firma Kurierska Sp. z o.o.', 'ul. Kurierska 30, 09-012 Katowice', NOW(), NOW());

@@ -15,7 +15,7 @@ class WasteRecord(Base):
     vehicle_id = Column(Integer, ForeignKey("vehicles.id"), nullable=False)
     driver_id = Column(Integer, ForeignKey("drivers.id"), nullable=False)
     destination_id = Column(Integer, ForeignKey("destinations.id"), nullable=False)
-    transfer_date = Column(Date, nullable=False)
+    transfer_date = Column(Date, nullable=False) #YYYY-MM-DD
     mass_kg = Column(Float, nullable=False)
     price_per_kg = Column(Float, nullable=False)
     total_price = Column(Float, nullable=False)
