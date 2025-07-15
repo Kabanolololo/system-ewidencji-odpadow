@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import date, datetime
-from typing import Optional
+from typing import Optional, Literal
+from fastapi import Query
 
 # Schematy podstawowy dla rekordu
 class WasteRecordBase(BaseModel):
@@ -45,4 +46,22 @@ class WasteRecordOut(WasteRecordBase):
 
 # Schemat do filtrowania danych
 class WasteRecordFilterParams(BaseModel):
-    pass
+    contractor_id: Optional[int] = Query(None)
+    user_id: Optional[int] = Query(None)
+    waste_id: Optional[int] = Query(None)
+    vehicle_id: Optional[int] = Query(None)
+    driver_id: Optional[int] = Query(None)
+    destination_id: Optional[int] = Query(None)
+    transfer_date_from: Optional[date] = Query(None)  # zakres od
+    transfer_date_to: Optional[date] = Query(None)    # zakres do
+    mass_kg_min: Optional[float] = Query(None)       # minimalna masa
+    mass_kg_max: Optional[float] = Query(None)       # maksymalna masa
+    price_per_kg_min: Optional[float] = Query(None)
+    price_per_kg_max: Optional[float] = Query(None)
+
+    sort_by: Optional[Literal[
+        "contractor_id", "user_id", "waste_id", "vehicle_id", "driver_id", 
+        "destination_id", "transfer_date", "mass_kg", "price_per_kg", "total_price"
+    ]] = Query("transfer_date")
+
+    sort_order: Optional[Literal["asc", "desc"]] = Query("asc")
