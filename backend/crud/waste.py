@@ -1,0 +1,115 @@
+from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
+from models.waste import Waste
+from schema.waste import WasteBase, WasteCreate, WasteUpdate, WasteOut, WasteFilterParams
+from utils.waste import validate_id, get_by_id,validate_waste_code_length, validate_waste_code_is_digit, validate_waste_code_unique
+
+# Funkcja do pobierania wszystkich odpadów
+def get_all_waste(filters: WasteFilterParams,db: Session):
+    query = db.query(Waste)
+    
+    # Filtrowanie po kodzie odpadu
+    if filters.code:
+        query = query.filter(Waste.code.ilike(f"%{filters.code}%"))
+    
+    # Sortowanie zmusza po kodzie odpadu
+    if filters.sort_by:
+        if filters.sort_by == "code":
+            column = Waste.code
+        else:
+            raise HTTPException(status_code=400, detail="Nieprawidłowe pole sortowania")
+        
+        # Sortowanie asc/desc
+        if filters.sort_order == "desc":
+            column = column.desc()
+        else:
+            column = column.asc()
+        
+        query = query.order_by(column)
+        
+    waste = query.all()
+    
+    if not waste:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brak pojazdów w systemie")
+    return waste
+
+# Funckja do pobrania konkretnego odpadu
+def get_one_waste(waste_id: int, db: Session):
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(waste_id)
+    
+    # FUNKCJA: Pobieranie kodu po id
+    db_waste = get_by_id(waste_id, db)
+    return db_waste
+
+# Funkcja do stworzenia odpadu
+def created_waste(waste: WasteCreate, db: Session):
+    # FUNKCJA:  Walidacja długosci kodu
+    validate_waste_code_length(waste.code)
+    
+    # FUNKCJA:  Walidacja typu danych kodu
+    validate_waste_code_is_digit(waste.code)
+    
+    # FUNKCJA: Walidacja unikalnosci kodu w bazie
+    validate_waste_code_unique(waste.code, db)
+
+    # dodanie odpadu do bazy
+    try:
+        db_waste = Waste(**waste.dict())
+        db.add(db_waste)
+        db.commit()
+        db.refresh(db_waste)
+        return db_waste
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Błąd integralności danych podczas tworzenia odpadu"
+        ) from e
+
+# Funkcja do aktualizacji odpadu
+def updated_waste(waste_id: int, waste: WasteUpdate, db: Session):
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(waste_id)
+
+    # FUNKCJA: Pobieranie kodu po id
+    existing_waste = get_by_id(waste_id, db)
+
+    # FUNKCJA:  Walidacja długosci kodu
+    validate_waste_code_length(waste.code)
+    
+    # FUNKCJA:  Walidacja typu danych kodu
+    validate_waste_code_is_digit(waste.code)
+    
+    # FUNKCJA: Walidacja unikalnosci kodu w bazie
+    validate_waste_code_unique(waste.code, db, waste_id=waste_id)
+
+    # Aktualizacja pól
+    existing_waste.code = waste.code
+    existing_waste.name = waste.name
+    existing_waste.notes = waste.notes
+
+    try:
+        db.commit()
+        db.refresh(existing_waste)
+        return existing_waste
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Błąd integralności danych podczas aktualizacji odpadu"
+        ) from e
+
+# Funkcja do usunięcia odpadu
+def deleted_waste(waste_id: int, db: Session):
+     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(waste_id)
+    
+    # FUNKCJA: Pobieranie kodu po id
+    existing_waste = get_by_id(waste_id, db)
+    
+    # Usunięcie odpadu
+    db.delete(existing_waste)
+    db.commit()
+    return {"message": "Usunięto kod odpadu"}
