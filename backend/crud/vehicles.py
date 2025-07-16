@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.vehicles import Vehicle
 from schema.vehicles import VehicleBase, VehicleCreate, VehicleUpdate, VehicleFilterParams
+from utils.vehicles import validate_id, get_by_id, validate_registration_number
 
 # Funkcja do pobierania wszystkich samochodów
 def get_all_cars(filters: VehicleFilterParams,db: Session):
@@ -35,22 +36,17 @@ def get_all_cars(filters: VehicleFilterParams,db: Session):
 
 # Funckja do pobrania konkretnego samochodu
 def get_one_car(car_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if car_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(car_id)
     
-    car = db.query(Vehicle).filter(Vehicle.id == car_id).first()
-    if not car:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono pojazdu")
-    return car
+    # FUNKCJA: Pobieranie destynacji po id
+    db_car = get_by_id(car_id, db)
+    return db_car
 
 # Funkcja tworzenia samochodu
 def created_car(car: VehicleCreate, db: Session):
-    # Walidacja czy istnieje taki samochod z rejestacja
-    plate = db.query(Vehicle).filter(Vehicle.registration_number==car.registration_number).first()
-    
-    if plate:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podana tablica rejestracyjna jest już w systemie")
+    # FUNKCJA: Sprawdzenie unikalnosci tablicy
+    validate_registration_number(car.registration_number, db)
     
     # Dodanie pojazdu do bazy danych
     try:
@@ -68,31 +64,14 @@ def created_car(car: VehicleCreate, db: Session):
 
 # Funkcja do aktualizacji samochodu
 def updated_car(car_id: int, car: VehicleUpdate, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if car_id < 1:
-        raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
-            detail="Podaj dodatnią liczbę"
-        )
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(car_id)
     
-    # Pobierz istniejący samochód + walidacja czy jest
-    existing_car = db.query(Vehicle).filter(Vehicle.id == car_id).first()
-    if not existing_car:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nie znaleziono pojazdu o ID {car_id}"
-        )
+    # FUNKCJA: Pobieranie destynacji po id
+    existing_car = get_by_id(car_id, db)
 
-    # Walidacja czy tablica rejestracyjna już istnieje w innym samochodzie
-    plate = db.query(Vehicle).filter(
-        Vehicle.registration_number == car.registration_number,
-        Vehicle.id != car_id  # ignoruj samego siebie
-    ).first()
-    if plate:
-        raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
-            detail="Podana tablica rejestracyjna jest już w systemie"
-        )
+    # FUNKCJA: Sprawdzenie unikalnosci tablicy
+    validate_registration_number(car.registration_number, db, exclude_id=car_id)
 
     # Aktualizacja pól
     existing_car.registration_number = car.registration_number
@@ -106,29 +85,20 @@ def updated_car(car_id: int, car: VehicleUpdate, db: Session):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Wystąpił błąd podczas aktualizacji pojazdu"
+            detail=f"Wystąpił błąd podczas aktualizacji pojazdu o id {car_id}"
         )
     
     return existing_car
 
 # Funkcja do usuwania samochodu
 def deleted_car(car_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if car_id < 1:
-        raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
-            detail="Podaj dodatnią liczbę"
-        )
-        
-    # Pobierz istniejący samochód + walidacja czy jest
-    existing_car = db.query(Vehicle).filter(Vehicle.id == car_id).first()
-    if not existing_car:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nie znaleziono pojazdu o ID {car_id}"
-        )
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(car_id)
+    
+    # FUNKCJA: Pobieranie destynacji po id
+    existing_car = get_by_id(car_id, db)
     
     # Usuniecie samochodu
     db.delete(existing_car)
     db.commit()
-    return {"message": "Usunięto pojazd"}
+    return {"message": f"Usunięto pojazd o id {car_id}"}

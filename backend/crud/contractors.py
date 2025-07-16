@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.contractors import Contractor
 from schema.contractors import ContractorCreate, ContractorOut, ContractorUpdate,ContractorFilterParams
-import re
+from utils.contractors import clean_address, validate_id, get_by_id,validate_nip_regon, check_unique
 import datetime
 import httpx
 
@@ -48,34 +48,21 @@ def get_all_contractors(filters: ContractorFilterParams, db: Session):
 
     return contractors
 
-
 # Funckja do pobrania konkretnego firmy
 def get_one_contractor(contractor_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if contractor_id < 1:
-            raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
-        
-    # Walidacja czy istnieje taki kierowca
-    db_contractor = db.query(Contractor).filter(Contractor.id == contractor_id).first()
-
-    if not db_contractor:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Nie znaleziono kontrahenta o id {db_contractor}"
-            )
-            
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(contractor_id)
+    
+    # FUNKCJA: Pobieranie kontrahenta po id
+    db_contractor = get_by_id(contractor_id, db)
     return db_contractor
 
 # Funkcja do stworzenia firmy (API VAT)
 def created_contractor_online(nip: str, db: Session):
     API_URL = "https://wl-api.mf.gov.pl/api/search/nip"
     
-    # Walidacja NIP-u
-    if not nip.isnumeric() or len(nip)!=10:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Niepoprawny NIP"
-        )
+    # FUNKCJA: Walidacja nipu
+    validate_nip_regon(nip=nip, regon=None)
 
     today = datetime.date.today().isoformat()
     url = f"{API_URL}/{nip}?date={today}"
@@ -85,23 +72,26 @@ def created_contractor_online(nip: str, db: Session):
             response = client.get(url)
             response.raise_for_status()
             data = response.json()
-    except httpx.HTTPError as e:
+    except httpx.HTTPError:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Błąd pobierania danych z API VAT"
+            detail="Błąd pobierania danych z API VAT"
         )
 
     subject = data.get("result", {}).get("subject")
     if not subject:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Nie znaleziono danych dla podanego NIP"
+            detail=F"Nie znaleziono danych dla podanego NIP {nip}"
         )
 
     nip_api = subject.get("nip")
     regon = subject.get("regon")
     name = subject.get("name")
     address = subject.get("residenceAddress")
+    
+    if not address:
+        address = "-"
 
     if not all([nip_api, regon, name, address]):
         raise HTTPException(
@@ -109,21 +99,12 @@ def created_contractor_online(nip: str, db: Session):
             detail="Brak wymaganych danych w odpowiedzi API"
         )
 
-    # Walidacja czy nip lub regon już istnieją
-    existing = db.query(Contractor).filter(Contractor.nip == nip_api).first()
-    if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Kontrahent z podanym NIP już istnieje w bazie"
-        )
+    # FUNKCJA: Sprawdzenie unikalności nipu
+    check_unique(db=db, nip=nip_api, regon=None)
 
-    # Wyczyść i sformatuj adres
-    address_clean = address.strip()
-    address_clean = re.sub(r'\s+', ' ', address_clean)
-    address_clean = re.sub(r'^(u[lL]?\.?\s*)+', '', address_clean, flags=re.IGNORECASE)
-    address_clean = f"UL. {address_clean}"
+    # FUNKCJA: Czyszczenie adresu
+    address_clean = clean_address(address)
 
-    # Zapisz do bazy
     new_contractor = Contractor(
         nip=nip_api,
         regon=regon,
@@ -138,47 +119,27 @@ def created_contractor_online(nip: str, db: Session):
 
 # Funkcja do stworzenia firmy (OFFLINE)
 def created_contractor_offline(contractor: ContractorCreate, db: Session):
-   # Walidacja czy nip i regon to liczby
-    errors = []
-    if not contractor.nip.isnumeric():
-        errors.append("NIP musi składać się tylko z cyfr")
-    if not contractor.regon.isnumeric():
-        errors.append("REGON musi składać się tylko z cyfr")
-    if errors:
+    # FUNKCA: Walidacja nip i regon
+    validate_nip_regon(nip=contractor.nip, regon=contractor.regon)
+
+    # FUNKCJA: Sprawdzenie unikalności nipu i regon
+    try:
+        check_unique(db=db, nip=contractor.nip, regon=contractor.regon)
+    except HTTPException as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=errors
+            detail=e.detail
         )
-        
-    # Walidacja czy nip lub regon już istnieją
-    existing_nip = db.query(Contractor).filter(Contractor.nip == contractor.nip).first()
-    existing_regon = db.query(Contractor).filter(Contractor.regon == contractor.regon).first()
 
-    if existing_nip or existing_regon:
-        if existing_nip and existing_regon:
-            detail = "Kontrahent z podanym NIP i REGON już istnieje."
-        elif existing_nip:
-            detail = "Kontrahent z podanym NIP już istnieje."
-        else:
-            detail = "Kontrahent z podanym REGON już istnieje."
+    # FUNKCJA: Czyszczenie adresu
+    address_clean = clean_address(contractor.address)
 
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=detail
-        )
-    
-    # Walidacja i czyszczenie adresu
-    validated_address = contractor.address.strip()
-    validated_address = re.sub(r'\s+', ' ', validated_address)
-    validated_address = re.sub(r'^(u[lL]?\.?\s*)+', '', validated_address, flags=re.IGNORECASE)
-    validated_address = f"ul. {validated_address}"
-
-    # Stworzenie nowego kontrahenta
+    # Tworzenie nowego kontrahenta
     new_contractor = Contractor(
         nip=contractor.nip,
         regon=contractor.regon,
         name=contractor.name,
-        address=validated_address
+        address=address_clean
     )
 
     db.add(new_contractor)
@@ -189,48 +150,21 @@ def created_contractor_offline(contractor: ContractorCreate, db: Session):
 
 # Funkcja do aktualizacji firmy
 def updated_contractor(contractor_id: int, contractor: ContractorUpdate, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if contractor_id < 1:
-            raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
-        
-    # Walidacja czy istnieje taki kierowca
-    db_contractor = db.query(Contractor).filter(Contractor.id == contractor_id).first()
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(contractor_id)
 
-    if not db_contractor:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Nie znaleziono kontrahenta o id {db_contractor}"
-            )
+    # FUNKCJA: Pobranie kontrahenta po id
+    db_contractor = get_by_id(contractor_id, db)
 
-    # Walidacja czy nip i regon to liczby
-    errors = []
-    if not contractor.nip.isnumeric():
-        errors.append("NIP musi składać się tylko z cyfr")
-    if not contractor.regon.isnumeric():
-        errors.append("REGON musi składać się tylko z cyfr")
-    if errors:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=errors
-        )
+    # FUNKCJA: Walidacja nip i regon
+    validate_nip_regon(nip=contractor.nip, regon=contractor.regon)
 
-    # walidacja nip nie może się powtarzać (poza tym obiektem)
+    # FUNKCJA: Sprawdzenie unikalności nip i regon (poza aktualizowanym obiektem)
     if contractor.nip and contractor.nip != db_contractor.nip:
-        existing_nip = db.query(Contractor).filter(Contractor.nip == contractor.nip).first()
-        if existing_nip:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Inny kontrahent z podanym NIP już istnieje"
-            )
+        check_unique(db=db, nip=contractor.nip, regon=None, exclude_id=contractor_id)
 
-    # walidacja regon nie może się powtarzać (poza tym obiektem)
     if contractor.regon and contractor.regon != db_contractor.regon:
-        existing_regon = db.query(Contractor).filter(Contractor.regon == contractor.regon).first()
-        if existing_regon:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Inny kontrahent z podanym REGON już istnieje"
-            )
+        check_unique(db=db, nip=None, regon=contractor.regon, exclude_id=contractor_id)
 
     # Aktualizacja pól
     if contractor.nip:
@@ -239,13 +173,10 @@ def updated_contractor(contractor_id: int, contractor: ContractorUpdate, db: Ses
         db_contractor.regon = contractor.regon
     if contractor.name:
         db_contractor.name = contractor.name
-
     if contractor.address:
-        validated_address = contractor.address.strip()
-        validated_address = re.sub(r'\s+', ' ', validated_address)
-        validated_address = re.sub(r'^(u[lL]?\.?\s*)+', '', validated_address, flags=re.IGNORECASE)
-        validated_address = f"ul. {validated_address}"
-        db_contractor.address = validated_address
+        
+        # FUNKCJA: Czyszczenie adresu
+        db_contractor.address = clean_address(contractor.address)
 
     db.commit()
     db.refresh(db_contractor)
@@ -254,20 +185,13 @@ def updated_contractor(contractor_id: int, contractor: ContractorUpdate, db: Ses
 
 # Funkcja do usunięcia firmy
 def deleted_contractor(contractor_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if contractor_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
-    
-    # Walidacja czy istnieje taki kierowca
-    db_contractor = db.query(Contractor).filter(Contractor.id == contractor_id).first()
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(contractor_id)
 
-    if not db_contractor:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nie znaleziono kontrahenta o id {db_contractor}"
-        )
-    
-    # Usunięcie kierowcy
+    # FUNKCJA: Pobranie kontrahenta po id (lub wyjątek jeśli nie istnieje)
+    db_contractor = get_by_id(contractor_id, db)
+
+    # Usunięcie kontrahenta
     db.delete(db_contractor)
     db.commit()
-    return {"message": "Usunięto kontrahenta"}
+    return {"message": f"Usunięto kontrahenta o id {contractor_id}"}

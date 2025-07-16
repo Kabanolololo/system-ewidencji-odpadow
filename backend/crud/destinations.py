@@ -3,6 +3,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.destinations import Destination
 from schema.destinations import DestinationBase, DestinationCreate, DestinationUpdate, DestinationOut,DestinationFilterParams
+from utils.contractors import clean_address
+from utils.destinations import validate_id, get_by_id
 import re
 
 # Funkcja do pobierania wszystkich destynacji wraz z filtrowaniem
@@ -56,24 +58,17 @@ def get_all_destinations(filters: DestinationFilterParams, db: Session):
 
 # Funckja do pobrania konkretnej destynacji
 def get_one_destination(destination_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if destination_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(destination_id)
     
-    car = db.query(Destination).filter(Destination.id == destination_id).first()
-    if not car:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono podanego adresu")
-    return car
+    # FUNKCJA: Pobieranie destynacji po id
+    db_destination = get_by_id(destination_id, db)
+    return db_destination
 
 # Funkcja tworzenia destynacji
 def create_destination(destination: DestinationCreate, db: Session):
-    # Walidacja ul.
-    validate_address = destination.address.strip()
-    # Zamień wielokrotne spacje na jedną
-    validate_address = re.sub(r'\s+', ' ', validate_address)
-    # Usuń 'ul.' z przodu
-    validate_address = re.sub(r'^(ul\.?\s*)', '', validate_address, flags=re.IGNORECASE)
-    validate_address = f"ul. {validate_address}" 
+    # FUNKCJA: Czyszczenie adresu
+    validate_address = clean_address(destination.address)
         
     # Walidacja czy adresy sie nie powtarzają w mieście
     existing_destination = db.query(Destination).filter(Destination.city == destination.city,Destination.address == validate_address).first()
@@ -99,20 +94,14 @@ def create_destination(destination: DestinationCreate, db: Session):
 
 # Funkcja do aktualizacji destynacji
 def update_destination(destination_id: int, destination: DestinationUpdate, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if destination_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(destination_id)
         
-    # Pobierz istniejącą destynację
-    existing_destination = db.query(Destination).filter(Destination.id == destination_id).first()
-    if not existing_destination:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Nie znaleziono adresu o ID {destination_id}")
-
-    # Walidacja i czyszczenie adresu
-    validate_address = destination.address.strip()
-    validate_address = re.sub(r'\s+', ' ', validate_address)
-    validate_address = re.sub(r'^(u[lL]?\.?\s*)+', '', validate_address, flags=re.IGNORECASE)
-    validate_address = f"ul. {validate_address}"
+    # FUNKCJA: Pobieranie destynacji po id
+    existing_destination = get_by_id(destination_id, db)
+    
+    # FUNKCJA: Czyszczenie adresu
+    validate_address = clean_address(destination.address)
 
     # WALIDACJA: czy inna destynacja w tym samym mieście nie ma takiego adresu
     existing_duplicate = db.query(Destination).filter(Destination.city == destination.city,Destination.address == validate_address,Destination.id != destination_id).first()
@@ -144,22 +133,13 @@ def update_destination(destination_id: int, destination: DestinationUpdate, db: 
 
 # Funkcja do usuwania destynacji
 def delete_destination(destination_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if destination_id < 1:
-        raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
-            detail="Podaj dodatnią liczbę"
-        )
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(destination_id)
         
-    # Pobierz istniejąca destynacje + walidacja czy jest
-    existing_destination = db.query(Destination).filter(Destination.id == destination_id).first()
-    if not existing_destination:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nie znaleziono adresu o ID {destination_id}"
-        )
+    # FUNKCJA: Pobieranie destynacji po id
+    existing_destination = get_by_id(destination_id, db)
     
     # Usuniecie destynacji
     db.delete(existing_destination)
     db.commit()
-    return {"message": "Usunięto adres"}
+    return {"message": f"Usunięto adres o id {destination_id}"}

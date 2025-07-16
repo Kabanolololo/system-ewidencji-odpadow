@@ -3,6 +3,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.users import User
 from schema.users import UserBase, UserCreate, UserUpdate, UserAdminUpdate, UserOut, UserFilterParams
+from utils.users import validate_id, get_by_id, generate_unique_username
+from utils.driver import validate_name_surname
 from utils.hash import hash_password
 
 # Funkcja do pobierania wszystkich users
@@ -13,7 +15,7 @@ def get_all_users(filters: UserFilterParams, db: Session):
     if filters.name:
         query = query.filter(User.name.ilike(f"%{filters.name}%"))
     elif filters.surname:
-        query = query.filter(User.name.ilike(f"%{filters.surname}%"))
+        query = query.filter(User.surname.ilike(f"%{filters.surname}%"))
     elif filters.role:
         if filters.role == "user":
             query = query.filter(User.role.ilike("user"))
@@ -53,38 +55,24 @@ def get_all_users(filters: UserFilterParams, db: Session):
 
 # Funckja do pobrania konkretnego usera
 def get_one_user(user_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if user_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(user_id)
     
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono użytkownika")
-    return user
+    # FUNKCJA: Pobieranie destynacji po id
+    db_user = get_by_id(user_id, db)
+    return db_user
 
 # Funkcja do stworzenia usera
 def create_user(user: UserCreate, db: Session):
-    # Walidacja imienia i nazwiska
-    if not user.name.isalpha() or not user.surname.isalpha():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Imię i nazwisko powinny zawierać tylko litery"
-        )
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_name_surname(user.name, user.surname)
 
-    # Tworzymy username: pierwsza litera imienia + nazwisko
-    base_username = f"{user.name[0].lower()}{user.surname.lower()}"
-    username = base_username
+    # FUNKCJA: Generowanie username do logowania
+    username = generate_unique_username(user.name, user.surname, db)
 
-    # Jeśli taki username istnieje, dodajemy numer
-    counter = 1
-    while db.query(User).filter(User.username == username).first():
-        username = f"{base_username}{counter}"
-        counter += 1
-
-    # Haszowanie hasła
+    # FUNKCJA: Haszowanie hasła
     hashed_password = hash_password(user.password_hash)
 
-    # Dodanie usera do bazy danych
     db_user = User(
         name=user.name,
         surname=user.surname,
@@ -108,33 +96,27 @@ def create_user(user: UserCreate, db: Session):
         
 # Funkcja do aktualizacji usera
 def update_user(user_id: int, user_data: UserUpdate, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if user_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
-    
-    db_user = db.query(User).filter(User.id == user_id).first()
-    if not db_user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono użytkownika")
-    
-    # Walidacja imienia i nazwiska jeśli podane
-    if user_data.name and not user_data.name.isalpha():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Imię powinno zawierać tylko litery")
-    if user_data.surname and not user_data.surname.isalpha():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Nazwisko powinno zawierać tylko litery")
-    
-    # Aktualizacja pól jeśli podane
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(user_id)
+
+    # FUNKCJA: Pobieranie użytkownika po id
+    db_user = get_by_id(user_id, db)
+
+    if user_data.name or user_data.surname:
+        # FUNKCJA: Walidacja imienia i nazwiska czy sa stringami
+        validate_name_surname(user_data.name or db_user.name, user_data.surname or db_user.surname)
+
     if user_data.name:
         db_user.name = user_data.name
     if user_data.surname:
         db_user.surname = user_data.surname
-    
-    # Rola na sztywno 'user'
+
     db_user.role = "user"
 
-    # Aktualizacja hasła jeśli podane
     if user_data.password_hash:
+        # FUNKCJA: Haszowanie hasła
         db_user.password_hash = hash_password(user_data.password_hash)
-    
+
     try:
         db.commit()
         db.refresh(db_user)
@@ -144,45 +126,26 @@ def update_user(user_id: int, user_data: UserUpdate, db: Session):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Wystąpił błąd podczas aktualizacji użytkownika"
         )
-    
+
     return db_user
 
 # Funkcja do aktualizacji usera ADMIN
 def update_user_admin(user_id: int, user: UserAdminUpdate, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if user_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
-    
-    # Sprawdzenie czy istnieje taki użytkownik
-    db_user = db.query(User).filter(User.id == user_id).first()
-    if not db_user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono użytkownika")
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(user_id)
 
-    # Walidacja imienia i nazwiska
-    if not user.name.isalpha() or not user.surname.isalpha():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Imię i nazwisko powinny zawierać tylko litery"
-        )
-    
-    # Tworzymy username: pierwsza litera imienia + nazwisko
-    base_username = f"{user.name[0].lower()}{user.surname.lower()}"
-    username = base_username
+    # FUNKCJA: Pobieranie użytkownika po id
+    db_user = get_by_id(user_id, db)
 
-    # Jeśli taki username istnieje, dodajemy numer
-    counter = 1
-    while True:
-        existing_user = db.query(User).filter(User.username == username).first()
-        if existing_user is None or existing_user.id == user_id:
-            # albo username jest wolny albo należy do aktualizowanego usera
-            break
-        username = f"{base_username}{counter}"
-        counter += 1
+    # FUNKCJA: Walidacja imienia i nazwiska czy sa stringami
+    validate_name_surname(user.name, user.surname)
 
-    # Haszowanie hasła
+    # FUNKCJA: Generowanie username do logowania
+    username = generate_unique_username(user.name, user.surname, db, exclude_id=user_id)
+
     if user.password_hash:
-        hashed_password = hash_password(user.password_hash)
-        db_user.password_hash = hashed_password
+        # FUNKCJA: Haszowanie hasła
+        db_user.password_hash = hash_password(user.password_hash)
 
     # Aktualizacja pól
     db_user.name = user.name
@@ -199,25 +162,18 @@ def update_user_admin(user_id: int, user: UserAdminUpdate, db: Session):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Wystąpił błąd podczas aktualizacji użytkownika"
         )
-    
+
     return db_user
 
 # Funkcja do usunięcia users
 def delete_user(user_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if user_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(user_id)
     
-    # Walidacja czy istnieje taki kierowca
-    db_user = db.query(User).filter(User.id == user_id).first()
-
-    if not db_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nie znaleziono użytkownika o id {user_id}"
-        )
+    # FUNKCJA: Pobieranie destynacji po id
+    db_user = get_by_id(user_id, db)
     
     # Usunięcie kierowcy
     db.delete(db_user)
     db.commit()
-    return {"message": "Usunięto użytkownika"}
+    return {"message": f"Usunięto użytkownika o id {user_id}"}

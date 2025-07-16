@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.driver import Driver
 from schema.driver import DriverBase, DriverCreate, DriverUpdate, DriverFilterParams
+from utils.driver import validate_id, get_by_id, validate_name_surname
 
 # Funkcja do pobierania wszystkich kierowców wraz z sortowaniem
 def get_all_drivers(filters: DriverFilterParams, db: Session):
@@ -43,24 +44,17 @@ def get_all_drivers(filters: DriverFilterParams, db: Session):
 
 # Funckja do pobrania konkretnego kierowcy
 def get_one_driver(driver_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if driver_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(driver_id)
     
-    driver = db.query(Driver).filter(Driver.id == driver_id).first()
-    if not driver:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono kierowcy")
-    return driver
+    # FUNKCJA: Pobieranie destynacji po id
+    db_driver = get_by_id(driver_id, db)
+    return db_driver
 
 # Funkcja do stworzenia kierowcy
 def created_driver(driver: DriverCreate, db: Session):
-    
-    # Walidacja typu danych dla imienia i nazwiska
-    if not driver.name.isalpha() or not driver.surname.isalpha():
-        raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Imię i nazwisko powinny zawierać tylko litery"
-    )
+    # FUNKCJA: Walidacja imienia i nazwiska czy sa stringami
+    validate_name_surname(driver.name, driver.surname)
         
     # Dodanie kierowcy do bazy danych
     try:
@@ -78,25 +72,14 @@ def created_driver(driver: DriverCreate, db: Session):
 
 # Funkcja do aktualizacji kierowcy
 def updated_driver(driver_id: int, driver: DriverUpdate, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if driver_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(driver_id)
     
-    # Walidacja czy istnieje taki kierowca
-    db_driver = db.query(Driver).filter(Driver.id == driver_id).first()
-
-    if not db_driver:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nie znaleziono kierowcy o id {driver_id}"
-        )
+    # FUNKCJA: Pobieranie destynacji po id
+    db_driver = get_by_id(driver_id, db)
         
-    # Walidacja typu danych dla imienia i nazwiska
-    if not driver.name.isalpha() or not driver.surname.isalpha():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Imię i nazwisko powinny zawierać tylko litery"
-        )
+    # FUNKCJA: Walidacja imienia i nazwiska czy sa stringami
+    validate_name_surname(driver.name, driver.surname)
     
     # Aktualizacja pól
     db_driver.name = driver.name
@@ -109,27 +92,20 @@ def updated_driver(driver_id: int, driver: DriverUpdate, db: Session):
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Wystąpił błąd podczas aktualizacji kierowcy"
+            detail=f"Wystąpił błąd podczas aktualizacji kierowcy o id {driver_id}"
         )
     
     return db_driver
         
 # Funkcja do usunięcia kierowcy
 def deleted_driver(driver_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if driver_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(driver_id)
     
-    # Walidacja czy istnieje taki kierowca
-    db_driver = db.query(Driver).filter(Driver.id == driver_id).first()
-
-    if not db_driver:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nie znaleziono kierowcy o id {driver_id}"
-        )
+    # FUNKCJA: Pobieranie destynacji po id
+    db_driver = get_by_id(driver_id, db)
     
     # Usunięcie kierowcy
     db.delete(db_driver)
     db.commit()
-    return {"message": "Usunięto kierowcę"}
+    return {"message": f"Usunięto kierowcę o id {driver_id}"}

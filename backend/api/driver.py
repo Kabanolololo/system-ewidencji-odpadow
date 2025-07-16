@@ -13,17 +13,17 @@ def list_drivers(filters: DriverFilterParams = Depends(), db: Session = Depends(
     return get_all_drivers(filters=filters, db=db)
 
 # Endpoint do pobierania pojedynczego elementu
-@router.get("/{driver_id}", response_model=DriverBase)
+@router.get("/{driver_id}", response_model=DriverOut)
 def get_driver(driver_id: int, db: Session = Depends(get_db)):
     return get_one_driver(driver_id=driver_id, db=db)
 
 # Endpoint do tworzenia pojedynczego elementu
-@router.post("/", response_model=DriverBase)
+@router.post("/", response_model=DriverOut)
 def create_driver(driver: DriverCreate, db: Session = Depends(get_db)):
     return created_driver(driver=driver, db=db)
 
 # Endpoint do aktualizacji pojedynczego elementu
-@router.put("/{driver_id}", response_model=DriverBase)
+@router.put("/{driver_id}", response_model=DriverOut)
 def update_driver(driver_id: int, driver: DriverUpdate, db: Session = Depends(get_db)):
     return updated_driver(driver_id=driver_id, driver=driver, db=db)
 

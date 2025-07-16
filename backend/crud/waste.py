@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.waste import Waste
 from schema.waste import WasteBase, WasteCreate, WasteUpdate, WasteOut, WasteFilterParams
+from utils.waste import validate_id, get_by_id,validate_waste_code_length, validate_waste_code_is_digit, validate_waste_code_unique
 
 # Funkcja do pobierania wszystkich odpadów
 def get_all_waste(filters: WasteFilterParams,db: Session):
@@ -35,40 +36,25 @@ def get_all_waste(filters: WasteFilterParams,db: Session):
 
 # Funckja do pobrania konkretnego odpadu
 def get_one_waste(waste_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if waste_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(waste_id)
     
-    waste = db.query(Waste).filter(Waste.id == waste_id).first()
-    if not waste:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono odpadu")
-    return waste
+    # FUNKCJA: Pobieranie kodu po id
+    db_waste = get_by_id(waste_id, db)
+    return db_waste
 
 # Funkcja do stworzenia odpadu
 def created_waste(waste: WasteCreate, db: Session):
-    # Walidacja czy istneieje już ten odpad
-    existing_waste = db.query(Waste).filter(Waste.code == waste.code).first()
-    if existing_waste:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Odpady z kodem '{waste.code}' już istnieją"
-        )
+    # FUNKCJA:  Walidacja długosci kodu
+    validate_waste_code_length(waste.code)
     
-    # Walidacja długości kodu
-    if len(waste.code) != 6:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Kod odpadu musi mieć dokładnie 6 znaków"
-        )
+    # FUNKCJA:  Walidacja typu danych kodu
+    validate_waste_code_is_digit(waste.code)
     
-    # Walidacja typu danych
-    if not waste.code.isdigit():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Kod odpadu musi być liczbą"
-        )
-    
-    # Dodanie kodu do bazy danych
+    # FUNKCJA: Walidacja unikalnosci kodu w bazie
+    validate_waste_code_unique(waste.code, db)
+
+    # dodanie odpadu do bazy
     try:
         db_waste = Waste(**waste.dict())
         db.add(db_waste)
@@ -84,46 +70,26 @@ def created_waste(waste: WasteCreate, db: Session):
 
 # Funkcja do aktualizacji odpadu
 def updated_waste(waste_id: int, waste: WasteUpdate, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if waste_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(waste_id)
+
+    # FUNKCJA: Pobieranie kodu po id
+    existing_waste = get_by_id(waste_id, db)
+
+    # FUNKCJA:  Walidacja długosci kodu
+    validate_waste_code_length(waste.code)
     
-    # Walidacja czy istnieje taki odpad
-    existing_waste = db.query(Waste).filter(Waste.id == waste_id).first()
+    # FUNKCJA:  Walidacja typu danych kodu
+    validate_waste_code_is_digit(waste.code)
     
-    if not existing_waste:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nie znaleziono odpadu o id {waste_id}"
-        )
-    
-    # Walidacja długości kodu
-    if len(waste.code) != 6:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Kod odpadu musi mieć dokładnie 6 znaków"
-        )
-    
-    # Walidacja typu danych
-    if not waste.code.isdigit():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Kod odpadu musi być liczbą"
-        )
-    
-    # Walidacja unikalności kodu
-    existing_code_waste = db.query(Waste).filter(Waste.code == waste.code).first()
-    if existing_code_waste:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Ten kod odpadu znajduje się już w bazie danych"
-        )
-    
+    # FUNKCJA: Walidacja unikalnosci kodu w bazie
+    validate_waste_code_unique(waste.code, db, waste_id=waste_id)
+
     # Aktualizacja pól
     existing_waste.code = waste.code
     existing_waste.name = waste.name
     existing_waste.notes = waste.notes
-    
+
     try:
         db.commit()
         db.refresh(existing_waste)
@@ -137,18 +103,11 @@ def updated_waste(waste_id: int, waste: WasteUpdate, db: Session):
 
 # Funkcja do usunięcia odpadu
 def deleted_waste(waste_id: int, db: Session):
-    # Walidacja czy podajemy poprawną liczbę
-    if waste_id < 1:
-        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Podaj dodatnią liczbę")
+     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    validate_id(waste_id)
     
-    # Walidacja czy istnieje taki odpad
-    existing_waste = db.query(Waste).filter(Waste.id == waste_id).first()
-    
-    if not existing_waste:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Nie znaleziono odpadu o id {waste_id}"
-        )
+    # FUNKCJA: Pobieranie kodu po id
+    existing_waste = get_by_id(waste_id, db)
     
     # Usunięcie odpadu
     db.delete(existing_waste)
