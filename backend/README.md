@@ -6,7 +6,7 @@ Thank you for using this FastAPI project! Below you will find instructions on ho
 
 ---
 
-1. Requirements 
+# 1. Requirements 
 
 Make sure you have the following installed:
 
@@ -99,3 +99,28 @@ The API will then be available at:
 ```
 http://127.0.0.1:8000
 ```
+
+## 7. Problems running entrypoint.sh on Linux
+
+If you encounter an error or the entrypoint.sh script does not work correctly when trying to run it, this may indicate a problem with the file format (e.g., Windows line endings). To fix this, run:
+
+```bash
+sudo apt-get install dos2unix  # if you don't have this tool
+dos2unix entrypoint.sh
+```
+
+After converting the file format, try running the script again.
+
+You can also check if the file is a valid shell script by running:
+
+```bash
+file entrypoint.sh
+```
+
+If it shows something like:
+
+```
+entrypoint.sh: Bourne-Again shell script, ASCII text executable
+```
+
+that means the file is fine and Git downloaded it correctly.

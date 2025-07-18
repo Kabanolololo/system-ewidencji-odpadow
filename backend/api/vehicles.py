@@ -4,20 +4,23 @@ from typing import List
 from schema.vehicles import VehicleBase, VehicleCreate, VehicleUpdate, VechicleOut, VehicleFilterParams
 from crud.vehicles import get_all_cars, get_one_car, created_car, updated_car,deleted_car
 from api.dependencies import get_db
-from auth.jwt import verify_token
+from utils.jwt import check_user_or_admin
 
 router = APIRouter()
+
+
+############################################################################## 
+################### Endpointy dla użytkowników zalgowanych ###################
+############################################################################## 
+
 
 # Endpoint do pobierania wszystkich elementów
 @router.get("/", response_model=List[VechicleOut])
 def list_vehicles(
         filters: VehicleFilterParams = Depends(),
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return get_all_cars(filters=filters, db=db)
 
 # Endpoint do pobierania pojedynczego elementu
@@ -25,11 +28,8 @@ def list_vehicles(
 def get_vehicle(
         vehicle_id: int, 
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return get_one_car(car_id=vehicle_id, db=db)
 
 # Endpoint do tworzenia pojedynczego elementu
@@ -37,11 +37,8 @@ def get_vehicle(
 def create_vehicle(
         vehicle: VehicleCreate, 
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return created_car(car=vehicle, db=db)
 
 # Endpoint do aktualizacji pojedynczego elementu
@@ -50,11 +47,8 @@ def update_vehicle(
         vehicle_id: int, 
         vehicle: VehicleUpdate, 
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return updated_car(car_id=vehicle_id, car=vehicle, db=db)
 
 # Endpoint do usuwania pojedynczego elementu
@@ -62,9 +56,6 @@ def update_vehicle(
 def delete_vehicle(
         vehicle_id: int,
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return deleted_car(car_id=vehicle_id, db=db)

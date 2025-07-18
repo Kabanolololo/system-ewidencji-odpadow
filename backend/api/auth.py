@@ -8,6 +8,10 @@ router = APIRouter()
 
 # Endpoint służacy do logowania
 @router.post("/login", response_model=LoginResponse)
-def login(request: LoginRequest, db: Session = Depends(get_db)):
+def login(
+        request: LoginRequest, 
+        db: Session = Depends(get_db)
+    ):
+    
     access_token = authenticate_user(db, request.username, request.password)
     return {"access_token": access_token, "token_type": "bearer"}

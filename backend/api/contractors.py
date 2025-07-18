@@ -4,20 +4,21 @@ from typing import List
 from schema.contractors import ContractorCreate, ContractorOut, ContractorUpdate,ContractorOnlineCreate,ContractorFilterParams
 from crud.contractors import get_all_contractors,get_one_contractor,created_contractor_online, created_contractor_offline,updated_contractor, deleted_contractor
 from api.dependencies import get_db
-from auth.jwt import verify_token
+from utils.jwt import check_user_or_admin
 
 router = APIRouter()
+
+############################################################################## 
+################### Endpointy dla użytkowników zalgowanych ###################
+############################################################################## 
 
 # Endpoint do pobierania wszystkich elementów
 @router.get("/", response_model=list[ContractorOut])
 def list_contractors(
         filters: ContractorFilterParams = Depends(), 
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return get_all_contractors(filters=filters, db=db)
 
 # Endpoint do pobierania pojedynczego elementu
@@ -25,11 +26,8 @@ def list_contractors(
 def get_contractor(
         contractor_id: int, 
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return get_one_contractor(contractor_id=contractor_id, db=db)
 
 # Endpoint do tworzenia pojedynczego elementu (API VAT)
@@ -37,11 +35,8 @@ def get_contractor(
 def create_contractor_online(
         contractor: ContractorOnlineCreate, 
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return created_contractor_online(nip=contractor.nip, db=db)
 
 # Endpoint do tworzenia pojedynczego elementu (OFFLINE)
@@ -49,11 +44,8 @@ def create_contractor_online(
 def create_contractor_offline(
         contractor: ContractorCreate, 
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return created_contractor_offline(contractor=contractor, db=db)
 
 # Endpoint do aktualizacji pojedynczego elementu
@@ -62,11 +54,8 @@ def update_contractor(
         contractor_id: int, 
         contractor: ContractorUpdate, 
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return updated_contractor(contractor_id=contractor_id, contractor=contractor, db=db)
 
 # Endpoint do usuwania pojedynczego elementu
@@ -74,9 +63,6 @@ def update_contractor(
 def delete_contractor(
         contractor_id: int, 
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return deleted_contractor(contractor_id=contractor_id, db=db)

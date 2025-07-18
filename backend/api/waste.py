@@ -4,20 +4,23 @@ from sqlalchemy.orm import Session
 from schema.waste import WasteBase, WasteCreate, WasteUpdate, WasteOut, WasteFilterParams
 from crud.waste import get_all_waste, get_one_waste, created_waste,updated_waste,deleted_waste
 from api.dependencies import get_db
-from auth.jwt import verify_token
+from utils.jwt import check_user_or_admin
 
 router = APIRouter()
+
+
+############################################################################## 
+################### Endpointy dla użytkowników zalgowanych ###################
+############################################################################## 
+
 
 # Endpoint do pobierania wszystkich elementów
 @router.get("/", response_model=List[WasteOut])
 def list_wastes(
         filters: WasteFilterParams = Depends(), 
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return get_all_waste(filters=filters, db=db)
 
 # Endpoint do pobierania pojedynczego odpadu
@@ -25,11 +28,8 @@ def list_wastes(
 def get_waste(
         waste_id: int, db: 
         Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return get_one_waste(waste_id=waste_id, db=db)
 
 # Endpoint do tworzenia odpadu
@@ -37,11 +37,8 @@ def get_waste(
 def create_waste(
         waste: WasteCreate, 
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return created_waste(waste=waste, db=db)
 
 # Endpoint do aktualizacji pojedynczego odpadu
@@ -50,21 +47,15 @@ def update_waste(
         waste_id: int, 
         waste: WasteUpdate,
         db: Session = Depends(get_db), 
-        token: str = Header(...)
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return updated_waste(waste_id=waste_id, waste=waste, db=db)
 
 # Endpoint do usuwania pojedynczego odpadu
 @router.delete("/{waste_id}")
 def delete_waste(
         waste_id: int, db: 
-            Session = Depends(get_db), 
-        token: str = Header(...)
+        Session = Depends(get_db), 
+        current_user: dict = Depends(check_user_or_admin)
     ):
-    
-    # Funkcja do weryfikacji tokenu
-    verify_token(token)
     return deleted_waste(waste_id=waste_id,db=db)
