@@ -7,3 +7,5 @@ starlette
 bcrypt
 passlib
 httpx
+python-jose
+python-dotenv

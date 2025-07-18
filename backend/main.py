@@ -7,6 +7,7 @@ from api.destinations import router as destinations_router
 from api.users import router as users_router
 from api.contractors import router as contractors_router
 from api.waste_records import router as wasterecords_router
+from api.auth import router as auth_router
 from database import SessionLocal, engine, Base
 import models
 
@@ -41,6 +42,7 @@ app.add_middleware(
 )
 
 # Routers dla zapytań API
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(wasterecords_router, prefix="/records", tags=["records"])
 app.include_router(contractors_router, prefix="/contractors", tags=["contractors"])
 app.include_router(users_router, prefix="/users", tags=["users"])
