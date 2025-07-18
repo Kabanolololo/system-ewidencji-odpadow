@@ -38,6 +38,11 @@ def get_all_waste_records(filters: WasteRecordFilterParams, db: Session):
     if filters.price_per_kg_max is not None:
         query = query.filter(WasteRecord.price_per_kg <= filters.price_per_kg_max)
 
+    if filters.total_price_min is not None:
+        query = query.filter(WasteRecord.total_price >= filters.total_price_min)
+    if filters.total_price_max is not None:
+        query = query.filter(WasteRecord.total_price <= filters.total_price_max)
+
     # Sortowanie - ręczny wybór kolumny
     if filters.sort_by:
         if filters.sort_by == "contractor_id":

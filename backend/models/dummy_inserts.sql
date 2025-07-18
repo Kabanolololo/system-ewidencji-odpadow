@@ -57,3 +57,26 @@ INSERT INTO contractors (nip, regon, name, address, created_at, edited_at) VALUE
 ('9638527410', '963852741', 'Firma Sprzątająca Sp. z o.o.', 'ul. Czysta 20, 07-890 Rzeszów', NOW(), NOW()),
 ('8527419630', '852741963', 'Ogrodnictwo Polska S.A.', 'ul. Zielona 25, 08-901 Opole', NOW(), NOW()),
 ('7419638520', '741963852', 'Firma Kurierska Sp. z o.o.', 'ul. Kurierska 30, 09-012 Katowice', NOW(), NOW());
+
+INSERT INTO waste_records (contractor_id, user_id, waste_id, vehicle_id, driver_id, destination_id, transfer_date, mass_kg, price_per_kg, total_price, notes, created_at, edited_at) VALUES
+(1, 1, 3, 4, 5, 6, '2024-01-15', 250.0, 2.5, 625.0, 'First batch', NOW(), NOW()),
+(2, 1, 4, 5, 6, 7, '2024-02-10', 500.0, 1.8, 900.0, NULL, NOW(), NOW()),
+(3, 1, 5, 6, 7, 8, '2024-03-05', 750.0, 3.0, 2250.0, 'Urgent transport', NOW(), NOW()),
+(4, 1, 6, 7, 8, 9, '2024-04-20', 300.0, 2.0, 600.0, 'Special conditions', NOW(), NOW()),
+(5, 1, 7, 8, 9, 10, '2024-05-12', 450.0, 4.0, 1800.0, NULL, NOW(), NOW()),
+(6, 1, 8, 9, 10, 1, '2024-06-18', 600.0, 1.5, 900.0, 'Late arrival', NOW(), NOW()),
+(7, 1, 9, 10, 1, 2, '2024-07-25', 850.0, 2.2, 1870.0, NULL, NOW(), NOW()),
+(8, 1, 10, 1, 2, 3, '2024-08-30', 200.0, 3.5, 700.0, 'Requires inspection', NOW(), NOW()),
+(9, 1, 1, 2, 3, 4, '2024-09-14', 950.0, 1.2, 1140.0, NULL, NOW(), NOW()),
+(10, 1, 2, 3, 4, 5, '2024-10-09', 400.0, 4.5, 1800.0, 'Handle with care', NOW(), NOW()),
+(1, 1, 5, 7, 9, 2, '2024-11-02', 520.0, 2.7, 1404.0, NULL, NOW(), NOW()),
+(2, 1, 6, 8, 10, 3, '2024-11-15', 670.0, 3.1, 2077.0, 'Hazardous waste', NOW(), NOW()),
+(3, 1, 7, 9, 1, 4, '2024-11-28', 330.0, 1.9, 627.0, NULL, NOW(), NOW()),
+(4, 1, 8, 10, 2, 5, '2024-12-05', 580.0, 2.4, 1392.0, NULL, NOW(), NOW()),
+(5, 1, 9, 1, 3, 6, '2024-12-19', 430.0, 3.8, 1634.0, 'Night shift', NOW(), NOW()),
+(6, 1, 10, 2, 4, 7, '2024-12-22', 310.0, 2.6, 806.0, NULL, NOW(), NOW()),
+(7, 1, 1, 3, 5, 8, '2024-12-27', 720.0, 1.7, 1224.0, NULL, NOW(), NOW()),
+(8, 1, 2, 4, 6, 9, '2024-12-29', 820.0, 2.1, 1722.0, 'Extra security', NOW(), NOW()),
+(9, 1, 3, 5, 7, 10, '2024-12-30', 270.0, 4.2, 1134.0, NULL, NOW(), NOW()),
+(10, 1, 4, 6, 8, 1, '2024-12-31', 650.0, 3.3, 2145.0, 'End of year shipment', NOW(), NOW());
+

@@ -38,3 +38,39 @@ def generate_unique_username(name: str, surname: str, db: Session, exclude_id: O
         counter += 1
 
     return username
+
+# Walidacja imienia i nazwiska
+def validate_name_surname(name: Optional[str], surname: Optional[str]):
+    if name is not None:
+        if not isinstance(name, str):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Imię musi być typu string"
+            )
+        if not name.strip():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Imię nie może być puste"
+            )
+        if any(char.isdigit() for char in name):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Imię nie może zawierać cyfr"
+            )
+
+    if surname is not None:
+        if not isinstance(surname, str):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Nazwisko musi być typu string"
+            )
+        if not surname.strip():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Nazwisko nie może być puste"
+            )
+        if any(char.isdigit() for char in surname):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Nazwisko nie może zawierać cyfr"
+            )

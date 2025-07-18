@@ -8,11 +8,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Kopiujemy i nadajemy prawa do entrypoint.sh
-RUN apt-get update && apt-get install -y netcat-openbsd
-
 COPY entrypoint.sh /entrypoint.sh
+
 RUN chmod +x /entrypoint.sh
+
+RUN apt-get update && apt-get install -y netcat-openbsd
 
 EXPOSE 8000
 

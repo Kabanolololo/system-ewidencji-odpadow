@@ -3,9 +3,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.users import User
 from schema.users import UserBase, UserCreate, UserUpdate, UserAdminUpdate, UserOut, UserFilterParams
-from utils.users import validate_id, get_by_id, generate_unique_username
-from utils.driver import validate_name_surname
-from utils.hash import hash_password
+from utils.users import validate_id, get_by_id, generate_unique_username, validate_name_surname
+from auth.hash import hash_password
 
 # Funkcja do pobierania wszystkich users
 def get_all_users(filters: UserFilterParams, db: Session):
@@ -64,7 +63,7 @@ def get_one_user(user_id: int, db: Session):
 
 # Funkcja do stworzenia usera
 def create_user(user: UserCreate, db: Session):
-    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+    # FUNKCJA: Walidacja czy podajemy poprawne dane
     validate_name_surname(user.name, user.surname)
 
     # FUNKCJA: Generowanie username do logowania
@@ -103,13 +102,18 @@ def update_user(user_id: int, user_data: UserUpdate, db: Session):
     db_user = get_by_id(user_id, db)
 
     if user_data.name or user_data.surname:
-        # FUNKCJA: Walidacja imienia i nazwiska czy sa stringami
-        validate_name_surname(user_data.name or db_user.name, user_data.surname or db_user.surname)
+        # FUNKCJA: Walidacja czy podajemy poprawne dane
+        new_name = user_data.name or db_user.name
+        new_surname = user_data.surname or db_user.surname
 
-    if user_data.name:
-        db_user.name = user_data.name
-    if user_data.surname:
-        db_user.surname = user_data.surname
+        validate_name_surname(new_name, new_surname)
+
+        # FUNKCJA: Generowanie username do logowania
+        username = generate_unique_username(new_name, new_surname, db, exclude_id=user_id)
+        db_user.username = username
+
+        db_user.name = new_name
+        db_user.surname = new_surname
 
     db_user.role = "user"
 
@@ -133,25 +137,27 @@ def update_user(user_id: int, user_data: UserUpdate, db: Session):
 def update_user_admin(user_id: int, user: UserAdminUpdate, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(user_id)
-
-    # FUNKCJA: Pobieranie użytkownika po id
+    
+    # FUNKCJA: Pobieranie destynacji po id
     db_user = get_by_id(user_id, db)
 
-    # FUNKCJA: Walidacja imienia i nazwiska czy sa stringami
-    validate_name_surname(user.name, user.surname)
+    # Jeśli imię/nazwisko są podane — waliduj i generuj nowy username
+    if user.name is not None or user.surname is not None:
+        new_name = user.name or db_user.name
+        new_surname = user.surname or db_user.surname
 
-    # FUNKCJA: Generowanie username do logowania
-    username = generate_unique_username(user.name, user.surname, db, exclude_id=user_id)
+        validate_name_surname(new_name, new_surname)
+        username = generate_unique_username(new_name, new_surname, db, exclude_id=user_id)
+        db_user.username = username
+
+        db_user.name = new_name
+        db_user.surname = new_surname
 
     if user.password_hash:
-        # FUNKCJA: Haszowanie hasła
         db_user.password_hash = hash_password(user.password_hash)
 
-    # Aktualizacja pól
-    db_user.name = user.name
-    db_user.surname = user.surname
-    db_user.username = username
-    db_user.role = user.role
+    if user.role:
+        db_user.role = user.role
 
     try:
         db.commit()
@@ -164,6 +170,7 @@ def update_user_admin(user_id: int, user: UserAdminUpdate, db: Session):
         )
 
     return db_user
+
 
 # Funkcja do usunięcia users
 def delete_user(user_id: int, db: Session):

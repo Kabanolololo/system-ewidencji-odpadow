@@ -20,3 +20,7 @@ docker compose down -v
 docker compose up --build
 # czekaj, aż backend się uruchomi
 # odwiedź http://localhost:8000 w przeglądarce
+
+
+Dac walidacje hasel na sam koniec:
+domyslne haslo string

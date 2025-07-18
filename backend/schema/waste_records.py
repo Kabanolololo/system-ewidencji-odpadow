@@ -58,6 +58,8 @@ class WasteRecordFilterParams(BaseModel):
     mass_kg_max: Optional[float] = Query(None)       # maksymalna masa
     price_per_kg_min: Optional[float] = Query(None)
     price_per_kg_max: Optional[float] = Query(None)
+    total_price_min: Optional[float] = Query(None)
+    total_price_max: Optional[float] = Query(None)
 
     sort_by: Optional[Literal[
         "contractor_id", "user_id", "waste_id", "vehicle_id", "driver_id", 
