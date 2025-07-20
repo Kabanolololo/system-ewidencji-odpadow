@@ -40,7 +40,7 @@ def create_new_waste_record(
     db: Session = Depends(get_db),
     current_user: dict = Depends(check_user_or_admin)
     ):
-    return create_waste_record(waste_record=waste_record, db=db)
+    return create_waste_record(waste_record=waste_record, user_id=current_user["user_id"], db=db)
 
 # Endpoint do aktualizacji rekordu
 @router.put("/{waste_record_id}", response_model=WasteRecordOut)
@@ -50,7 +50,7 @@ def update_existing_waste_record(
     db: Session = Depends(get_db),
     current_user: dict = Depends(check_user_or_admin)
     ):
-    return update_waste_record(waste_record_id=waste_record_id, waste_record=waste_record, db=db)
+    return update_waste_record(waste_record_id=waste_record_id, waste_record=waste_record, user_id=current_user["user_id"], db=db)
 
 # Endpoint do usuwania rekordu
 @router.delete("/{waste_record_id}")
@@ -59,4 +59,4 @@ def delete_existing_waste_record(
     db: Session = Depends(get_db),
     current_user: dict = Depends(check_user_or_admin)
     ):
-    return delete_waste_record(waste_record_id=waste_record_id, db=db)
+    return delete_waste_record(waste_record_id=waste_record_id, user_id=current_user["user_id"], db=db)

@@ -37,7 +37,7 @@ def create_contractor_online(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return created_contractor_online(nip=contractor.nip, db=db)
+    return created_contractor_online(nip=contractor.nip, user_id=current_user["user_id"], db=db)
 
 # Endpoint do tworzenia pojedynczego elementu (OFFLINE)
 @router.post("/create/offline", response_model=ContractorOut)
@@ -56,7 +56,7 @@ def update_contractor(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return updated_contractor(contractor_id=contractor_id, contractor=contractor, db=db)
+    return updated_contractor(contractor_id=contractor_id, contractor=contractor, user_id=current_user["user_id"], db=db)
 
 # Endpoint do usuwania pojedynczego elementu
 @router.delete("/{contractor_id}")
@@ -65,4 +65,4 @@ def delete_contractor(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return deleted_contractor(contractor_id=contractor_id, db=db)
+    return deleted_contractor(contractor_id=contractor_id, user_id=current_user["user_id"], db=db)

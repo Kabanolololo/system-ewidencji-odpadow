@@ -49,7 +49,7 @@ def update_waste(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return updated_waste(waste_id=waste_id, waste=waste, db=db)
+    return updated_waste(waste_id=waste_id, waste=waste, user_id=current_user["user_id"], db=db)
 
 # Endpoint do usuwania pojedynczego odpadu
 @router.delete("/{waste_id}")
@@ -58,4 +58,4 @@ def delete_waste(
         Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return deleted_waste(waste_id=waste_id,db=db)
+    return deleted_waste(waste_id=waste_id, user_id=current_user["user_id"], db=db)

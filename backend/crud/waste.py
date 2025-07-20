@@ -45,7 +45,7 @@ def get_one_waste(waste_id: int, db: Session):
     return db_waste
 
 # Funkcja do stworzenia odpadu
-def created_waste(waste: WasteCreate, db: Session, user_id: int):
+def created_waste(waste: WasteCreate, user_id: int, db: Session):
     # FUNKCJA:  Walidacja długosci kodu
     validate_waste_code_length(waste.code)
     
@@ -74,23 +74,27 @@ def created_waste(waste: WasteCreate, db: Session, user_id: int):
         ) from e
 
 # Funkcja do aktualizacji odpadu
-def updated_waste(waste_id: int, waste: WasteUpdate, db: Session):
+def updated_waste(waste_id: int, waste: WasteUpdate, user_id: int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(waste_id)
 
-    # FUNKCJA: Pobieranie kodu po id
+    # FUNKCJA: Pobieranie rekordu po id
     existing_waste = get_by_id(waste_id, db)
 
-    # FUNKCJA:  Walidacja długosci kodu
+    # FUNKCJA: Walidacja długości kodu
     validate_waste_code_length(waste.code)
-    
-    # FUNKCJA:  Walidacja typu danych kodu
+
+    # FUNKCJA: Walidacja typu danych kodu
     validate_waste_code_is_digit(waste.code)
-    
-    # FUNKCJA: Walidacja unikalnosci kodu w bazie
+
+    # FUNKCJA: Walidacja unikalności kodu w bazie
     validate_waste_code_unique(waste.code, db, waste_id=waste_id)
 
-    # Aktualizacja pól
+    # FUNKCJA: Tworzy kopię starych danych
+    old_data = existing_waste.__dict__.copy()
+    old_data.pop('_sa_instance_state', None)
+
+    # FUNKCJA: Aktualizacja pól
     existing_waste.code = waste.code
     existing_waste.name = waste.name
     existing_waste.notes = waste.notes
@@ -98,7 +102,16 @@ def updated_waste(waste_id: int, waste: WasteUpdate, db: Session):
     try:
         db.commit()
         db.refresh(existing_waste)
+
+        # FUNKCJA: Tworzy kopię nowych danych
+        new_data = existing_waste.__dict__.copy()
+        new_data.pop('_sa_instance_state', None)
+
+        # FUNKCJA: Tworzy i zapisuje log audytu w bazie
+        create_audit_log(db=db, user_id=user_id, table_name="waste", record_id=existing_waste.id, operation="update", old_data=old_data, new_data=new_data)
+
         return existing_waste
+
     except IntegrityError as e:
         db.rollback()
         raise HTTPException(
@@ -107,12 +120,15 @@ def updated_waste(waste_id: int, waste: WasteUpdate, db: Session):
         ) from e
 
 # Funkcja do usunięcia odpadu
-def deleted_waste(waste_id: int, db: Session):
+def deleted_waste(waste_id: int,  user_id: int, db: Session):
      # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(waste_id)
     
     # FUNKCJA: Pobieranie kodu po id
     existing_waste = get_by_id(waste_id, db)
+    
+    #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+    create_audit_log(db=db, user_id=user_id, table_name="waste", record_id=existing_waste.id, operation="delete", old_data=existing_waste, new_data=None)
     
     # Usunięcie odpadu
     db.delete(existing_waste)

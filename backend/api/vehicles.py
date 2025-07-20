@@ -33,23 +33,23 @@ def get_vehicle(
     return get_one_car(car_id=vehicle_id, db=db)
 
 # Endpoint do tworzenia pojedynczego elementu
-@router.post("/", response_model=VehicleCreate)
+@router.post("/", response_model=VechicleOut)
 def create_vehicle(
         vehicle: VehicleCreate, 
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return created_car(car=vehicle, db=db)
+    return created_car(car=vehicle, user_id=current_user["user_id"], db=db)
 
 # Endpoint do aktualizacji pojedynczego elementu
-@router.put("/{vehicle_id}", response_model=VehicleUpdate)
+@router.put("/{vehicle_id}", response_model=VechicleOut)
 def update_vehicle(
         vehicle_id: int, 
         vehicle: VehicleUpdate, 
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return updated_car(car_id=vehicle_id, car=vehicle, db=db)
+    return updated_car(car_id=vehicle_id, car=vehicle, user_id=current_user["user_id"], db=db)
 
 # Endpoint do usuwania pojedynczego elementu
 @router.delete("/{vehicle_id}")
@@ -58,4 +58,4 @@ def delete_vehicle(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return deleted_car(car_id=vehicle_id, db=db)
+    return deleted_car(car_id=vehicle_id, user_id=current_user["user_id"], db=db)

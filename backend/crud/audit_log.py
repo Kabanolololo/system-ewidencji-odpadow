@@ -1,10 +1,12 @@
 from sqlalchemy.orm import Session
 from models import AuditLog
-from datetime import datetime
+from datetime import datetime, date
 
 # Serializuje wartości na JSON-friendly format  
 def serialize_value(value):
     if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, date):
         return value.isoformat()
     if isinstance(value, dict):
         return {k: serialize_value(v) for k, v in value.items()}

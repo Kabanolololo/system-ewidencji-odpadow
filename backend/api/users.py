@@ -53,7 +53,7 @@ def create_new_user(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_admin)
     ):
-    return create_user(user=user, db=db)
+    return create_user(user=user, user_id=current_user["user_id"], db=db)
 
 # ADMIN: Endpoint do aktualizacji pojedynczego elementu (ADMIN)
 @router.put("/admin/{user_id}", response_model=UserOut)

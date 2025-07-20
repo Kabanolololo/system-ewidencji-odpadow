@@ -39,7 +39,7 @@ def create_driver(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return created_driver(driver=driver, db=db)
+    return created_driver(driver=driver, user_id=current_user["user_id"], db=db)
 
 # Endpoint do aktualizacji pojedynczego elementu
 @router.put("/{driver_id}", response_model=DriverOut)
@@ -49,7 +49,7 @@ def update_driver(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return updated_driver(driver_id=driver_id, driver=driver, db=db)
+    return updated_driver(driver_id=driver_id, driver=driver, user_id=current_user["user_id"], db=db)
 
 # Endpoint do usuwania pojedynczego elementu
 @router.delete("/{driver_id}")
@@ -58,4 +58,4 @@ def delete_driver(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return deleted_driver(driver_id=driver_id, db=db)
+    return deleted_driver(driver_id=driver_id, user_id=current_user["user_id"], db=db)
