@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from models.waste import Waste
 from schema.waste import WasteBase, WasteCreate, WasteUpdate, WasteOut, WasteFilterParams
 from utils.waste import validate_id, get_by_id,validate_waste_code_length, validate_waste_code_is_digit, validate_waste_code_unique
+from crud.audit_log import create_audit_log, serialize_sqlalchemy_obj
 
 # Funkcja do pobierania wszystkich odpadów
 def get_all_waste(filters: WasteFilterParams,db: Session):
@@ -44,7 +45,7 @@ def get_one_waste(waste_id: int, db: Session):
     return db_waste
 
 # Funkcja do stworzenia odpadu
-def created_waste(waste: WasteCreate, db: Session):
+def created_waste(waste: WasteCreate, db: Session, user_id: int):
     # FUNKCJA:  Walidacja długosci kodu
     validate_waste_code_length(waste.code)
     
@@ -60,6 +61,10 @@ def created_waste(waste: WasteCreate, db: Session):
         db.add(db_waste)
         db.commit()
         db.refresh(db_waste)
+
+        #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+        create_audit_log(db=db, user_id=user_id, table_name="waste", record_id=db_waste.id, operation="create", old_data=None, new_data=db_waste)
+
         return db_waste
     except IntegrityError as e:
         db.rollback()

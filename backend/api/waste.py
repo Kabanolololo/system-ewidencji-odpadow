@@ -39,7 +39,7 @@ def create_waste(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return created_waste(waste=waste, db=db)
+    return created_waste(waste=waste, user_id=current_user["user_id"], db=db)
 
 # Endpoint do aktualizacji pojedynczego odpadu
 @router.put("/{waste_id}", response_model=WasteUpdate)

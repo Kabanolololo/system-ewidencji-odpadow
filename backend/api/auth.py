@@ -3,15 +3,15 @@ from sqlalchemy.orm import Session
 from schema.auth import LoginRequest, LoginResponse
 from crud.auth import authenticate_user
 from api.dependencies import get_db
+from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter()
 
 # Endpoint służacy do logowania
-@router.post("/login", response_model=LoginResponse)
+@router.post("/login")
 def login(
-        request: LoginRequest, 
-        db: Session = Depends(get_db)
-    ):
-    
-    access_token = authenticate_user(db, request.username, request.password)
+    form_data: OAuth2PasswordRequestForm = Depends(), 
+    db: Session = Depends(get_db)
+):
+    access_token = authenticate_user(db, form_data.username, form_data.password)
     return {"access_token": access_token, "token_type": "bearer"}

@@ -4,7 +4,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from auth.config import ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+# mechanizm OAuth2
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 # Funkcja generująca token JWT
 def create_access_token(data: dict, expires_delta: timedelta = None):
