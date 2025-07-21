@@ -5,7 +5,6 @@ psycopg2-binary
 pydantic
 starlette
 bcrypt
-passlib
 httpx
 python-jose
 python-dotenv

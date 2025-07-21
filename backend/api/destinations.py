@@ -39,7 +39,7 @@ def create_new_destination(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return create_destination(destination=destination, db=db)
+    return create_destination(destination=destination, user_id=current_user["user_id"], db=db)
 
 # Endpoint do aktualizacji pojedynczego elementu
 @router.put("/{destination_id}", response_model=DestinationOut)
@@ -49,7 +49,7 @@ def update_existing_destination(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return update_destination(destination_id=destination_id, destination=destination, db=db)
+    return update_destination(destination_id=destination_id, destination=destination, user_id=current_user["user_id"], db=db)
 
 # Endpoint do usuwania pojedynczego elementu
 @router.delete("/{destination_id}")
@@ -58,4 +58,4 @@ def delete_existing_destination(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return delete_destination(destination_id=destination_id, db=db)
+    return delete_destination(destination_id=destination_id, user_id=current_user["user_id"], db=db)

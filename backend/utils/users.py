@@ -3,6 +3,7 @@ from typing import Optional, Literal
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from models.users import User
+import string
 
 # Walidacja czy podajemy poprawną liczbę
 def validate_id(user_id: int):
@@ -74,3 +75,31 @@ def validate_name_surname(name: Optional[str], surname: Optional[str]):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Nazwisko nie może zawierać cyfr"
             )
+        
+# Walidacja hasła    
+def validate_password(password: str):
+    if len(password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Hasło musi mieć co najmniej 6 znaków."
+        )
+    if not any(char.islower() for char in password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Hasło musi zawierać co najmniej jedną małą literę."
+        )
+    if not any(char.isupper() for char in password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Hasło musi zawierać co najmniej jedną wielką literę."
+        )
+    if not any(char.isdigit() for char in password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Hasło musi zawierać co najmniej jedną cyfrę."
+        )
+    if not any(char in string.punctuation for char in password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Hasło musi zawierać co najmniej jeden znak specjalny."
+        )

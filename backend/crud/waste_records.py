@@ -4,7 +4,9 @@ from sqlalchemy.exc import IntegrityError
 from models import WasteRecord, Contractor, User, Waste, Vehicle, Driver, Destination
 from schema.waste_records import WasteRecordBase, WasteRecordCreate, WasteRecordFilterParams, WasteRecordOut, WasteRecordUpdate
 from utils.waste_records import validate_id, get_by_id, parse_float, get_or_404, validate_not_future_date, calculate_total_price
+from crud.audit_log import create_audit_log
 
+# Funckja do pobrania wszystkich rekordów
 def get_all_waste_records(filters: WasteRecordFilterParams, db: Session):
     query = db.query(WasteRecord)
 
@@ -92,7 +94,7 @@ def get_one_waste_record(waste_record_id: int, db: Session):
     return db_record
 
 # Funkcja do stworzenia rekordu
-def create_waste_record(waste_record: WasteRecordCreate, db: Session):
+def create_waste_record(waste_record: WasteRecordCreate, user_id: int, db: Session):
     # FUNKCJA: Parsowanie na float
     mass_kg = parse_float(waste_record.mass_kg)
     price_per_kg = parse_float(waste_record.price_per_kg)
@@ -128,10 +130,14 @@ def create_waste_record(waste_record: WasteRecordCreate, db: Session):
     db.add(db_record)
     db.commit()
     db.refresh(db_record)
+    
+    #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+    create_audit_log(db=db, user_id=user_id, table_name="waste_records", record_id=db_record.id, operation="create", old_data=None, new_data=db_record)
+    
     return db_record
 
 # Funkcja do aktualizacji rekordu
-def update_waste_record(waste_record_id: int, waste_record: WasteRecordUpdate, db: Session):
+def update_waste_record(waste_record_id: int, waste_record: WasteRecordUpdate, user_id: int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(waste_record_id)
 
@@ -146,6 +152,10 @@ def update_waste_record(waste_record_id: int, waste_record: WasteRecordUpdate, d
     db_record.mass_kg = mass_kg
     db_record.price_per_kg = price_per_kg
     db_record.total_price = calculate_total_price(mass_kg, price_per_kg)
+    
+    # FUNKCJA: Tworzy kopię starych danych
+    old_data = db_record.__dict__.copy()
+    old_data.pop('_sa_instance_state', None)
 
     # FUNKCJE: Walidacja i aktualizacja ID kontrahenta
     if waste_record.contractor_id:
@@ -178,18 +188,25 @@ def update_waste_record(waste_record_id: int, waste_record: WasteRecordUpdate, d
 
     if waste_record.notes is not None:
         db_record.notes = waste_record.notes
-
+    
     db.commit()
     db.refresh(db_record)
+    
+    # FUNKCJA: Tworzy i zapisuje log audytu w bazie
+    create_audit_log(db=db, user_id=user_id, table_name="waste_records", record_id=db_record.id, operation="update", old_data=old_data, new_data=db_record)
+    
     return db_record
 
 # Funkcja do usunięcia rekordu
-def delete_waste_record(waste_record_id: int, db: Session):
+def delete_waste_record(waste_record_id: int, user_id: int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(waste_record_id)
     
     # FUNKCJA: Pobieranie destynacji po id
     db_record = get_by_id(waste_record_id, db)
+    
+    #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+    create_audit_log(db=db, user_id=user_id, table_name="waste_records", record_id=db_record.id, operation="delete", old_data=db_record, new_data=None)
     
     # Usunięcie rekordu
     db.delete(db_record)

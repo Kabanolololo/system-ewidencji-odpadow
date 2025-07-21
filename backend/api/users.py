@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from schema.users import UserBase, UserCreate, UserUpdate, UserAdminUpdate, UserOut, UserFilterParams
 from crud.users import get_all_users, get_one_user,create_user ,update_user, update_user_admin, delete_user
 from api.dependencies import get_db
-from utils.jwt import check_user_or_admin, check_admin
+from utils.jwt import check_user_or_admin, check_admin, check_is_self
 
 router = APIRouter()
 
@@ -30,6 +30,8 @@ def update_existing_user(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
+    # FUNKCJA: czy ty to ty
+    check_is_self(current_user, user_id)
     return update_user(user_id=user_id, user_data=user_data, db=db)
 
 ############################################################################## 
@@ -53,7 +55,7 @@ def create_new_user(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_admin)
     ):
-    return create_user(user=user, db=db)
+    return create_user(user=user, user_id=current_user["user_id"], db=db)
 
 # ADMIN: Endpoint do aktualizacji pojedynczego elementu (ADMIN)
 @router.put("/admin/{user_id}", response_model=UserOut)
