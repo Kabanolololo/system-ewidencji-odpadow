@@ -6,6 +6,7 @@ from schema.destinations import DestinationBase, DestinationCreate, DestinationU
 from utils.contractors import clean_address
 from utils.destinations import validate_id, get_by_id
 import re
+from crud.audit_log import create_audit_log
 
 # Funkcja do pobierania wszystkich destynacji wraz z filtrowaniem
 def get_all_destinations(filters: DestinationFilterParams, db: Session):
@@ -66,7 +67,7 @@ def get_one_destination(destination_id: int, db: Session):
     return db_destination
 
 # Funkcja tworzenia destynacji
-def create_destination(destination: DestinationCreate, db: Session):
+def create_destination(destination: DestinationCreate, user_id:int, db: Session):
     # FUNKCJA: Czyszczenie adresu
     validate_address = clean_address(destination.address)
         
@@ -83,6 +84,10 @@ def create_destination(destination: DestinationCreate, db: Session):
         db.add(db_destination)
         db.commit()
         db.refresh(db_destination)
+        
+        #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+        create_audit_log(db=db, user_id=user_id, table_name="destinations", record_id=db_destination.id, operation="create", old_data=None, new_data=db_destination)
+    
         return db_destination
 
     except IntegrityError as e:
@@ -93,7 +98,7 @@ def create_destination(destination: DestinationCreate, db: Session):
         ) from e
 
 # Funkcja do aktualizacji destynacji
-def update_destination(destination_id: int, destination: DestinationUpdate, db: Session):
+def update_destination(destination_id: int, destination: DestinationUpdate, user_id:int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(destination_id)
         
@@ -112,6 +117,10 @@ def update_destination(destination_id: int, destination: DestinationUpdate, db: 
             detail=f"Adres '{validate_address}' w mieście '{destination.city}' jest już w systemie."
         )
     
+    # FUNKCJA: Tworzy kopię starych danych
+    old_data = existing_destination.__dict__.copy()
+    old_data.pop('_sa_instance_state', None)
+
     # Aktualizacja
     existing_destination.country = destination.country
     existing_destination.voivodeship = destination.voivodeship
@@ -122,6 +131,10 @@ def update_destination(destination_id: int, destination: DestinationUpdate, db: 
     try:
         db.commit()
         db.refresh(existing_destination)
+        
+        # FUNKCJA: Tworzy i zapisuje log audytu w bazie
+        create_audit_log(db=db, user_id=user_id, table_name="destinations", record_id=existing_destination.id, operation="update", old_data=old_data, new_data=existing_destination)
+    
     except Exception as e:
         db.rollback()
         raise HTTPException(
@@ -132,12 +145,15 @@ def update_destination(destination_id: int, destination: DestinationUpdate, db: 
     return existing_destination
 
 # Funkcja do usuwania destynacji
-def delete_destination(destination_id: int, db: Session):
+def delete_destination(destination_id: int, user_id:int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(destination_id)
         
     # FUNKCJA: Pobieranie destynacji po id
     existing_destination = get_by_id(destination_id, db)
+    
+    #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+    create_audit_log(db=db, user_id=user_id, table_name="destinations", record_id=existing_destination.id, operation="delete", old_data=existing_destination, new_data=None)
     
     # Usuniecie destynacji
     db.delete(existing_destination)

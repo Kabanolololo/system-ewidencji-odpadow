@@ -133,6 +133,7 @@ def create_waste_record(waste_record: WasteRecordCreate, user_id: int, db: Sessi
     
     #FUNKCJA: tworzy i zapisuje log audytu w bazie  
     create_audit_log(db=db, user_id=user_id, table_name="waste_records", record_id=db_record.id, operation="create", old_data=None, new_data=db_record)
+    
     return db_record
 
 # Funkcja do aktualizacji rekordu
@@ -193,6 +194,7 @@ def update_waste_record(waste_record_id: int, waste_record: WasteRecordUpdate, u
     
     # FUNKCJA: Tworzy i zapisuje log audytu w bazie
     create_audit_log(db=db, user_id=user_id, table_name="waste_records", record_id=db_record.id, operation="update", old_data=old_data, new_data=db_record)
+    
     return db_record
 
 # Funkcja do usunięcia rekordu

@@ -3,8 +3,9 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.users import User
 from schema.users import UserBase, UserCreate, UserUpdate, UserAdminUpdate, UserOut, UserFilterParams
-from utils.users import validate_id, get_by_id, generate_unique_username, validate_name_surname
+from utils.users import validate_id, get_by_id, generate_unique_username, validate_name_surname, validate_password
 from auth.hash import hash_password
+from crud.audit_log import create_audit_log
 
 # Funkcja do pobierania wszystkich users
 def get_all_users(filters: UserFilterParams, db: Session):
@@ -62,13 +63,13 @@ def get_one_user(user_id: int, db: Session):
     return db_user
 
 # Funkcja do stworzenia usera
-def create_user(user: UserCreate, db: Session):
+def create_user(user: UserCreate, user_id: int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawne dane
     validate_name_surname(user.name, user.surname)
 
     # FUNKCJA: Generowanie username do logowania
     username = generate_unique_username(user.name, user.surname, db)
-
+    
     # FUNKCJA: Haszowanie hasła
     hashed_password = hash_password(user.password_hash)
 
@@ -84,6 +85,10 @@ def create_user(user: UserCreate, db: Session):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
+        
+        #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+        create_audit_log(db=db, user_id=user_id, table_name="users", record_id=db_user.id, operation="create", old_data=None, new_data=db_user)
+    
         return db_user
 
     except IntegrityError:
@@ -118,7 +123,10 @@ def update_user(user_id: int, user_data: UserUpdate, db: Session):
     db_user.role = "user"
 
     if user_data.password_hash:
-        # FUNKCJA: Haszowanie hasła
+        # Waliduj podane nowe hasło
+        validate_password(user_data.password_hash)
+
+        # Haszuj hasło
         db_user.password_hash = hash_password(user_data.password_hash)
 
     try:
@@ -140,6 +148,10 @@ def update_user_admin(user_id: int, user: UserAdminUpdate, db: Session):
     
     # FUNKCJA: Pobieranie destynacji po id
     db_user = get_by_id(user_id, db)
+    
+    # FUNKCJA: Tworzy kopię starych danych
+    old_data = db_user.__dict__.copy()
+    old_data.pop('_sa_instance_state', None)
 
     # Jeśli imię/nazwisko są podane — waliduj i generuj nowy username
     if user.name is not None or user.surname is not None:
@@ -162,6 +174,10 @@ def update_user_admin(user_id: int, user: UserAdminUpdate, db: Session):
     try:
         db.commit()
         db.refresh(db_user)
+        
+        # FUNKCJA: Tworzy i zapisuje log audytu w bazie
+        create_audit_log(db=db, user_id=user_id, table_name="users", record_id=db_user.id, operation="update", old_data=old_data, new_data=db_user)
+        
     except Exception:
         db.rollback()
         raise HTTPException(
@@ -179,6 +195,9 @@ def delete_user(user_id: int, db: Session):
     
     # FUNKCJA: Pobieranie destynacji po id
     db_user = get_by_id(user_id, db)
+    
+    #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+    create_audit_log(db=db, user_id=user_id, table_name="users", record_id=db_user.id, operation="delete", old_data=db_user, new_data=None)
     
     # Usunięcie kierowcy
     db.delete(db_user)

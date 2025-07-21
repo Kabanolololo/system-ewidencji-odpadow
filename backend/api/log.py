@@ -16,8 +16,8 @@ router = APIRouter()
 @router.get("/", response_model=List[AuditLogOut])
 def list_logs(
         filters: AuditLogParams = Depends(),
-        db: Session = Depends(get_db)#, 
-        #current_user: dict = Depends(check_admin)
+        db: Session = Depends(get_db), 
+        current_user: dict = Depends(check_admin)
     ):
     return get_all_logs(filters=filters, db=db)
 

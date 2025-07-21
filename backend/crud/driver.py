@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from models.driver import Driver
 from schema.driver import DriverBase, DriverCreate, DriverUpdate, DriverFilterParams
 from utils.driver import validate_id, get_by_id, validate_name_surname
+from crud.audit_log import create_audit_log
 
 # Funkcja do pobierania wszystkich kierowców wraz z sortowaniem
 def get_all_drivers(filters: DriverFilterParams, db: Session):
@@ -52,7 +53,7 @@ def get_one_driver(driver_id: int, db: Session):
     return db_driver
 
 # Funkcja do stworzenia kierowcy
-def created_driver(driver: DriverCreate, db: Session):
+def created_driver(driver: DriverCreate, user_id: int, db: Session):
     # FUNKCJA: Walidacja imienia i nazwiska czy sa stringami
     validate_name_surname(driver.name, driver.surname)
         
@@ -62,6 +63,10 @@ def created_driver(driver: DriverCreate, db: Session):
         db.add(db_driver)
         db.commit()
         db.refresh(db_driver)
+        
+        #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+        create_audit_log(db=db, user_id=user_id, table_name="drivers", record_id=db_driver.id, operation="create", old_data=None, new_data=db_driver)
+    
         return db_driver
     except IntegrityError as e:
         db.rollback()
@@ -71,7 +76,7 @@ def created_driver(driver: DriverCreate, db: Session):
         ) from e
 
 # Funkcja do aktualizacji kierowcy
-def updated_driver(driver_id: int, driver: DriverUpdate, db: Session):
+def updated_driver(driver_id: int, driver: DriverUpdate, user_id:int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(driver_id)
     
@@ -81,6 +86,10 @@ def updated_driver(driver_id: int, driver: DriverUpdate, db: Session):
     # FUNKCJA: Walidacja imienia i nazwiska czy sa stringami
     validate_name_surname(driver.name, driver.surname)
     
+    # FUNKCJA: Tworzy kopię starych danych
+    old_data = db_driver.__dict__.copy()
+    old_data.pop('_sa_instance_state', None)
+    
     # Aktualizacja pól
     db_driver.name = driver.name
     db_driver.surname = driver.surname
@@ -88,6 +97,10 @@ def updated_driver(driver_id: int, driver: DriverUpdate, db: Session):
     try:
         db.commit()
         db.refresh(db_driver)
+        
+        # FUNKCJA: Tworzy i zapisuje log audytu w bazie
+        create_audit_log(db=db, user_id=user_id, table_name="drivers", record_id=db_driver.id, operation="update", old_data=old_data, new_data=db_driver)
+    
     except Exception as e:
         db.rollback()
         raise HTTPException(
@@ -98,12 +111,15 @@ def updated_driver(driver_id: int, driver: DriverUpdate, db: Session):
     return db_driver
         
 # Funkcja do usunięcia kierowcy
-def deleted_driver(driver_id: int, db: Session):
+def deleted_driver(driver_id: int, user_id: int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(driver_id)
     
     # FUNKCJA: Pobieranie destynacji po id
     db_driver = get_by_id(driver_id, db)
+    
+    #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+    create_audit_log(db=db, user_id=user_id, table_name="drivers", record_id=db_driver.id, operation="delete", old_data=db_driver, new_data=None)
     
     # Usunięcie kierowcy
     db.delete(db_driver)

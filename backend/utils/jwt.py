@@ -24,3 +24,11 @@ def check_admin(token: str = Depends(oauth2_scheme)):
             detail="Tylko administrator ma uprawnienia do wykonania tej operacji"
         )
     return current_user
+
+# Funkcja czy ty to ty
+def check_is_self(current_user: dict, user_id: int):
+    if current_user["user_id"] != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Nie możesz edytować innego użytkownika"
+        )

@@ -6,6 +6,7 @@ from schema.contractors import ContractorCreate, ContractorOut, ContractorUpdate
 from utils.contractors import clean_address, validate_id, get_by_id,validate_nip_regon, check_unique
 import datetime
 import httpx
+from crud.audit_log import create_audit_log
 
 # Funkcja do pobierania wszystkich firm wraz z filtrowaniem
 def get_all_contractors(filters: ContractorFilterParams, db: Session):
@@ -58,7 +59,7 @@ def get_one_contractor(contractor_id: int, db: Session):
     return db_contractor
 
 # Funkcja do stworzenia firmy (API VAT)
-def created_contractor_online(nip: str, db: Session):
+def created_contractor_online(nip: str, user_id: int, db: Session):
     API_URL = "https://wl-api.mf.gov.pl/api/search/nip"
     
     # FUNKCJA: Walidacja nipu
@@ -114,11 +115,14 @@ def created_contractor_online(nip: str, db: Session):
     db.add(new_contractor)
     db.commit()
     db.refresh(new_contractor)
+    
+    #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+    create_audit_log(db=db, user_id=user_id, table_name="contractors", record_id=new_contractor.id, operation="create", old_data=None, new_data=new_contractor)
 
     return new_contractor
 
 # Funkcja do stworzenia firmy (OFFLINE)
-def created_contractor_offline(contractor: ContractorCreate, db: Session):
+def created_contractor_offline(contractor: ContractorCreate, user_id:int, db: Session):
     # FUNKCA: Walidacja nip i regon
     validate_nip_regon(nip=contractor.nip, regon=contractor.regon)
 
@@ -145,11 +149,14 @@ def created_contractor_offline(contractor: ContractorCreate, db: Session):
     db.add(new_contractor)
     db.commit()
     db.refresh(new_contractor)
+    
+    #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+    create_audit_log(db=db, user_id=user_id, table_name="contractors", record_id=new_contractor.id, operation="create", old_data=None, new_data=new_contractor)
 
     return new_contractor
 
 # Funkcja do aktualizacji firmy
-def updated_contractor(contractor_id: int, contractor: ContractorUpdate, db: Session):
+def updated_contractor(contractor_id: int, contractor: ContractorUpdate, user_id: int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(contractor_id)
 
@@ -166,6 +173,10 @@ def updated_contractor(contractor_id: int, contractor: ContractorUpdate, db: Ses
     if contractor.regon and contractor.regon != db_contractor.regon:
         check_unique(db=db, nip=None, regon=contractor.regon, exclude_id=contractor_id)
 
+    # FUNKCJA: Tworzy kopię starych danych
+    old_data = db_contractor.__dict__.copy()
+    old_data.pop('_sa_instance_state', None)
+    
     # Aktualizacja pól
     if contractor.nip:
         db_contractor.nip = contractor.nip
@@ -180,16 +191,22 @@ def updated_contractor(contractor_id: int, contractor: ContractorUpdate, db: Ses
 
     db.commit()
     db.refresh(db_contractor)
+    
+    # FUNKCJA: Tworzy i zapisuje log audytu w bazie
+    create_audit_log(db=db, user_id=user_id, table_name="contractors", record_id=db_contractor.id, operation="update", old_data=old_data, new_data=db_contractor)
 
     return db_contractor
 
 # Funkcja do usunięcia firmy
-def deleted_contractor(contractor_id: int, db: Session):
+def deleted_contractor(contractor_id: int, user_id:int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(contractor_id)
 
     # FUNKCJA: Pobranie kontrahenta po id (lub wyjątek jeśli nie istnieje)
     db_contractor = get_by_id(contractor_id, db)
+    
+    #FUNKCJA: tworzy i zapisuje log audytu w bazie  
+    create_audit_log(db=db, user_id=user_id, table_name="contractors", record_id=db_contractor.id, operation="delete", old_data=db_contractor, new_data=None)
 
     # Usunięcie kontrahenta
     db.delete(db_contractor)
