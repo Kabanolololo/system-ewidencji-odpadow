@@ -26,6 +26,6 @@ def list_logs(
 def get_log(
         log_id: int, 
         db: Session = Depends(get_db), 
-        current_user: dict = Depends(check_user_or_admin)
+        current_user: dict = Depends(check_admin)
     ):
     return get_one_log(log_id=log_id, db=db)
