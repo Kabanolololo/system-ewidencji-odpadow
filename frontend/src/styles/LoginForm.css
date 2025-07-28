@@ -1,6 +1,16 @@
+.login-main {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e8f5e9;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
 .login-container {
   text-align: center;
-  color: #2e7d32; 
+  color: #2e7d32;
 }
 
 .login-container h1 {
