@@ -14,8 +14,11 @@ import Contractors from './features/dashboard/Contractors';
 import Waste from './features/dashboard/Waste';
 import Reports from './features/dashboard/Reports';
 import Account from './features/dashboard/Account';
+import LogOut from './features/dashboard/LogOut';
+import Records from './features/dashboard/Records';
 
 function App() {
+  // domyślnie true, żeby symulować "zalogowanego" użytkownika
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
@@ -52,8 +55,10 @@ function App() {
             <Route path="destinations" element={<Destinations />} />
             <Route path="contractors" element={<Contractors />} />
             <Route path="waste" element={<Waste />} />
+            <Route path="records" element={<Records />} />
             <Route path="reports" element={<Reports />} />
             <Route path="account" element={<Account />} />
+            <Route path="logout" element={<LogOut />} />
           </Route>
 
           {/* Wszystko inne na login */}

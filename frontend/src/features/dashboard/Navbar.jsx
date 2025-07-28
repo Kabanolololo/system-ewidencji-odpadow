@@ -12,8 +12,10 @@ function Navbar() {
         <li><NavLink to="destinations" className={({ isActive }) => isActive ? 'active' : ''}>Destynacje</NavLink></li>
         <li><NavLink to="contractors" className={({ isActive }) => isActive ? 'active' : ''}>Kontrahenci</NavLink></li>
         <li><NavLink to="waste" className={({ isActive }) => isActive ? 'active' : ''}>Odpady</NavLink></li>
+        <li><NavLink to="records" className={({ isActive }) => isActive ? 'active' : ''}>Ewidencja</NavLink></li>
         <li><NavLink to="reports" className={({ isActive }) => isActive ? 'active' : ''}>Raporty</NavLink></li>
         <li><NavLink to="account" className={({ isActive }) => isActive ? 'active' : ''}>Edytuj Konto</NavLink></li>
+        <li><NavLink to="logout" className={({ isActive }) => isActive ? 'active' : ''}>Wyloguj</NavLink></li>
       </ul>
     </nav>
   );

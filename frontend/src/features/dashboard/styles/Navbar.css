@@ -1,8 +1,10 @@
 .navbar {
   width: 100%;
+  min-height: 60px;
   background-color: #a5d6a7;
   padding: 10px 20px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   font-family: Arial, sans-serif;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -16,18 +18,21 @@
   font-size: 1.5rem;
   color: #2e7d32;
   flex-shrink: 0;
+  margin-right: 40px;
+  display: flex;
+  align-items: center;
 }
 
 .navbar-links {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  flex-grow: 1;
   display: flex;
+  justify-content: center;
   gap: 15px;
   list-style: none;
   margin: 0;
   padding: 0;
   flex-wrap: nowrap;
+  align-items: center;
 }
 
 .navbar-links li {
@@ -54,4 +59,22 @@
   background-color: #388e3c;
   color: white;
   font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    align-items: flex-start;
+  }
+
+  .navbar-logo {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .navbar-links {
+    flex-basis: 100%;
+    margin-top: 10px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }

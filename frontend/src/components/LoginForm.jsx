@@ -13,7 +13,7 @@ function LoginForm({ onLogin }) {
     console.log('Password:', password);
     alert(`Zalogowano jako: ${username}`);
 
-    // Tu możesz dodać prawdziwą walidację, ale dla testu od razu:
+    // Tu dodać prawdziwą walidację
     onLogin();        // zmień stan w App na zalogowany
     navigate('/dashboard'); // przejdź do dashboardu
   };
