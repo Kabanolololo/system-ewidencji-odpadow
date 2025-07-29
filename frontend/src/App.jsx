@@ -19,7 +19,7 @@ import Records from './features/dashboard/Records';
 
 function App() {
   // domyślnie true, żeby symulować "zalogowanego" użytkownika
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   return (
     <Router>

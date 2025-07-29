@@ -1,41 +1,41 @@
 .default-container {
-  max-width: 900px;
-  margin: 40px auto;
-  margin-top: 100px;
-  padding: 40px;
-  background: #f1f8e9;
-  border-radius: 10px;
-  border: 2px solid #a5d6a7;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  color: #2e7d32;
-  font-family: Arial, sans-serif;
+	max-width: 900px;
+	margin: 40px auto;
+	margin-top: 100px;
+	padding: 40px;
+	background: #f1f8e9;
+	border-radius: 10px;
+	border: 2px solid #a5d6a7;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+	color: #2e7d32;
+	font-family: Arial, sans-serif;
 }
 
 .default-container h1 {
-  margin-bottom: 10px;
-  color: #2e7d32;
+	margin-bottom: 10px;
+	color: #2e7d32;
 }
 
 .default-container p {
-  margin-bottom: 20px;
-  line-height: 1.6;
+	margin-bottom: 20px;
+	line-height: 1.6;
 }
 
 .default-section {
-  margin-bottom: 20px;
+	margin-bottom: 20px;
   background: #ffffff;
-  border-left: 6px solid #81c784;
-  padding: 20px;
-  border-radius: 6px;
-  transition: transform 0.2s;
+	border-left: 6px solid #81c784;
+	padding: 20px;
+	border-radius: 6px;
+	transition: transform 0.2s;
 }
 
 .default-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .default-section h2 {
-  margin-bottom: 8px;
-  color: #2e7d32;
+	margin-bottom: 8px;
+	color: #2e7d32;
 }
