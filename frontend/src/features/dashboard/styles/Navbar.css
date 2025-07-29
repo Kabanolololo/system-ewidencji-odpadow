@@ -1,4 +1,8 @@
 .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   min-height: 60px;
   background-color: #a5d6a7;
@@ -10,8 +14,20 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   overflow-x: auto;
   white-space: nowrap;
-  position: relative;
+  z-index: 999;
+  transition: backgroun
 }
+
+.navbar.sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0; /* dodaj to! */
+  background-color: #a5d6a7;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 1000; 
+}
+
 
 .navbar-logo {
   font-weight: bold;

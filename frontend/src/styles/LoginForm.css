@@ -77,3 +77,9 @@
   text-decoration: underline;
   font-size: 0.9em;
 }
+.login-form label {
+  text-align: left;
+  margin-bottom: 5px;
+  font-size: 0.9em;
+  color: #2e7d32;
+}

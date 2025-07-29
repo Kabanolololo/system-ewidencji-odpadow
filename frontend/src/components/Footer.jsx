@@ -12,7 +12,7 @@ function Footer() {
           <strong>Opis:</strong> Ewidencja odpadów w przedsiębiorstwie recyklingowym
         </p>
       </div>
-      <p className="footer-note">© 2025 Ewidencja Odpadów — Przedsiębiorstwo Recyklingowe</p>
+      <p className="footer-note">© 2025 Ewidencja Odpadów - Przedsiębiorstwo Recyklingowe</p>
     </footer>
   );
 }

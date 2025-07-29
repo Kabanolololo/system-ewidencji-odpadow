@@ -1,9 +1,26 @@
 import { NavLink } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import './styles/Navbar.css';
 
 function Navbar() {
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Jeśli przewinięto więcej niż 0 px w pionie, navbar jest sticky
+      setIsSticky(window.scrollY > 0);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    // cleanup
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${isSticky ? 'sticky' : ''}`}>
       <div className="navbar-logo">Ewidencja Odpadów</div>
       <ul className="navbar-links">
         <li><NavLink to="admin" className={({ isActive }) => isActive ? 'active' : ''}>Panel Admina</NavLink></li>
