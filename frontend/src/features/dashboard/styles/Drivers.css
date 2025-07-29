@@ -119,15 +119,27 @@ h1 {
 	position: relative;
 }
 
-.drivers-table th.sort-asc::after {
-	content: ' ▲';
+.drivers-table th::after {
+	content: ' ';
 	font-size: 0.7rem;
+	color: transparent;
+	display: inline-block;
+	width: 1em;
+	text-align: right;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+}
+
+.drivers-table th.sort-asc::after {
+	content: '▲';
 	color: #4caf50;
 }
 
 .drivers-table th.sort-desc::after {
-	content: ' ▼';
-	font-size: 0.7rem;
+	content: '▼';
 	color: #4caf50;
 }
 

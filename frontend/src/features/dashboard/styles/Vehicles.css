@@ -120,23 +120,31 @@ h1 {
 }
 
 .vehicles-table tr:hover {
-	background-color: #dcedc8;
+	background-color: #f1f8e9;
+}
+
+.vehicles-table th::after {
+	content: ' '; 
+	font-size: 0.7rem;
+	color: transparent;
+	display: inline-block;
+	width: 1em;
+	text-align: right;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
 }
 
 .vehicles-table th.sort-asc::after {
-	content: ' ▲';
-	font-size: 0.7rem;
+	content: '▲';
 	color: #2e7d32;
 }
 
 .vehicles-table th.sort-desc::after {
-	content: ' ▼';
-	font-size: 0.7rem;
+	content: '▼';
 	color: #2e7d32;
-}
-
-.vehicles-table tr:hover {
-	background-color: #f1f8e9;
 }
 
 /* Przycisk edytuj i usuń */
