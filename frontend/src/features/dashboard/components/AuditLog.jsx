@@ -33,30 +33,46 @@ function AuditLog() {
 
       {/* --- Filtry --- */}
       <div className="audit-log-filters">
-        <select className="audit-log-select">
-          <option value="">Tabela</option>
-          <option value="users">Users</option>
-          <option value="vehicles">Vehicles</option>
-          <option value="drivers">Drivers</option>
-        </select>
+        <label className="audit-log-label">
+          Tabela:
+          <select className="audit-log-select">
+            <option value="">Tabela</option>
+            <option value="wastes">Wastes</option>
+            <option value="waste_records">Waste Records</option>
+            <option value="vehicles">Vehicles</option>
+            <option value="users">Users</option>
+            <option value="drivers">Drivers</option>
+            <option value="destinations">Destinations</option>
+            <option value="contractors">Contractors</option>
+          </select>
+        </label>
 
-        <select className="audit-log-select">
-          <option value="">Operacja</option>
-          <option value="create">Create</option>
-          <option value="update">Update</option>
-          <option value="delete">Delete</option>
-        </select>
+        <label className="audit-log-label">
+          Operacja:
+          <select className="audit-log-select">
+            <option value="">Operacja</option>
+            <option value="create">Create</option>
+            <option value="update">Update</option>
+            <option value="delete">Delete</option>
+          </select>
+        </label>
 
-        <select className="audit-log-select">
-          <option value="created_at">Sortuj po dacie</option>
-          <option value="table_name">Tabela</option>
-          <option value="operation">Operacja</option>
-        </select>
+        <label className="audit-log-label">
+          Sortuj według:
+          <select className="audit-log-select">
+            <option value="created_at">Data</option>
+            <option value="table_name">Tabela</option>
+            <option value="operation">Operacja</option>
+          </select>
+        </label>
 
-        <select className="audit-log-select">
-          <option value="asc">Rosnąco</option>
-          <option value="desc">Malejąco</option>
-        </select>
+        <label className="audit-log-label">
+          Kolejność:
+          <select className="audit-log-select">
+            <option value="asc">Rosnąco</option>
+            <option value="desc">Malejąco</option>
+          </select>
+        </label>
       </div>
 
       {/* --- Lista zdarzeń --- */}

@@ -1,5 +1,6 @@
 ﻿import { useState } from 'react';
 import '../styles/Waste.css';
+import '../styles/Modals.css';
 
 function Waste() {
   const [wastes, setWastes] = useState([
@@ -126,7 +127,7 @@ function Waste() {
         <thead>
           <tr>
             <th onClick={handleSort} className={sortOrder ? `sort-${sortOrder}` : ''} style={{ cursor: 'pointer' }}>
-              Kod {sortOrder === 'asc' ? '▲' : sortOrder === 'desc' ? '▼' : ''}
+              Kod
             </th>
             <th>Nazwa</th>
             <th>Notatki</th>

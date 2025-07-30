@@ -7,7 +7,6 @@
 .sidebar {
   position: relative;
   width: 220px;
-  margin-top: 50px;
   background-color: #a5d6a7;
   color: #2e7d32;
   padding: 20px;
@@ -61,7 +60,7 @@
 .admin-content {
   flex: 1;
   padding: 40px;
-  margin-top: 30px;
+  margin-top: 50px;
   background-color: #f4f4f4;
   box-sizing: border-box;
 }
@@ -78,7 +77,6 @@
   .sidebar::after {
     display: none;
   }
-}
 
   .sidebar h2 {
     margin-top: 20px;

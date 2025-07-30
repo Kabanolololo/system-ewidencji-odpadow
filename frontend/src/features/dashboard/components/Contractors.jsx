@@ -1,5 +1,6 @@
 ﻿import { useState } from 'react';
 import '../styles/Contractors.css';
+import '../styles/Modals.css';
 
 function Contractors() {
   const [contractors, setContractors] = useState([

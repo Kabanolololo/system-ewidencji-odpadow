@@ -1,5 +1,6 @@
 ﻿import { useState } from 'react';
 import '../styles/Vehicles.css';
+import '../styles/Modals.css';
 
 function Vehicles() {
   const [vehicles, setVehicles] = useState([

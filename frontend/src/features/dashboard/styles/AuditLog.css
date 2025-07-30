@@ -1,6 +1,7 @@
 .audit-log-container {
   max-width: 900px;
   margin: 40px auto;
+  margin-top: 20px;
   padding: 20px;
   font-family: Arial, sans-serif;
 }
@@ -10,7 +11,7 @@
   font-size: 1.8rem;
   font-weight: bold;
   margin-bottom: 30px;
-  color: #2e7d32;
+  color: #000000;
 }
 
 /* Filtry */
@@ -24,6 +25,7 @@
 
 .audit-log-select {
   padding: 8px 12px;
+  margin-top: 5px;
   border: 1px solid #a5d6a7;
   border-radius: 5px;
   font-size: 1rem;
@@ -43,6 +45,14 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.audit-log-label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.95rem;
+  color: #2e7d32;
+  font-weight: 600;
 }
 
 .audit-log-entry {

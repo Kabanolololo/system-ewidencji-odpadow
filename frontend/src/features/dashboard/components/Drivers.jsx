@@ -1,5 +1,6 @@
 ﻿import { useState } from 'react';
 import '../styles/Drivers.css';
+import '../styles/Modals.css';
 
 function Drivers() {
   const [drivers, setDrivers] = useState([

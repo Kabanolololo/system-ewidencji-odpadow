@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import '../styles/Users.css';
+import '../styles/Modals.css';
 
 function Users() {
   const [users, setUsers] = useState([

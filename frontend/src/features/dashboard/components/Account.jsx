@@ -1,5 +1,7 @@
 ﻿import { useState } from 'react';
 import '../styles/Account.css';
+import '../styles/Modals.css';
+import '../styles/Buttons.css';
 
 function Account() {
   const [account, setAccount] = useState({
