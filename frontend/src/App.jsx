@@ -16,8 +16,8 @@ import Reports from './features/dashboard/Reports';
 import Account from './features/dashboard/components/Account';
 import LogOut from './features/dashboard/LogOut';
 import Records from './features/dashboard/Records';
-import Users from './features/dashboard/Users';
-import AuditLog from './features/dashboard/AuditLog';
+import Users from './features/dashboard/components/Users';
+import AuditLog from './features/dashboard/components/AuditLog';
 
 function App() {
   // domyślnie true, żeby symulować "zalogowanego" użytkownika

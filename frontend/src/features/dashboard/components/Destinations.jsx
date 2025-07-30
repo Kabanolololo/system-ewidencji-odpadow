@@ -198,11 +198,11 @@ function Destinations() {
       <table className="drivers-table">
         <thead>
           <tr>
-            <th onClick={() => handleSort('country')} className={sortConfig.key === 'country' ? `sort-${sortConfig.direction}` : ''}>Country</th>
-            <th onClick={() => handleSort('voivodeship')} className={sortConfig.key === 'voivodeship' ? `sort-${sortConfig.direction}` : ''}>Voivodeship</th>
-            <th onClick={() => handleSort('city')} className={sortConfig.key === 'city' ? `sort-${sortConfig.direction}` : ''}>City</th>
-            <th onClick={() => handleSort('postal_code')} className={sortConfig.key === 'postal_code' ? `sort-${sortConfig.direction}` : ''}>Postal Code</th>
-            <th onClick={() => handleSort('address')} className={sortConfig.key === 'address' ? `sort-${sortConfig.direction}` : ''}>Address</th>
+            <th onClick={() => handleSort('country')} className={sortConfig.key === 'country' ? `sort-${sortConfig.direction}` : ''}>Kraj</th>
+            <th onClick={() => handleSort('voivodeship')} className={sortConfig.key === 'voivodeship' ? `sort-${sortConfig.direction}` : ''}>Województwo</th>
+            <th onClick={() => handleSort('city')} className={sortConfig.key === 'city' ? `sort-${sortConfig.direction}` : ''}>Miasto</th>
+            <th onClick={() => handleSort('postal_code')} className={sortConfig.key === 'postal_code' ? `sort-${sortConfig.direction}` : ''}>Kod pocztowy</th>
+            <th onClick={() => handleSort('address')} className={sortConfig.key === 'address' ? `sort-${sortConfig.direction}` : ''}>Adres</th>
             <th>Akcje</th>
           </tr>
         </thead>
