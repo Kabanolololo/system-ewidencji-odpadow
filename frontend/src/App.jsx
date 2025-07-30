@@ -4,18 +4,20 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginForm from './components/LoginForm';
 import Footer from './components/Footer';
 
-import Dashboard from './features/dashboard/Dashboard';
+import Dashboard from './features/dashboard/components/Dashboard';
 import Default from './features/dashboard/Default';
-import AdminPanel from './features/dashboard/AdminPanel';
-import Drivers from './features/dashboard/Drivers';
-import Vehicles from './features/dashboard/Vehicles';
-import Destinations from './features/dashboard/Destinations';
-import Contractors from './features/dashboard/Contractors';
-import Waste from './features/dashboard/Waste';
+import AdminPanel from './features/dashboard/components/AdminPanel';
+import Drivers from './features/dashboard/components/Drivers';
+import Vehicles from './features/dashboard/components/Vehicles';
+import Destinations from './features/dashboard/components/Destinations';
+import Contractors from './features/dashboard/components/Contractors';
+import Waste from './features/dashboard/components/Waste';
 import Reports from './features/dashboard/Reports';
-import Account from './features/dashboard/Account';
+import Account from './features/dashboard/components/Account';
 import LogOut from './features/dashboard/LogOut';
 import Records from './features/dashboard/Records';
+import Users from './features/dashboard/Users';
+import AuditLog from './features/dashboard/AuditLog';
 
 function App() {
   // domyślnie true, żeby symulować "zalogowanego" użytkownika
@@ -49,7 +51,10 @@ function App() {
             }
           >
             <Route index element={<Default />} />
-            <Route path="admin" element={<AdminPanel />} />
+            <Route path="admin" element={<AdminPanel />}>
+              <Route path="users" element={<Users />} />
+              <Route path="audit-log" element={<AuditLog />} />
+            </Route>
             <Route path="drivers" element={<Drivers />} />
             <Route path="vehicles" element={<Vehicles />} />
             <Route path="destinations" element={<Destinations />} />

@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import './styles/Contractors.css';
+import '../styles/Contractors.css';
 
 function Contractors() {
   const [contractors, setContractors] = useState([

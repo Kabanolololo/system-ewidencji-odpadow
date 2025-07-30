@@ -1,6 +1,6 @@
-import Navbar from './Navbar';
+import Navbar from '../Navbar';
 import { Outlet } from 'react-router-dom';
-import './styles/Dashboard.css';
+import '../styles/Dashboard.css';
 
 function Dashboard() {
   return (

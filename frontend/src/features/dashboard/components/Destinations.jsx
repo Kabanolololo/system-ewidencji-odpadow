@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import './styles/Destinations.css';
+import '../styles/Destinations.css';
 
 function Destinations() {
   const [destinations, setDestinations] = useState([
