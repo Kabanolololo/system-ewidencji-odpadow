@@ -12,7 +12,7 @@ import Vehicles from './features/dashboard/components/Vehicles';
 import Destinations from './features/dashboard/components/Destinations';
 import Contractors from './features/dashboard/components/Contractors';
 import Waste from './features/dashboard/components/Waste';
-import Reports from './features/dashboard/Reports';
+import Reports from './features/dashboard/components/Reports';
 import Account from './features/dashboard/components/Account';
 import LogOut from './features/dashboard/LogOut';
 import Records from './features/dashboard/Records';

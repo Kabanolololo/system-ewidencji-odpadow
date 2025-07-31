@@ -127,7 +127,7 @@ function Waste() {
         <thead>
           <tr>
             <th onClick={handleSort} className={sortOrder ? `sort-${sortOrder}` : ''} style={{ cursor: 'pointer' }}>
-              Kod
+              Kod odpadu
             </th>
             <th>Nazwa</th>
             <th>Notatki</th>
