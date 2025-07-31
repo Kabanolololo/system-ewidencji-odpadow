@@ -70,7 +70,6 @@ function AddRecord({
 
   return (
     <div className="form-card">
-      <h2>Dodaj Nową Ewidencję</h2>
       <form onSubmit={handleSubmit} className="form-grid">
         <label>
           Kontrahent:
