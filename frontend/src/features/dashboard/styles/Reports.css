@@ -1,0 +1,116 @@
+/* === Container === */
+.reports-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 100px;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
+  background-color: #fdfdfd;
+  color: #2e3a2f;
+}
+
+/* === Filtry === */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.filter {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter label {
+  margin-bottom: 0.3rem;
+  font-weight: bold;
+  color: #33691e; 
+}
+
+.filter select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #a5d6a7;
+  border-radius: 4px;
+  background-color: #e8f5e9; 
+  color: #2e3a2f;
+  transition: border-color 0.3s ease;
+}
+
+.filter select:hover,
+.filter select:focus {
+  border-color: #558b2f;
+  outline: none;
+}
+
+/* === Card === */
+.card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(56, 142, 60, 0.15);
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 1px solid #c8e6c9; 
+  color: #2e3a2f;
+}
+
+.card h2 {
+  margin-bottom: 1rem;
+  color: #2e7d32;
+}
+
+.sub-card {
+  background: #f1f8e9;
+  border-radius: 6px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #aed581;
+  color: #33691e;
+}
+
+.sub-card h3 {
+  margin-bottom: 0.5rem;
+  color: #558b2f;
+}
+
+/* === Chart placeholder === */
+.chart-placeholder {
+  background: #e3f2fd;
+  border: 2px dashed #90caf9; 
+  padding: 2rem;
+  text-align: center;
+  color: #1e88e5;
+  font-weight: 600;
+}
+
+/* === Tables === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  color: #2e3a2f;
+}
+
+thead {
+  background: #c8e6c9;
+  color: #1b5e20;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.6rem;
+  border-bottom: 1px solid #a5d6a7;
+}
+
+tbody tr:hover {
+  background: #dcedc8; 
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+  }
+}

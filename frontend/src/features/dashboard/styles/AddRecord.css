@@ -1,0 +1,134 @@
+.form-card {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1.5rem 2rem;
+  background: #f1f8e9; /* jasne, delikatne tło */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.07);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #2e7d32;
+  border: 2px solid #a5d6a7;
+}
+
+.form-card h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #2e7d32;
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem 2rem;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  color: #2e7d32;
+  font-size: 1rem;
+  position: relative;
+}
+
+.form-grid input[type="text"],
+.form-grid input[type="number"],
+.form-grid input[type="date"] {
+  margin-top: 0.4rem;
+  padding: 0.6rem 0.8rem;
+  border: 1.8px solid #a5d6a7;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  color: #2e7d32;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+.form-grid input[type="text"]:focus,
+.form-grid input[type="number"]:focus,
+.form-grid input[type="date"]:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 6px #4caf5077;
+  background-color: #f9fff9;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1.5px solid #4caf50;
+  border-top: none;
+  max-height: 140px;
+  overflow-y: auto;
+  border-radius: 0 0 6px 6px;
+  z-index: 10;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+  font-size: 0.9rem;
+  color: #2e7d32;
+}
+
+.suggestions-list li {
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.suggestions-list li:hover {
+  background-color: #4caf50;
+  color: white;
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.8rem;
+}
+
+.btn-primary {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.6rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #388e3c;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #4caf50;
+  border: 2px solid #4caf50;
+  padding: 0.5rem 1.4rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-outline:hover {
+  background-color: #4caf50;
+  color: white;
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    justify-content: center;
+  }
+}

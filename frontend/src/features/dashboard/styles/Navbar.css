@@ -1,0 +1,137 @@
+/* NAVBAR */
+.navbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	min-height: 60px;
+	background-color: #37973c;
+	padding: 10px 20px;
+	display: flex;
+	align-items: center;
+	font-family: Arial, sans-serif;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	overflow-x: auto;
+	white-space: nowrap;
+	z-index: 999;
+}
+
+.navbar.sticky {
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-logo {
+	font-weight: bold;
+	font-size: 1.5rem;
+	color: #ffffff;
+	margin-right: 40px;
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+.navbar-links {
+	display: flex;
+	flex-grow: 1;
+	justify-content: center;
+	gap: 15px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	align-items: center;
+}
+
+.navbar-links li {
+	flex-shrink: 0;
+}
+
+.navbar-links a {
+	text-decoration: none;
+	color: #ffffff;
+	font-weight: 600;
+	padding: 6px 10px;
+	border-radius: 4px;
+	transition: background-color 0.3s ease;
+	display: inline-block;
+	white-space: nowrap;
+}
+
+.navbar-links a:hover {
+	background-color: #fbc02d;
+	color: #ffffff;
+}
+
+.navbar-links a.active {
+	background-color: #f9a825;
+	color: #ffffff;
+	font-weight: 700;
+}
+
+/* BURGER MENU */
+.burger {
+	display: none;
+	flex-direction: column;
+	justify-content: space-between;
+	width: 25px;
+	height: 18px;
+	cursor: pointer;
+	margin-left: auto;
+}
+
+.burger div {
+	width: 100%;
+	height: 3px;
+	background: #ffffff;
+	transition: all 0.3s ease;
+}
+
+.burger.open div:nth-child(1) {
+	transform: rotate(45deg) translateY(7px);
+}
+
+.burger.open div:nth-child(2) {
+	opacity: 0;
+}
+
+.burger.open div:nth-child(3) {
+	transform: rotate(-45deg) translateY(-7px);
+}
+
+@media (max-width: 768px) {
+	.navbar {
+		flex-wrap: wrap;
+	}
+
+	.navbar-logo {
+		margin-right: auto;
+	}
+
+	.burger {
+		display: flex;
+	}
+
+	.navbar-links {
+		flex-basis: 100%;
+		display: none;
+		flex-direction: column;
+		align-items: flex-start;
+		background: #37973c;
+		padding: 10px 0;
+		margin-top: 10px;
+	}
+
+	.navbar-links.open {
+		display: flex;
+	}
+
+	.navbar-links li {
+		width: 100%;
+		padding: 8px 20px;
+	}
+
+	.navbar-links a {
+		display: block;
+		width: 100%;
+	}
+}
