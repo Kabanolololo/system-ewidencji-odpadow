@@ -1,249 +1,245 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, { useState } from "react";
 import '../styles/Reports.css';
 
 function Reports() {
-  // === Filtry ===
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [wasteType, setWasteType] = useState("");
-  const [contractor, setContractor] = useState("");
-
   const years = [2023, 2024, 2025];
-  const wasteTypes = ["Papier", "Plastik", "Szkło"];
-  const contractors = ["Firma X", "Firma Y"];
+  const months = [
+    { value: "01", label: "Styczeń" },
+    { value: "02", label: "Luty" },
+    { value: "03", label: "Marzec" },
+    { value: "04", label: "Kwiecień" },
+    { value: "05", label: "Maj" },
+    { value: "06", label: "Czerwiec" },
+    { value: "07", label: "Lipiec" },
+    { value: "08", label: "Sierpień" },
+    { value: "09", label: "Wrzesień" },
+    { value: "10", label: "Październik" },
+    { value: "11", label: "Listopad" },
+    { value: "12", label: "Grudzień" },
+  ];
 
-  // === Dane ===
-  const [chartData, setChartData] = useState([]);
-  const [pickupsData, setPickupsData] = useState([]);
-  const [revenueData, setRevenueData] = useState([]);
-  const [avgPriceData, setAvgPriceData] = useState([]);
-  const [topWasteData, setTopWasteData] = useState([]);
-  const [topContractorsData, setTopContractorsData] = useState([]);
+  // Globalny rok i zakres miesięcy (dla wszystkich tabel)
+  const [globalYear, setGlobalYear] = useState(2025);
+  const [startMonth, setStartMonth] = useState("01");
+  const [endMonth, setEndMonth] = useState("12");
 
-  useEffect(() => {
-    // Symulacja ładowania z API
-    // TODO: Zastąp `fetchXYZ` swoim zapytaniem do backendu
+  // Oddzielny stan roku dla wykresów
+  const [chartsYear, setChartsYear] = useState(2025);
 
-    fetchChartData();
-    fetchPickupsData();
-    fetchRevenueData();
-    fetchAvgPriceData();
-    fetchTopWasteData();
-    fetchTopContractorsData();
-  }, [year, wasteType, contractor]);
+  const getMonthLabel = (val) => months.find(m => m.value === val)?.label || val;
 
-  const fetchChartData = () => {
-    // Przykład - tutaj podłączasz do swojego backendu
-    setChartData([
-      { month: "Styczeń", Papier: 12, Plastik: 8, Szkło: 5 },
-      { month: "Luty", Papier: 10, Plastik: 7, Szkło: 4 },
-    ]);
+  // Generowanie zakresu miesięcy dla tabel
+  const generateMonthRange = (year, startM, endM) => {
+    const start = parseInt(startM);
+    const end = parseInt(endM);
+    let result = [];
+    for (let m = start; m <= end; m++) {
+      const mm = m < 10 ? `0${m}` : `${m}`;
+      result.push(`${year}-${mm}`);
+    }
+    return result;
   };
 
-  const fetchPickupsData = () => {
-    setPickupsData([
-      { waste: "Papier", month: "Styczeń", count: 12 },
-      { waste: "Plastik", month: "Styczeń", count: 8 },
-    ]);
-  };
-
-  const fetchRevenueData = () => {
-    setRevenueData([
-      { waste: "Papier", revenue: 15000, share: "35%" },
-      { waste: "Plastik", revenue: 12000, share: "28%" },
-    ]);
-  };
-
-  const fetchAvgPriceData = () => {
-    setAvgPriceData([
-      { waste: "Papier", month: "Styczeń", price: 0.85 },
-      { waste: "Plastik", month: "Styczeń", price: 0.95 },
-    ]);
-  };
-
-  const fetchTopWasteData = () => {
-    setTopWasteData([
-      { waste: "Plastik", mass: 12000, courses: 52, contractor: "Firma X" },
-      { waste: "Papier", mass: 9000, courses: 45, contractor: "Firma Y" },
-    ]);
-  };
-
-  const fetchTopContractorsData = () => {
-    setTopContractorsData([
-      { contractor: "Firma X", pickups: 152 },
-      { contractor: "Firma Y", pickups: 132 },
-    ]);
+  // Przykładowe dane (statyczne)
+  const sampleData = {
+    "01": { Papier: 1000, Plastik: 800, Szkło: 600 },
+    "02": { Papier: 1100, Plastik: 820, Szkło: 620 },
+    "03": { Papier: 1050, Plastik: 810, Szkło: 630 },
+    // ... itd.
   };
 
   return (
     <div className="reports-container">
-      {/* === Filtry === */}
-      <div className="filters">
-        <div className="filter">
-          <h1>CONCEPT TO SIE ZMIENI PRAWDOPODOBNIE</h1>
+
+      {/* Wybór roku dla wykresów (oddzielny) */}
+      <div className="filter-row">
+        <label>Rok dla wykresów:</label>
+        <select value={chartsYear} onChange={e => setChartsYear(Number(e.target.value))}>
+          {years.map(y => <option key={y} value={y}>{y}</option>)}
+        </select>
+      </div>
+
+      {/* Wykresy */}
+      <section className="card">
+        <h2>Wykres masy odpadów (rok {chartsYear})</h2>
+        <div className="chart-placeholder">[Wykres masy odpadów]</div>
+      </section>
+      <section className="card">
+        <h2>Wykres liczby odbiorów (rok {chartsYear})</h2>
+        <div className="chart-placeholder">[Wykres liczby odbiorów]</div>
+      </section>
+
+      {/* Globalne filtry dla tabel */}
+      <section className="card">
+        <h2>Filtry dla tabel</h2>
+        <div className="filter-row">
           <label>Rok:</label>
-          <select value={year} onChange={(e) => setYear(Number(e.target.value))}>
-            {years.map((y) => (
-              <option key={y} value={y}>{y}</option>
-            ))}
+          <select value={globalYear} onChange={e => setGlobalYear(Number(e.target.value))}>
+            {years.map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
+
+          <label>Zakres miesięcy:</label>
+          <select value={startMonth} onChange={e => setStartMonth(e.target.value)}>
+            {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+          </select>
+          -
+          <select value={endMonth} onChange={e => setEndMonth(e.target.value)}>
+            {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>
         </div>
+      </section>
 
-        <div className="filter">
-          <label>Typ odpadu:</label>
-          <select value={wasteType} onChange={(e) => setWasteType(e.target.value)}>
-            <option value="">Wszystkie</option>
-            {wasteTypes.map((w) => (
-              <option key={w} value={w}>{w}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="filter">
-          <label>Kontrahent:</label>
-          <select value={contractor} onChange={(e) => setContractor(e.target.value)}>
-            <option value="">Wszyscy</option>
-            {contractors.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* === Wykres === */}
-      <div className="card">
-        <h2>Masa odpadów w roku</h2>
-        {/* Zastąp placeholder swoim wykresem (np. Chart.js, Recharts) */}
-        <div className="chart-placeholder">
-          {chartData.map((row, idx) => (
-            <div key={idx}>{row.month}: Papier {row.Papier} | Plastik {row.Plastik} | Szkło {row.Szkło}</div>
-          ))}
-        </div>
-      </div>
-
-      {/* === Liczba odbiorów w kartach === */}
-      <div className="card">
-        <h2>Liczba odbiorów w roku</h2>
-        {wasteTypes.map((waste) => (
-          <div key={waste} className="sub-card">
-            <h3>{waste}</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Miesiąc</th>
-                  <th>Liczba odbiorów</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pickupsData
-                  .filter((p) => p.waste === waste)
-                  .map((p, idx) => (
-                    <tr key={idx}>
-                      <td>{p.month}</td>
-                      <td>{p.count}</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
-        ))}
-      </div>
-
-      {/* === Przychody === */}
-      <div className="card">
-        <h2>Przychody</h2>
+      {/* Tabela masy odpadów - korzysta z globalYear, startMonth, endMonth */}
+      <section className="card">
+        <h2>Tabela masy odpadów</h2>
         <table>
           <thead>
             <tr>
-              <th>Typ odpadu</th>
+              <th>Miesiąc</th>
+              <th>Papier (kg)</th>
+              <th>Plastik (kg)</th>
+              <th>Szkło (kg)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {generateMonthRange(globalYear, startMonth, endMonth).map(month => {
+              const mm = month.split("-")[1];
+              return (
+                <tr key={month}>
+                  <td>{month} ({getMonthLabel(mm)})</td>
+                  <td>{sampleData[mm]?.Papier ?? "-"}</td>
+                  <td>{sampleData[mm]?.Plastik ?? "-"}</td>
+                  <td>{sampleData[mm]?.Szkło ?? "-"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </section>
+
+      {/* Tabela liczby odbiorów - analogicznie */}
+      <section className="card">
+        <h2>Tabela liczby odbiorów</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Miesiąc</th>
+              <th>Papier</th>
+              <th>Plastik</th>
+              <th>Szkło</th>
+            </tr>
+          </thead>
+          <tbody>
+            {generateMonthRange(globalYear, startMonth, endMonth).map(month => {
+              const mm = month.split("-")[1];
+              return (
+                <tr key={month}>
+                  <td>{month} ({getMonthLabel(mm)})</td>
+                  <td>{sampleData[mm]?.Papier ? Math.floor(sampleData[mm].Papier / 100) : "-"}</td>
+                  <td>{sampleData[mm]?.Plastik ? Math.floor(sampleData[mm].Plastik / 100) : "-"}</td>
+                  <td>{sampleData[mm]?.Szkło ? Math.floor(sampleData[mm].Szkło / 100) : "-"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </section>
+
+      {/* Tabela średniej ceny za kg */}
+      <section className="card">
+        <h2>Średnia cena za kg</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Miesiąc</th>
+              <th>Papier (PLN)</th>
+              <th>Plastik (PLN)</th>
+              <th>Szkło (PLN)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {generateMonthRange(globalYear, startMonth, endMonth).map(month => {
+              const mm = month.split("-")[1];
+              // Przykładowe ceny
+              const price = sampleData[mm] ? {
+                Papier: 0.8,
+                Plastik: 0.9,
+                Szkło: 0.85,
+              } : null;
+
+              return (
+                <tr key={month}>
+                  <td>{month} ({getMonthLabel(mm)})</td>
+                  <td>{price ? price.Papier.toFixed(2) : "-"}</td>
+                  <td>{price ? price.Plastik.toFixed(2) : "-"}</td>
+                  <td>{price ? price.Szkło.toFixed(2) : "-"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </section>
+
+      {/* Przychody z danego odpadu i ogólny (wspólny filtr z tabelami) */}
+      <section className="card">
+        <h2>Przychody z danego odpadu</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Miesiąc</th>
+              <th>Papier (PLN)</th>
+              <th>Plastik (PLN)</th>
+              <th>Szkło (PLN)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {generateMonthRange(globalYear, startMonth, endMonth).map(month => {
+              const mm = month.split("-")[1];
+              const data = sampleData[mm];
+              const papierIncome = data ? data.Papier * 0.8 : 0;
+              const plastikIncome = data ? data.Plastik * 0.9 : 0;
+              const szkloIncome = data ? data.Szkło * 0.85 : 0;
+
+              return (
+                <tr key={month}>
+                  <td>{month} ({getMonthLabel(mm)})</td>
+                  <td>{papierIncome ? papierIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-"}</td>
+                  <td>{plastikIncome ? plastikIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-"}</td>
+                  <td>{szkloIncome ? szkloIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+
+        <br />
+        <h2>Przychody ogólne (PLN)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Miesiąc</th>
               <th>Przychód (PLN)</th>
-              <th>Udział %</th>
             </tr>
           </thead>
           <tbody>
-            {revenueData.map((r, idx) => (
-              <tr key={idx}>
-                <td>{r.waste}</td>
-                <td>{r.revenue} PLN</td>
-                <td>{r.share}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            {generateMonthRange(globalYear, startMonth, endMonth).map(month => {
+              const mm = month.split("-")[1];
+              const data = sampleData[mm];
+              const income = data
+                ? data.Papier * 0.8 + data.Plastik * 0.9 + data.Szkło * 0.85
+                : 0;
 
-      {/* === Średnia cena za kg === */}
-      <div className="card">
-        <h2>Średnia cena za kg (miesięczna)</h2>
-        {wasteTypes.map((waste) => (
-          <div key={waste} className="sub-card">
-            <h3>{waste}</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Miesiąc</th>
-                  <th>Średnia cena (PLN)</th>
+              return (
+                <tr key={month}>
+                  <td>{month} ({getMonthLabel(mm)})</td>
+                  <td>{income ? income.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-"}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {avgPriceData
-                  .filter((a) => a.waste === waste)
-                  .map((a, idx) => (
-                    <tr key={idx}>
-                      <td>{a.month}</td>
-                      <td>{a.price} PLN</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
-        ))}
-      </div>
-
-      {/* === TOP 3 odpady === */}
-      <div className="card">
-        <h2>TOP 3 najczęściej wywożone odpady</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Typ odpadu</th>
-              <th>Masa (kg)</th>
-              <th>Liczba kursów</th>
-              <th>Najwięcej dla kontrahenta</th>
-            </tr>
-          </thead>
-          <tbody>
-            {topWasteData.map((t, idx) => (
-              <tr key={idx}>
-                <td>{t.waste}</td>
-                <td>{t.mass} kg</td>
-                <td>{t.courses}</td>
-                <td>{t.contractor}</td>
-              </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
-      </div>
+      </section>
 
-      {/* === TOP 3 kontrahenci === */}
-      <div className="card">
-        <h2>TOP 3 najczęściej odwiedzane firmy</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Kontrahent</th>
-              <th>Liczba odbiorów</th>
-            </tr>
-          </thead>
-          <tbody>
-            {topContractorsData.map((c, idx) => (
-              <tr key={idx}>
-                <td>{c.contractor}</td>
-                <td>{c.pickups}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }

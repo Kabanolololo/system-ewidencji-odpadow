@@ -10,35 +10,33 @@
 }
 
 /* === Filtry === */
-.filters {
+.filter-row {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 2rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
-.filter {
-  display: flex;
-  flex-direction: column;
-}
-
-.filter label {
-  margin-bottom: 0.3rem;
+.filter-row label {
   font-weight: bold;
-  color: #33691e; 
+  color: #33691e;
+  margin-right: 0.5rem;
+  white-space: nowrap;
 }
 
-.filter select {
+.filter-row select {
   padding: 0.4rem 0.6rem;
   border: 1px solid #a5d6a7;
   border-radius: 4px;
-  background-color: #e8f5e9; 
+  background-color: #e8f5e9;
   color: #2e3a2f;
   transition: border-color 0.3s ease;
+  min-width: 120px;
 }
 
-.filter select:hover,
-.filter select:focus {
+.filter-row select:hover,
+.filter-row select:focus {
   border-color: #558b2f;
   outline: none;
 }
@@ -50,8 +48,13 @@
   box-shadow: 0 2px 6px rgba(56, 142, 60, 0.15);
   margin-bottom: 2rem;
   padding: 1.5rem;
-  border: 1px solid #c8e6c9; 
+  border: 1px solid #c8e6c9;
   color: #2e3a2f;
+}
+
+/* Margines między kolejnymi kartami */
+.card + .card {
+  margin-top: 1.5rem;
 }
 
 .card h2 {
@@ -78,7 +81,7 @@
 /* === Chart placeholder === */
 .chart-placeholder {
   background: #e3f2fd;
-  border: 2px dashed #90caf9; 
+  border: 2px dashed #90caf9;
   padding: 2rem;
   text-align: center;
   color: #1e88e5;
@@ -104,13 +107,45 @@ th, td {
   border-bottom: 1px solid #a5d6a7;
 }
 
+/* Wyrównanie liczb do prawej (wszystkie kolumny poza pierwszą) */
+th:nth-child(n+2),
+td:nth-child(n+2) {
+  text-align: right;
+}
+
+/* Lepsze wyrównanie nagłówków tabel */
+thead th {
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+}
+
+/* Podświetlenie wiersza przy hover */
 tbody tr:hover {
-  background: #dcedc8; 
+  background: #dcedc8;
+}
+
+/* === Body padding === */
+body {
+  margin: 0;
+  padding: 0 1rem 2rem 1rem;
+  background-color: #f5f9f4;
 }
 
 /* === Responsive === */
 @media (max-width: 768px) {
-  .filters {
+  .filter-row {
     flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-row label,
+  .filter-row select {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  th, td {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.5rem;
   }
 }
