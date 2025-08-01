@@ -103,3 +103,9 @@ def validate_password(password: str):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Hasło musi zawierać co najmniej jeden znak specjalny."
         )
+
+# Formatowanie imienia i nazwiska
+def format_name_surname(name: Optional[str], surname: Optional[str]) -> tuple[str, str]:
+    formatted_name = name.strip().lower().capitalize() if name else ""
+    formatted_surname = surname.strip().lower().capitalize() if surname else ""
+    return formatted_name, formatted_surname

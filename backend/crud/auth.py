@@ -10,11 +10,11 @@ def get_user_by_username(db: Session, username: str):
     return db.query(User).filter(User.username == username).first()
 
 # Funkcja autentykująca użytkownika
-def authenticate_user(db: Session, username: str, password: str) -> str:
+def authenticate_user(db: Session, username: str, password: str) -> tuple[str, int]:
     user = db.query(User).filter(User.username == username).first()
     if not user or not verify_password(password, user.password_hash):
         raise HTTPException(status_code=401, detail="Nieprawidłowy login lub hasło")
 
     token_data = {"user_id": user.id, "role": user.role}
     access_token = create_access_token(token_data)
-    return access_token
+    return access_token, user.id, user.role

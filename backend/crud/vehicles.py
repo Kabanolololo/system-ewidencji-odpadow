@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.vehicles import Vehicle
 from schema.vehicles import VehicleBase, VehicleCreate, VehicleUpdate, VehicleFilterParams
-from utils.vehicles import validate_id, get_by_id, validate_registration_number
+from utils.vehicles import validate_id, get_by_id, validate_registration_number, format_registration_number
 from crud.audit_log import create_audit_log
 
 # Funkcja do pobierania wszystkich samochodów
@@ -46,6 +46,10 @@ def get_one_car(car_id: int, db: Session):
 
 # Funkcja tworzenia samochodu
 def created_car(car: VehicleCreate, user_id: int, db: Session):
+    
+    # Funkcja: Formatowanie numeru rejestracyjnego
+    car.registration_number = format_registration_number(car.registration_number)
+
     # FUNKCJA: Sprawdzenie unikalnosci tablicy
     validate_registration_number(car.registration_number, db)
     
@@ -75,6 +79,9 @@ def updated_car(car_id: int, car: VehicleUpdate, user_id: int, db: Session):
     # FUNKCJA: Pobieranie destynacji po id
     existing_car = get_by_id(car_id, db)
 
+    # Funkcja: Formatowanie numeru rejestracyjnego
+    car.registration_number = format_registration_number(car.registration_number)
+    
     # FUNKCJA: Sprawdzenie unikalnosci tablicy
     validate_registration_number(car.registration_number, db, exclude_id=car_id)
     

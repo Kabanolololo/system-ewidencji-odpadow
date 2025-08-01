@@ -66,4 +66,4 @@ class WasteRecordFilterParams(BaseModel):
         "destination_id", "transfer_date", "mass_kg", "price_per_kg", "total_price"
     ]] = Query("transfer_date")
 
-    sort_order: Optional[Literal["asc", "desc"]] = Query("asc")
+    sort_order: Optional[Literal["asc", "desc"]] = Query("desc")

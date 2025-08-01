@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.users import User
 from schema.users import UserBase, UserCreate, UserUpdate, UserAdminUpdate, UserOut, UserFilterParams
-from utils.users import validate_id, get_by_id, generate_unique_username, validate_name_surname, validate_password
+from utils.users import validate_id, get_by_id, generate_unique_username, validate_name_surname, validate_password, format_name_surname
 from auth.hash import hash_password
 from crud.audit_log import create_audit_log
 
@@ -66,6 +66,9 @@ def get_one_user(user_id: int, db: Session):
 def create_user(user: UserCreate, user_id: int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawne dane
     validate_name_surname(user.name, user.surname)
+    
+    # FUNKCJA: Formatowanie imienia i nazwiska
+    user.name, user.surname = format_name_surname(user.name, user.surname)
 
     # FUNKCJA: Generowanie username do logowania
     username = generate_unique_username(user.name, user.surname, db)
@@ -111,7 +114,11 @@ def update_user(user_id: int, user_data: UserUpdate, db: Session):
         new_name = user_data.name or db_user.name
         new_surname = user_data.surname or db_user.surname
 
+        # Funkcja: Walidacja imienia i nazwiska
         validate_name_surname(new_name, new_surname)
+        
+        # FUNKCJA: Formatowanie imienia i nazwiska
+        new_name, new_surname = format_name_surname(new_name, new_surname)
 
         # FUNKCJA: Generowanie username do logowania
         username = generate_unique_username(new_name, new_surname, db, exclude_id=user_id)
@@ -158,7 +165,13 @@ def update_user_admin(user_id: int, user: UserAdminUpdate, db: Session):
         new_name = user.name or db_user.name
         new_surname = user.surname or db_user.surname
 
+        # FUNKCJA: Walidacja imienia i nazwiska
         validate_name_surname(new_name, new_surname)
+        
+        # FUNKCJA: Formatowanie imienia i nazwiska
+        new_name, new_surname = format_name_surname(new_name, new_surname)
+        
+        # FUNKCJA: Generowanie username do logowania
         username = generate_unique_username(new_name, new_surname, db, exclude_id=user_id)
         db_user.username = username
 

@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from models.destinations import Destination
 from schema.destinations import DestinationBase, DestinationCreate, DestinationUpdate, DestinationOut,DestinationFilterParams
 from utils.contractors import clean_address
-from utils.destinations import validate_id, get_by_id
+from utils.destinations import validate_id, get_by_id, format_location_fields
 import re
 from crud.audit_log import create_audit_log
 
@@ -68,6 +68,10 @@ def get_one_destination(destination_id: int, db: Session):
 
 # Funkcja tworzenia destynacji
 def create_destination(destination: DestinationCreate, user_id:int, db: Session):
+    
+    # FUNKCJA: formatowanie pól lokalizacji
+    destination.country, destination.voivodeship, destination.city = format_location_fields(destination.country,destination.voivodeship,destination.city)
+    
     # FUNKCJA: Czyszczenie adresu
     validate_address = clean_address(destination.address)
         
@@ -104,6 +108,9 @@ def update_destination(destination_id: int, destination: DestinationUpdate, user
         
     # FUNKCJA: Pobieranie destynacji po id
     existing_destination = get_by_id(destination_id, db)
+    
+    # FUNKCJA: formatowanie pól lokalizacji
+    destination.country, destination.voivodeship, destination.city = format_location_fields(destination.country,destination.voivodeship,destination.city)
     
     # FUNKCJA: Czyszczenie adresu
     validate_address = clean_address(destination.address)

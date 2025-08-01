@@ -13,5 +13,5 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(), 
     db: Session = Depends(get_db)
 ):
-    access_token = authenticate_user(db, form_data.username, form_data.password)
-    return {"access_token": access_token, "token_type": "bearer"}
+    access_token, user_id, role = authenticate_user(db, form_data.username, form_data.password)
+    return {"access_token": access_token, "token_type": "bearer", "user_id": user_id, "role": role}

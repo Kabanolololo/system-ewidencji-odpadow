@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.driver import Driver
 from schema.driver import DriverBase, DriverCreate, DriverUpdate, DriverFilterParams
-from utils.driver import validate_id, get_by_id, validate_name_surname
+from utils.driver import validate_id, get_by_id, validate_name_surname, format_driver_name_surname
 from crud.audit_log import create_audit_log
 
 # Funkcja do pobierania wszystkich kierowców wraz z sortowaniem
@@ -56,6 +56,9 @@ def get_one_driver(driver_id: int, db: Session):
 def created_driver(driver: DriverCreate, user_id: int, db: Session):
     # FUNKCJA: Walidacja imienia i nazwiska czy sa stringami
     validate_name_surname(driver.name, driver.surname)
+    
+    # FUNKCJA: Formatowanie imienia i nazwiska
+    driver.name, driver.surname = format_driver_name_surname(driver.name, driver.surname)
         
     # Dodanie kierowcy do bazy danych
     try:
@@ -89,6 +92,9 @@ def updated_driver(driver_id: int, driver: DriverUpdate, user_id:int, db: Sessio
     # FUNKCJA: Tworzy kopię starych danych
     old_data = db_driver.__dict__.copy()
     old_data.pop('_sa_instance_state', None)
+    
+    # FUNKCJA: Formatowanie imienia i nazwiska
+    driver.name, driver.surname = format_driver_name_surname(driver.name, driver.surname)
     
     # Aktualizacja pól
     db_driver.name = driver.name
