@@ -124,13 +124,6 @@ tbody tr:hover {
   background: #dcedc8;
 }
 
-/* === Body padding === */
-body {
-  margin: 0;
-  padding: 0 1rem 2rem 1rem;
-  background-color: #f5f9f4;
-}
-
 /* === Responsive === */
 @media (max-width: 768px) {
   .filter-row {
