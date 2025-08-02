@@ -3,13 +3,21 @@ from sqlalchemy.orm import Session
 from api.dependencies import get_db
 from crud.reports import get_waste_mass_by_month, get_available_years, get_pickup_counts_by_month, get_average_revenue_by_waste, get_revenue_by_month, get_total_revenue_by_month
 from schema.reports import WasteMassByMonth, YearsResponse, WastePickupCount, WasteAverageRevenue, WasteRevenueByMonth, TotalRevenueByMonth, FilterParameters
-from typing import List    
+from typing import List
+from utils.jwt import check_user_or_admin    
 
 router = APIRouter()
 
+############################################################################## 
+################### Endpointy dla użytkowników zalgowanych ###################
+############################################################################## 
+
 # Endpointy wyświetlający lata
 @router.get("/api/reports/years", response_model=YearsResponse)
-def get_years(db: Session = Depends(get_db)):
+def get_years(
+    db: Session = Depends(get_db), 
+    current_user: dict = Depends(check_user_or_admin)
+    ):
     years = get_available_years(db)
     return {"years": years}
 
@@ -17,7 +25,8 @@ def get_years(db: Session = Depends(get_db)):
 @router.get("/api/reports/waste-mass", response_model=List[WasteMassByMonth])
 def waste_mass_report(
     filters: FilterParameters = Depends(),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db), 
+    current_user: dict = Depends(check_user_or_admin)
 ):
     data = get_waste_mass_by_month(
         db, 
@@ -31,7 +40,8 @@ def waste_mass_report(
 @router.get("/api/reports/pickup-counts", response_model=List[WastePickupCount])
 def pickup_counts(
     filters: FilterParameters = Depends(),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db), 
+    current_user: dict = Depends(check_user_or_admin)
 ):
     return get_pickup_counts_by_month(db, filters.year, filters.month_from, filters.month_to)
 
@@ -39,7 +49,8 @@ def pickup_counts(
 @router.get("/api/reports/average-revenue", response_model=List[WasteAverageRevenue])
 def average_revenue(
     filters: FilterParameters = Depends(),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db), 
+    current_user: dict = Depends(check_user_or_admin)
 ):
     return get_average_revenue_by_waste(db, filters.year, filters.month_from, filters.month_to)
 
@@ -47,7 +58,8 @@ def average_revenue(
 @router.get("/api/reports/revenue-by-month", response_model=List[WasteRevenueByMonth])
 def revenue_by_month(
     filters: FilterParameters = Depends(),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db), 
+    current_user: dict = Depends(check_user_or_admin)
 ):
     return get_revenue_by_month(db, filters.year, filters.month_from, filters.month_to)
 
@@ -55,6 +67,7 @@ def revenue_by_month(
 @router.get("/api/reports/total-revenue-by-month", response_model=List[TotalRevenueByMonth])
 def total_revenue_by_month(
     filters: FilterParameters = Depends(),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db), 
+    current_user: dict = Depends(check_user_or_admin)
 ):
     return get_total_revenue_by_month(db, filters.year, filters.month_from, filters.month_to)
