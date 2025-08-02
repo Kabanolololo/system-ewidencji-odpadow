@@ -108,9 +108,13 @@ function RecordTable() {
   }, [records, filters, sortBy, sortDir]);
 
   const renderSortIcon = (field) => {
-    if (sortBy !== field) return null;
-    return sortDir === "asc" ? "▲" : "▼";
-  };
+  if (sortBy !== field) return null;
+  return (
+    <span style={{ fontSize: "10px", color: "#4CAF50"}}>
+      {sortDir === "asc" ? "▲" : "▼"}
+    </span>
+  );
+};
 
   // Obsługa edycji
   const handleEdit = (record) => {
@@ -308,6 +312,7 @@ function RecordTable() {
             ].map(({ label, field }) => (
               <th
                 key={label}
+                
                 onClick={field ? () => handleSortChange(field) : undefined}
                 style={{ cursor: field ? "pointer" : "default" }}
               >
