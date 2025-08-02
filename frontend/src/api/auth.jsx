@@ -3,8 +3,9 @@ export async function loginUser(username, password) {
   formBody.append("username", username);
   formBody.append("password", password);
 
+  // Endpoint do logowania
   try {
-    const response = await fetch("http://localhost:8000/auth/login", {
+    const response = await fetch("http://192.168.0.33:8000/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -13,7 +14,7 @@ export async function loginUser(username, password) {
     });
 
     if (!response.ok) {
-      // Pobierz info o błędzie z odpowiedzi
+      // Jeśli odpowiedź nie jest OK, pokazujemy błąd
       let errorMsg = `Błąd HTTP: ${response.status}`;
       try {
         const errorData = await response.json();
@@ -27,7 +28,7 @@ export async function loginUser(username, password) {
     }
 
     const data = await response.json();
-    return data; // { access_token, token_type, user_id, role }
+    return data;
   } catch (error) {
     throw new Error(error.message);
   }

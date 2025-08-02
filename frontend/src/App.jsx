@@ -20,7 +20,7 @@ import Users from './features/dashboard/components/Users';
 import AuditLog from './features/dashboard/components/AuditLog';
 
 function App() {
-  // Zmieniamy startowy stan na null - "nie wiemy jeszcze"
+  // Zmieniamy startowy stan na null
   const [isLoggedIn, setIsLoggedIn] = useState(null);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ function App() {
 
   // Dopóki nie wiemy czy jest zalogowany, nie renderujemy routingu
   if (isLoggedIn === null) {
-    return <div>Ładowanie...</div>;  // lub loader, spinner itp.
+    return console.log("Ładowanie podstrony...");
   }
 
   return (
@@ -51,7 +51,7 @@ function App() {
 
           {/* Chroniony dashboard */}
           <Route
-            path="/dashboard/*"   // <-- zmieniamy na /* żeby obsłużyć podścieżki
+            path="/dashboard/*"
             element={
               isLoggedIn ? (
                 <Dashboard />

@@ -5,6 +5,8 @@ import './styles/Navbar.css';
 function Navbar() {
   const [isSticky, setIsSticky] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  // Stan do przechowywania roli użytkownika
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -12,6 +14,10 @@ function Navbar() {
     };
 
     window.addEventListener('scroll', handleScroll);
+
+    // Pobranie roli użytkownika z localStorage i zapis do stanu
+    const storedRole = localStorage.getItem('role');
+    setRole(storedRole);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -30,7 +36,9 @@ function Navbar() {
       </div>
 
       <ul className={`navbar-links ${menuOpen ? 'open' : ''}`}>
-        <li><NavLink to="/dashboard/admin" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Panel Admina</NavLink></li>
+         {role === 'admin' && (
+          <li><NavLink to="/dashboard/admin" className={({ isActive }) => (isActive ? 'active' : '')}onClick={() => setMenuOpen(false)}>Panel Admina</NavLink></li>
+        )}
         <li><NavLink to="/dashboard/drivers" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Kierowcy</NavLink></li>
         <li><NavLink to="/dashboard/vehicles" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Pojazdy</NavLink></li>
         <li><NavLink to="/dashboard/destinations" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Destynacje</NavLink></li>
