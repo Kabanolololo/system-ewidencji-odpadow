@@ -30,16 +30,16 @@ function Navbar() {
       </div>
 
       <ul className={`navbar-links ${menuOpen ? 'open' : ''}`}>
-        <li><NavLink to="admin" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Panel Admina</NavLink></li>
-        <li><NavLink to="drivers" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Kierowcy</NavLink></li>
-        <li><NavLink to="vehicles" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Pojazdy</NavLink></li>
-        <li><NavLink to="destinations" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Destynacje</NavLink></li>
-        <li><NavLink to="contractors" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Kontrahenci</NavLink></li>
-        <li><NavLink to="waste" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Odpady</NavLink></li>
-        <li><NavLink to="records" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Ewidencja</NavLink></li>
-        <li><NavLink to="reports" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Raporty</NavLink></li>
-        <li><NavLink to="account" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Edytuj Konto</NavLink></li>
-        <li><NavLink to="logout" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Wyloguj</NavLink></li>
+        <li><NavLink to="/dashboard/admin" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Panel Admina</NavLink></li>
+        <li><NavLink to="/dashboard/drivers" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Kierowcy</NavLink></li>
+        <li><NavLink to="/dashboard/vehicles" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Pojazdy</NavLink></li>
+        <li><NavLink to="/dashboard/destinations" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Destynacje</NavLink></li>
+        <li><NavLink to="/dashboard/contractors" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Kontrahenci</NavLink></li>
+        <li><NavLink to="/dashboard/waste" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Odpady</NavLink></li>
+        <li><NavLink to="/dashboard/records" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Ewidencja</NavLink></li>
+        <li><NavLink to="/dashboard/reports" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Raporty</NavLink></li>
+        <li><NavLink to="/dashboard/account" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Edytuj Konto</NavLink></li>
+        <li><NavLink to="/dashboard/logout" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setMenuOpen(false)}>Wyloguj</NavLink></li>
       </ul>
     </nav>
   );
