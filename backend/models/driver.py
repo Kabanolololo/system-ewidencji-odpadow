@@ -16,3 +16,7 @@ class Driver(Base):
 
     # Relacja 1:n  Kierowca -> Ewidencja
     waste_records = relationship("WasteRecord", back_populates="driver")
+    
+    @property
+    def full_name(self):
+        return f"{self.name} {self.surname}"

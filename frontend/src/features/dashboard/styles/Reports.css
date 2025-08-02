@@ -110,7 +110,7 @@ th, td {
 /* Wyrównanie liczb do prawej (wszystkie kolumny poza pierwszą) */
 th:nth-child(n+2),
 td:nth-child(n+2) {
-  text-align: right;
+  text-align: center;
 }
 
 /* Lepsze wyrównanie nagłówków tabel */

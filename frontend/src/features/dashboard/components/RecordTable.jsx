@@ -3,16 +3,16 @@ import EditRecordModal from "./EditRecordModal";
 import "../styles/RecordTable.css";
 
 function RecordTable() {
-  // Tu masz listę rekordów w stanie, jeden przykładowy rekord
+  // Przykładowe rekordy z nowymi polami tekstowymi
   const [records, setRecords] = useState([
     {
       id: 1,
-      contractor_id: 1,
-      user_id: 2,
-      waste_id: 3,
-      vehicle_id: 4,
-      driver_id: 5,
-      destination_id: 6,
+      contractor_nip: "1234567890",
+      user_username: "jan_kowalski",
+      waste_code: "WST001",
+      vehicle_registration_number: "XYZ1234",
+      driver_full_name: "Adam Nowak",
+      destination_name: "Zakład Utylizacji",
       transfer_date: "2025-07-31",
       mass_kg: 1200,
       price_per_kg: 2.5,
@@ -22,12 +22,12 @@ function RecordTable() {
   ]);
 
   const [filters, setFilters] = useState({
-    contractor_id: "",
-    user_id: "",
-    waste_id: "",
-    vehicle_id: "",
-    driver_id: "",
-    destination_id: "",
+    contractor_nip: "",
+    user_username: "",
+    waste_code: "",
+    vehicle_registration_number: "",
+    driver_full_name: "",
+    destination_name: "",
     transfer_date_from: "",
     transfer_date_to: "",
     mass_kg_min: "",
@@ -62,47 +62,26 @@ function RecordTable() {
   // Filtracja i sortowanie
   const filteredSortedRecords = useMemo(() => {
     let filtered = records.filter((r) => {
-      const idsToCheck = [
-        "contractor_id",
-        "user_id",
-        "waste_id",
-        "vehicle_id",
-        "driver_id",
-        "destination_id",
-      ];
-      for (const idField of idsToCheck) {
-        if (filters[idField] !== "") {
-          if (Number(r[idField]) !== Number(filters[idField])) return false;
-        }
-      }
+      // Filtry tekstowe - sprawdzanie, czy zawiera fragment (case insensitive)
+      if (filters.contractor_nip && !r.contractor_nip.toLowerCase().includes(filters.contractor_nip.toLowerCase())) return false;
+      if (filters.user_username && !r.user_username.toLowerCase().includes(filters.user_username.toLowerCase())) return false;
+      if (filters.waste_code && !r.waste_code.toLowerCase().includes(filters.waste_code.toLowerCase())) return false;
+      if (filters.vehicle_registration_number && !r.vehicle_registration_number.toLowerCase().includes(filters.vehicle_registration_number.toLowerCase())) return false;
+      if (filters.driver_full_name && !r.driver_full_name.toLowerCase().includes(filters.driver_full_name.toLowerCase())) return false;
+      if (filters.destination_name && !r.destination_name.toLowerCase().includes(filters.destination_name.toLowerCase())) return false;
 
-      if (filters.transfer_date_from) {
-        if (r.transfer_date < filters.transfer_date_from) return false;
-      }
-      if (filters.transfer_date_to) {
-        if (r.transfer_date > filters.transfer_date_to) return false;
-      }
+      // Filtry zakresowe
+      if (filters.transfer_date_from && r.transfer_date < filters.transfer_date_from) return false;
+      if (filters.transfer_date_to && r.transfer_date > filters.transfer_date_to) return false;
 
-      if (filters.mass_kg_min !== "") {
-        if (r.mass_kg < Number(filters.mass_kg_min)) return false;
-      }
-      if (filters.mass_kg_max !== "") {
-        if (r.mass_kg > Number(filters.mass_kg_max)) return false;
-      }
+      if (filters.mass_kg_min && r.mass_kg < Number(filters.mass_kg_min)) return false;
+      if (filters.mass_kg_max && r.mass_kg > Number(filters.mass_kg_max)) return false;
 
-      if (filters.price_per_kg_min !== "") {
-        if (r.price_per_kg < Number(filters.price_per_kg_min)) return false;
-      }
-      if (filters.price_per_kg_max !== "") {
-        if (r.price_per_kg > Number(filters.price_per_kg_max)) return false;
-      }
+      if (filters.price_per_kg_min && r.price_per_kg < Number(filters.price_per_kg_min)) return false;
+      if (filters.price_per_kg_max && r.price_per_kg > Number(filters.price_per_kg_max)) return false;
 
-      if (filters.total_price_min !== "") {
-        if (r.total_price < Number(filters.total_price_min)) return false;
-      }
-      if (filters.total_price_max !== "") {
-        if (r.total_price > Number(filters.total_price_max)) return false;
-      }
+      if (filters.total_price_min && r.total_price < Number(filters.total_price_min)) return false;
+      if (filters.total_price_max && r.total_price > Number(filters.total_price_max)) return false;
 
       return true;
     });
@@ -158,69 +137,70 @@ function RecordTable() {
 
   return (
     <div className="record-table-wrapper">
-
       <div className="filters">
+        {/* Filtry tekstowe */}
         <div className="filter-item">
-          <label>Kontrahent ID</label>
+          <label>Kontrahent NIP</label>
           <input
-            type="number"
-            name="contractor_id"
-            value={filters.contractor_id}
+            type="text"
+            name="contractor_nip"
+            value={filters.contractor_nip}
             onChange={handleFilterChange}
-            placeholder="Kontrahent ID"
+            placeholder="Kontrahent NIP"
           />
         </div>
         <div className="filter-item">
-          <label>Użytkownik ID</label>
+          <label>Użytkownik</label>
           <input
-            type="number"
-            name="user_id"
-            value={filters.user_id}
+            type="text"
+            name="user_username"
+            value={filters.user_username}
             onChange={handleFilterChange}
-            placeholder="Użytkownik ID"
+            placeholder="Nazwa użytkownika"
           />
         </div>
         <div className="filter-item">
-          <label>Typ odpadu ID</label>
+          <label>Typ odpadu (kod)</label>
           <input
-            type="number"
-            name="waste_id"
-            value={filters.waste_id}
+            type="text"
+            name="waste_code"
+            value={filters.waste_code}
             onChange={handleFilterChange}
-            placeholder="Typ odpadu ID"
+            placeholder="Kod odpadu"
           />
         </div>
         <div className="filter-item">
-          <label>Pojazd ID</label>
+          <label>Numer rejestracyjny pojazdu</label>
           <input
-            type="number"
-            name="vehicle_id"
-            value={filters.vehicle_id}
+            type="text"
+            name="vehicle_registration_number"
+            value={filters.vehicle_registration_number}
             onChange={handleFilterChange}
-            placeholder="Pojazd ID"
+            placeholder="Numer rejestracyjny"
           />
         </div>
         <div className="filter-item">
-          <label>Kierowca ID</label>
+          <label>Kierowca (pełna nazwa)</label>
           <input
-            type="number"
-            name="driver_id"
-            value={filters.driver_id}
+            type="text"
+            name="driver_full_name"
+            value={filters.driver_full_name}
             onChange={handleFilterChange}
-            placeholder="Kierowca ID"
+            placeholder="Imię i nazwisko kierowcy"
           />
         </div>
         <div className="filter-item">
-          <label>Destynacja ID</label>
+          <label>Destynacja</label>
           <input
-            type="number"
-            name="destination_id"
-            value={filters.destination_id}
+            type="text"
+            name="destination_name"
+            value={filters.destination_name}
             onChange={handleFilterChange}
-            placeholder="Destynacja ID"
+            placeholder="Nazwa destynacji"
           />
         </div>
 
+        {/* Filtry zakresowe */}
         <div className="filter-item">
           <label>Data od</label>
           <input
@@ -308,52 +288,51 @@ function RecordTable() {
         </div>
       </div>
 
-
       <table className="record-table">
         <thead>
           <tr>
-            {[
+            {[ 
               { label: "ID", field: "id" },
-              { label: "Kontrahent ID", field: "contractor_id" },
-              { label: "Użytkownik ID", field: "user_id" },
-              { label: "Typ odpadu ID", field: "waste_id" },
-              { label: "Pojazd ID", field: "vehicle_id" },
-              { label: "Kierowca ID", field: "driver_id" },
-              { label: "Destynacja ID", field: "destination_id" },
-              { label: "Data przekazania", field: "transfer_date" },
+              { label: "Kontrahent NIP", field: "contractor_nip" },
+              { label: "Użytkownik", field: "user_username" },
+              { label: "Typ odpadu (kod)", field: "waste_code" },
+              { label: "Nr rejestracyjny pojazdu", field: "vehicle_registration_number" },
+              { label: "Kierowca", field: "driver_full_name" },
+              { label: "Destynacja", field: "destination_name" },
+              { label: "Data transferu", field: "transfer_date" },
               { label: "Masa (kg)", field: "mass_kg" },
-              { label: "Cena za kg (PLN)", field: "price_per_kg" },
-              { label: "Łączna cena (PLN)", field: "total_price" },
+              { label: "Cena/kg (PLN)", field: "price_per_kg" },
+              { label: "Cena łączna (PLN)", field: "total_price" },
+              { label: "Notatki", field: "notes" },
+              { label: "Akcje", field: null }
             ].map(({ label, field }) => (
               <th
-                key={field}
-                onClick={() => handleSortChange(field)}
-                className={sortBy === field ? "sorted" : ""}
+                key={label}
+                onClick={field ? () => handleSortChange(field) : undefined}
+                style={{ cursor: field ? "pointer" : "default" }}
               >
-                {label} <span style={{ fontSize: "0.7rem", marginLeft: "4px" }}>{renderSortIcon(field)}</span>
+                {label} {field && renderSortIcon(field)}
               </th>
             ))}
-            <th>Notatki</th>
-            <th>Akcje</th>
           </tr>
         </thead>
         <tbody>
           {filteredSortedRecords.length === 0 ? (
             <tr>
-              <td colSpan="13" style={{ textAlign: "center" }}>
-                Brak danych do wyświetlenia.
+              <td colSpan="14" style={{ textAlign: "center" }}>
+                Brak rekordów do wyświetlenia
               </td>
             </tr>
           ) : (
             filteredSortedRecords.map((r) => (
               <tr key={r.id}>
                 <td>{r.id}</td>
-                <td>{r.contractor_id}</td>
-                <td>{r.user_id}</td>
-                <td>{r.waste_id}</td>
-                <td>{r.vehicle_id}</td>
-                <td>{r.driver_id}</td>
-                <td>{r.destination_id}</td>
+                <td>{r.contractor_nip}</td>
+                <td>{r.user_username}</td>
+                <td>{r.waste_code}</td>
+                <td>{r.vehicle_registration_number}</td>
+                <td>{r.driver_full_name}</td>
+                <td>{r.destination_name}</td>
                 <td>{r.transfer_date}</td>
                 <td>{r.mass_kg}</td>
                 <td>{r.price_per_kg.toFixed(2)}</td>
