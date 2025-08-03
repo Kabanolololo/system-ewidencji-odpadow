@@ -28,5 +28,5 @@ class AuditLogOut(BaseModel):
 class AuditLogParams(BaseModel):
     table_name: Optional[Literal["wastes","waste_records","vehicles","users","drivers","destinations","contractors"]] = Query(None)
     operation: Optional[Literal["create","update","delete"]] = Query(None)
-    sort_by: Optional[Literal["table_name","operation","created_at"]] = Query("table_name")
-    sort_order: Optional[Literal["asc", "desc"]] = Query("asc")
+    sort_by: Optional[Literal["table_name","operation","created_at"]] = Query("created_at")
+    sort_order: Optional[Literal["asc", "desc"]] = Query("desc")
