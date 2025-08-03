@@ -105,9 +105,13 @@ def create_user(user: UserCreate, user_id: int, db: Session):
 def update_user(user_id: int, user_data: UserUpdate, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(user_id)
-
+    
     # FUNKCJA: Pobieranie użytkownika po id
     db_user = get_by_id(user_id, db)
+    
+    # FUNKCJA: Tworzy kopię starych danych
+    old_data = db_user.__dict__.copy()
+    old_data.pop('_sa_instance_state', None)
 
     if user_data.name or user_data.surname:
         # FUNKCJA: Walidacja czy podajemy poprawne dane
@@ -127,7 +131,9 @@ def update_user(user_id: int, user_data: UserUpdate, db: Session):
         db_user.name = new_name
         db_user.surname = new_surname
 
-    db_user.role = "user"
+    # Jeśli rola jest podana, sprawdź czy jest poprawna
+    if db_user.role not in ["admin", "user"]:
+        db_user.role = "user"
 
     if user_data.password_hash:
         # Waliduj podane nowe hasło
@@ -139,6 +145,10 @@ def update_user(user_id: int, user_data: UserUpdate, db: Session):
     try:
         db.commit()
         db.refresh(db_user)
+        
+        # FUNKCJA: Tworzy i zapisuje log audytu w bazie
+        create_audit_log(db=db, user_id=user_id, table_name="users", record_id=db_user.id, operation="update", old_data=old_data, new_data=db_user)
+        
     except Exception:
         db.rollback()
         raise HTTPException(

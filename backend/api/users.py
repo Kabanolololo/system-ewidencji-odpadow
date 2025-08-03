@@ -20,6 +20,8 @@ def get_user(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
+    # FUNKCJA: czy ty to ty
+    check_is_self(current_user, user_id)
     return get_one_user(user_id=user_id, db=db)
 
 # Endpoint do aktualizacji pojedynczego elementu (USER)
