@@ -1,13 +1,16 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException, status, Depends
 from sqlalchemy.exc import IntegrityError
 from models.audit_log import AuditLog
+from models.users import User
 from schema.log import AuditLogOut, AuditLogParams
 from utils.contractors import validate_id, get_by_id
 
 # Funkcja do pobierania wszystkich firm wraz z filtrowaniem
 def get_all_logs(filters: AuditLogParams, db: Session):
-    query = db.query(AuditLog)
+    query = db.query(AuditLog).options(
+        joinedload(AuditLog.user)
+    )
     
      # Filtrowanie po nazwie tabeli/operacji
     if filters.table_name:
