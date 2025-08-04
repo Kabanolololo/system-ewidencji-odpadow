@@ -88,7 +88,7 @@ function Account() {
     setSaveError(null);
   };
 
-  if (error) return <p className="error">{error}</p>;
+  if (error) return <p className="error" style={{marginTop: "100px"}}>{error}</p>;
   if (!account) return <p className='loading'>Ładowanie danych...</p>;
 
   return (
