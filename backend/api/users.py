@@ -70,10 +70,23 @@ def update_existing_user_admin(
     return update_user_admin(user_id=user_id, user=user, db=db)
 
 # Endpoint do usuwania pojedynczego elementu
-@router.delete("/{user_id}")
+@router.delete("/{user_id}", status_code=status.HTTP_200_OK)
 def delete_existing_user(
         user_id: int, 
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_admin)
     ):
-    return delete_user(user_id=user_id, db=db)
+    try:
+        if user_id == current_user["user_id"]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Nie można usunąć własnego konta"
+            )
+        return delete_user(user_id=user_id, current_user_id=current_user["user_id"], db=db)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Wystąpił błąd podczas usuwania użytkownika: {str(e)}"
+        )

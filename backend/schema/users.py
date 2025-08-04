@@ -5,8 +5,8 @@ from fastapi import Query
 
 # Schemat podstawowy dla usera
 class UserBase(BaseModel):
-    name: str = "Jan"
-    surname: str = "Kowalski"
+    name: str
+    surname: str
 
 # schemat tworzenia usera
 class UserCreate(UserBase):

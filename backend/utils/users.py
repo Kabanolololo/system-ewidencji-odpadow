@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from models.users import User
 import string
+import unicodedata
 
 # Walidacja czy podajemy poprawną liczbę
 def validate_id(user_id: int):
@@ -23,9 +24,15 @@ def get_by_id(user_id: int, db: Session) -> User:
         )
     return user
 
-# Generowanie username do logowania
+# Usuwa polskie znaki diakrytyczne z tekstu
+def strip_accents(text: str) -> str:
+    text = unicodedata.normalize('NFKD', text)
+    return ''.join([c for c in text if not unicodedata.combining(c)])
+
 def generate_unique_username(name: str, surname: str, db: Session, exclude_id: Optional[int] = None) -> str:
     base_username = f"{name[0].lower()}{surname.lower()}"
+    base_username = strip_accents(base_username)
+
     username = base_username
     counter = 1
 

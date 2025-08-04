@@ -211,18 +211,38 @@ def update_user_admin(user_id: int, user: UserAdminUpdate, db: Session):
     return db_user
 
 
-# Funkcja do usunięcia users
-def delete_user(user_id: int, db: Session):
-    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+def delete_user(user_id: int, current_user_id: int, db: Session):
+    # Walidacja czy podajemy poprawną liczbę
     validate_id(user_id)
     
-    # FUNKCJA: Pobieranie destynacji po id
+    # Pobieranie użytkownika po id
     db_user = get_by_id(user_id, db)
     
-    #FUNKCJA: tworzy i zapisuje log audytu w bazie  
-    create_audit_log(db=db, user_id=user_id, table_name="users", record_id=db_user.id, operation="delete", old_data=db_user, new_data=None)
+    # Zachowanie danych użytkownika przed usunięciem do logu
+    user_data = db_user.__dict__.copy()
+    user_data.pop('_sa_instance_state', None)
     
-    # Usunięcie kierowcy
-    db.delete(db_user)
-    db.commit()
-    return {"message": f"Usunięto użytkownika o id {user_id}"}
+    try:
+        # Utworzenie logu audytu przed commitem
+        create_audit_log(
+            db=db,
+            user_id=current_user_id,
+            table_name="users",
+            record_id=user_id,
+            operation="delete",
+            old_data=user_data,
+            new_data=None
+        )
+        
+        # Usunięcie użytkownika
+        db.delete(db_user)
+
+        db.commit()
+        return {"message": f"Usunięto użytkownika o id {user_id}"}
+        
+    except Exception:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Wystąpił błąd podczas usuwania użytkownika"
+        )

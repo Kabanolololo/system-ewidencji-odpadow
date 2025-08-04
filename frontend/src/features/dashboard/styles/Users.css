@@ -21,6 +21,29 @@ h1 {
 	border-radius: 6px;
 	box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
 	border: 2px solid #a5d6a7;
+	transition: all 0.3s ease;
+	overflow: hidden;
+}
+
+.add-user-form .info {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #2e7d32;
+  background: #e8f5e9;
+  padding: 8px 12px;
+  border-left: 4px solid #66bb6a;
+  border-radius: 4px;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .form-row {
