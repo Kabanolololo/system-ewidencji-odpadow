@@ -8,18 +8,21 @@ function Drivers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Form states
+  // Stan do dodawania nowego kierowcy
   const [newDriver, setNewDriver] = useState({ name: '', surname: '' });
   const [addError, setAddError] = useState('');
 
+  // Stany do wyszukiwania i sortowania
   const [searchName, setSearchName] = useState('');
   const [searchSurname, setSearchSurname] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
 
+  // Stan do edycji kierowcy
   const [editingDriver, setEditingDriver] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
 
+  // Ładowanie kierowców z backendu
   useEffect(() => {
     async function loadDrivers() {
       setLoading(true);
@@ -49,7 +52,7 @@ function Drivers() {
     setSortConfig({ key, direction });
   };
 
-  // Dodawanie kierowcy (na froncie tylko)
+  // Dodawanie nowego kierowcy
   const handleAddDriver = async (e) => {
     e.preventDefault();
     setAddError('');
@@ -74,7 +77,7 @@ function Drivers() {
     }
   };
 
-  // Edycja formularza
+  // Obsługa zmiany danych edytowanego kierowcy
   const handleChangeEditing = (e) => {
     const { name, value } = e.target;
     setEditingDriver({ ...editingDriver, [name]: value });
@@ -105,12 +108,13 @@ function Drivers() {
     }
   };
 
-
+  // Anulowanie edycji
   const handleCancelEdit = () => {
     setEditingDriver(null);
     setSaveError('');
   };
 
+  // Obsługa usuwania kierowcy
   const handleDeleteDriver = async (e, id) => {
     e.stopPropagation();
     if (window.confirm('Czy na pewno chcesz usunąć tego kierowcę?')) {

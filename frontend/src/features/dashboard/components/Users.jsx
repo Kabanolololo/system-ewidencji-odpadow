@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchAllUsersWithStoredToken, createNewUser ,updateUserById, deleteUserById } from '../../../api/Users'; // <-- DODANE
+import { fetchAllUsersWithStoredToken, createNewUser ,updateUserById, deleteUserById } from '../../../api/Users';
 import '../styles/Users.css';
 import '../styles/Modals.css';
 
