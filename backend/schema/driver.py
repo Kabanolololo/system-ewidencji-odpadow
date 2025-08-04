@@ -5,8 +5,8 @@ from fastapi import Query
 
 # Schematy podstawowy dla kierowców
 class DriverBase(BaseModel):
-    name: str = "Jan"
-    surname: str = "Kowalski"
+    name: str
+    surname: str
 
 # schemat tworzenia kierowcy
 class DriverCreate(DriverBase):
@@ -14,8 +14,8 @@ class DriverCreate(DriverBase):
 
 # schemat aktualizacja kierowcy
 class DriverUpdate(DriverBase):
-    name: Optional[str] = "Edyta"
-    surname: Optional[str] = "Miłoszewska"
+    name: Optional[str]
+    surname: Optional[str]
 
 # Schemat do zwracania na GET
 class DriverOut(DriverBase):

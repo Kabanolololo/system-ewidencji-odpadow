@@ -1,88 +1,142 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
+import { fetchAllDriversWithStoredToken, createNewDriver, updateDriverById, deleteDriverById } from '../../../api/Drivers';
 import '../styles/Drivers.css';
 import '../styles/Modals.css';
 
 function Drivers() {
-  const [drivers, setDrivers] = useState([
-    { id: 1, firstName: 'Jan', lastName: 'Kowalski' },
-    { id: 2, firstName: 'Anna', lastName: 'Nowak' },
-    { id: 3, firstName: 'Piotr', lastName: 'Zieliński' },
-  ]);
+  const [drivers, setDrivers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const [newDriver, setNewDriver] = useState({ firstName: '', lastName: '' });
-  const [searchFirstName, setSearchFirstName] = useState('');
-  const [searchLastName, setSearchLastName] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  // Form states
+  const [newDriver, setNewDriver] = useState({ name: '', surname: '' });
+  const [addError, setAddError] = useState('');
+
+  const [searchName, setSearchName] = useState('');
+  const [searchSurname, setSearchSurname] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
+
   const [editingDriver, setEditingDriver] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
-  const handleAddDriver = (e) => {
-    e.preventDefault();
-    if (!newDriver.firstName.trim() || !newDriver.lastName.trim()) return;
+  useEffect(() => {
+    async function loadDrivers() {
+      setLoading(true);
+      setError('');
+      try {
+        const data = await fetchAllDriversWithStoredToken({
+          name: searchName,
+          surname: searchSurname,
+          sort_by: sortConfig.key,
+          sort_order: sortConfig.direction,
+        });
+        setDrivers(data);
+      } catch (err) {
+        setError(err.message || 'Błąd podczas pobierania kierowców');
+        setDrivers([]);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-    const newId = drivers.length ? Math.max(...drivers.map(d => d.id)) + 1 : 1;
-    setDrivers([...drivers, { id: newId, ...newDriver }]);
-    setNewDriver({ firstName: '', lastName: '' });
-  };
+    loadDrivers();
+  }, [searchName, searchSurname, sortConfig]);
 
   const handleSort = (key) => {
     let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
+    if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
     setSortConfig({ key, direction });
   };
 
-  const sortedDrivers = [...drivers].sort((a, b) => {
-    if (!sortConfig.key) return 0;
-    const aKey = a[sortConfig.key].toLowerCase();
-    const bKey = b[sortConfig.key].toLowerCase();
+  // Dodawanie kierowcy (na froncie tylko)
+  const handleAddDriver = async (e) => {
+    e.preventDefault();
+    setAddError('');
 
-    if (aKey < bKey) return sortConfig.direction === 'asc' ? -1 : 1;
-    if (aKey > bKey) return sortConfig.direction === 'asc' ? 1 : -1;
-    return 0;
-  });
+    if (!newDriver.name.trim() || !newDriver.surname.trim()) {
+      setAddError('Wszystkie pola są wymagane.');
+      return;
+    }
 
-  const filteredDrivers = sortedDrivers.filter(driver =>
-    driver.firstName.toLowerCase().includes(searchFirstName.toLowerCase()) &&
-    driver.lastName.toLowerCase().includes(searchLastName.toLowerCase())
-  );
+    try {
+      const createdDriver = await createNewDriver({
+        name: newDriver.name.trim(),
+        surname: newDriver.surname.trim(),
+      });
 
-  const handleDeleteDriver = (e, id) => {
-    e.stopPropagation();
-    if (window.confirm('Czy na pewno chcesz usunąć tego kierowcę?')) {
-      setDrivers(drivers.filter(d => d.id !== id));
-      if (editingDriver?.id === id) {
-        setEditingDriver(null);
-      }
+      setDrivers([...drivers, createdDriver]);
+
+      setNewDriver({ name: '', surname: '' });
+    } catch (err) {
+      console.error(err);
+      setAddError(err.message || "Błąd podczas dodawania kierowcy");
     }
   };
 
+  // Edycja formularza
   const handleChangeEditing = (e) => {
     const { name, value } = e.target;
     setEditingDriver({ ...editingDriver, [name]: value });
   };
 
-  const handleSaveEdit = () => {
-    setDrivers(drivers.map(d => (d.id === editingDriver.id ? editingDriver : d)));
-    setEditingDriver(null);
+  const handleSaveEdit = async () => {
+    setSaving(true);
+    setSaveError('');
+
+    if (!editingDriver.name.trim() || !editingDriver.surname.trim()) {
+      setSaveError('Wszystkie pola są wymagane.');
+      setSaving(false);
+      return;
+    }
+
+    try {
+      const updatedDriver = await updateDriverById(editingDriver.id, {
+        name: editingDriver.name.trim(),
+        surname: editingDriver.surname.trim(),
+      });
+
+      setDrivers(drivers.map(d => (d.id === updatedDriver.id ? updatedDriver : d)));
+      setEditingDriver(null);
+    } catch (err) {
+      setSaveError(err.message || 'Błąd podczas zapisywania zmian');
+    } finally {
+      setSaving(false);
+    }
   };
+
 
   const handleCancelEdit = () => {
     setEditingDriver(null);
+    setSaveError('');
+  };
+
+  const handleDeleteDriver = async (e, id) => {
+    e.stopPropagation();
+    if (window.confirm('Czy na pewno chcesz usunąć tego kierowcę?')) {
+      try {
+        await deleteDriverById(id);
+        setDrivers(drivers.filter(d => d.id !== id));
+        if (editingDriver?.id === id) setEditingDriver(null);
+      } catch (err) {
+        alert(err.message || 'Błąd podczas usuwania kierowcy');
+      }
+    }
   };
 
   return (
     <div className="drivers-container">
       <h1>Lista Kierowców</h1>
 
+      {/* Formularz dodawania */}
       <form onSubmit={handleAddDriver} className="add-driver-form">
         <div className="form-row">
           <label>
             Imię:
             <input
               type="text"
-              value={newDriver.firstName}
-              onChange={e => setNewDriver({ ...newDriver, firstName: e.target.value })}
+              value={newDriver.name}
+              onChange={e => setNewDriver({ ...newDriver, name: e.target.value })}
               placeholder="Wpisz imię"
               required
             />
@@ -91,83 +145,84 @@ function Drivers() {
             Nazwisko:
             <input
               type="text"
-              value={newDriver.lastName}
-              onChange={e => setNewDriver({ ...newDriver, lastName: e.target.value })}
+              value={newDriver.surname}
+              onChange={e => setNewDriver({ ...newDriver, surname: e.target.value })}
               placeholder="Wpisz nazwisko"
               required
             />
           </label>
         </div>
         <button type="submit" className="add-button">Dodaj</button>
+        {addError && <p className="error">{addError}</p>}
       </form>
 
-
-      <div className="search-inputs">
+      {/* Filtry */}
+      <div className="search-inputs" style={{ marginBottom: '1rem' }}>
         <input
           type="text"
           placeholder="Szukaj po imieniu"
-          value={searchFirstName}
-          onChange={e => setSearchFirstName(e.target.value)}
+          value={searchName}
+          onChange={e => setSearchName(e.target.value)}
         />
         <input
           type="text"
           placeholder="Szukaj po nazwisku"
-          value={searchLastName}
-          onChange={e => setSearchLastName(e.target.value)}
+          value={searchSurname}
+          onChange={e => setSearchSurname(e.target.value)}
         />
       </div>
 
-      <table className="drivers-table">
-        <thead>
-          <tr>
-            <th
-              onClick={() => handleSort('firstName')}
-              className={sortConfig.key === 'firstName' ? `sort-${sortConfig.direction}` : ''}
-            >
-              Imię
-            </th>
-            <th
-              onClick={() => handleSort('lastName')}
-              className={sortConfig.key === 'lastName' ? `sort-${sortConfig.direction}` : ''}
-            >
-              Nazwisko
-            </th>
-            <th>Akcje</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredDrivers.map(driver => (
-            <tr key={driver.id}>
-              <td>{driver.firstName}</td>
-              <td>{driver.lastName}</td>
-              <td>
-                <button
-                  onClick={() => setEditingDriver(driver)}
-                  className="edit-button"
-                  title="Edytuj kierowcę"
-                >
-                  Edytuj
-                </button>
-                <button
-                  onClick={(e) => handleDeleteDriver(e, driver.id)}
-                  className="delete-button"
-                  title="Usuń kierowcę"
-                >
-                  ×
-                </button>
-              </td>
-            </tr>
-          ))}
-          {filteredDrivers.length === 0 && (
-            <tr>
-              <td colSpan="3" style={{ textAlign: 'center', fontStyle: 'italic' }}>
-                Brak wyników
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      {error && <p className="error">{error}</p>}
 
+      {/* Tabela */}
+      <div style={{ position: 'relative' }}>
+        {drivers.length > 0 ? (
+          <table className="users-table">
+            <thead>
+              <tr>
+                <th
+                  onClick={() => handleSort('name')}
+                  className={sortConfig.key === 'name' ? `sort-${sortConfig.direction}` : ''}
+                  style={{ cursor: 'pointer' }}
+                >
+                  Imię
+                </th>
+                <th
+                  onClick={() => handleSort('surname')}
+                  className={sortConfig.key === 'surname' ? `sort-${sortConfig.direction}` : ''}
+                  style={{ cursor: 'pointer' }}
+                >
+                  Nazwisko
+                </th>
+                <th>Akcje</th>
+              </tr>
+            </thead>
+            <tbody>
+              {drivers.map(driver => (
+                <tr key={driver.id}>
+                  <td>{driver.name}</td>
+                  <td>{driver.surname}</td>
+                  <td>
+                    <button onClick={() => setEditingDriver(driver)} className="edit-button">Edytuj</button>
+                    <button onClick={(e) => handleDeleteDriver(e, driver.id)} className="delete-button">×</button>
+
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          !loading && !error && <p style={{ textAlign: 'center', fontStyle: 'italic' }}>Brak wyników.</p>
+        )}
+
+        {loading && (
+          <div className="loading-overlay">
+            <div className="spinner"></div>
+          </div>
+        )}
+      </div>
+
+      {/* Edycja */}
       {editingDriver && (
         <div className="modal-overlay" onClick={handleCancelEdit}>
           <div className="edit-panel" onClick={e => e.stopPropagation()}>
@@ -177,8 +232,8 @@ function Drivers() {
               Imię:
               <input
                 type="text"
-                name="firstName"
-                value={editingDriver.firstName}
+                name="name"
+                value={editingDriver.name}
                 onChange={handleChangeEditing}
                 required
               />
@@ -187,15 +242,19 @@ function Drivers() {
               Nazwisko:
               <input
                 type="text"
-                name="lastName"
-                value={editingDriver.lastName}
+                name="surname"
+                value={editingDriver.surname}
                 onChange={handleChangeEditing}
                 required
               />
             </label>
+
+            {saveError && <p className="error">{saveError}</p>}
+            {saving && <p className="loading">Zapisywanie zmian...</p>}
+
             <div className="buttons">
-              <button onClick={handleSaveEdit}>Zapisz</button>
-              <button onClick={handleCancelEdit}>Anuluj</button>
+              <button onClick={handleSaveEdit} disabled={saving}>Zapisz</button>
+              <button onClick={handleCancelEdit} disabled={saving}>Anuluj</button>
             </div>
           </div>
         </div>
