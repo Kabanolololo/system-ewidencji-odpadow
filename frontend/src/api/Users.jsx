@@ -33,7 +33,7 @@ export async function fetchAllUsersWithStoredToken({ name, surname, role, sort_b
     }
     throw new Error(errorData.detail || `Błąd ${response.status} podczas pobierania listy użytkowników`);
   }
-
+  console.log('Pobrano listę użytkowników');
   return response.json();
 }
 
@@ -65,7 +65,7 @@ export async function createNewUser({ name, surname, password_hash, role }) {
     } catch (_) {}
     throw new Error(errorData.detail || `Błąd ${response.status} podczas tworzenia użytkownika`);
   }
-
+  console.log('Dodano nowego użytkownika:', name, surname, role);
   return response.json();
 }
 
@@ -97,7 +97,7 @@ export async function updateUserById(user_id, { name, surname, password_hash, ro
     } catch (_) {}
     throw new Error(errorData.detail || `Błąd ${response.status} podczas aktualizacji użytkownika`);
   }
-
+  console.log('Zaktualizowano użytkownika o id:', user_id);
   return response.json();
 }
 
@@ -127,6 +127,6 @@ export async function deleteUserById(user_id) {
     } catch (_) {}
     throw new Error(errorData.detail || `Błąd ${response.status} podczas usuwania użytkownika`);
   }
-
+  console.log('Usunięto użytkownika o id:', user_id);
   return response.json();
 }
