@@ -160,7 +160,7 @@ h1 {
 .contractors-table th,
 .contractors-table td {
 	padding: 12px 15px;
-	text-align: left;
+	text-align: left !important;
 	border-bottom: 1px solid #eee;
 	user-select: none;
 	color: #2e7d32;

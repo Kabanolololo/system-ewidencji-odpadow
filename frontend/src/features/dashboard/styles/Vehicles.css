@@ -104,6 +104,10 @@ h1 {
 	width: 100%;
 	border-collapse: collapse;
 }
+.vehicles-table th,
+.vehicles-table td {
+	text-align: left !important;
+}
 
 .vehicles-table th {
 	background-color: #a5d6a7;
@@ -117,9 +121,11 @@ h1 {
 }
 
 .vehicles-table td {
+	text-align: left;
 	padding: 12px 15px;
 	border-bottom: 1px solid #eee;
 	color: #2e7d32;
+	
 }
 
 .vehicles-table tr:hover {

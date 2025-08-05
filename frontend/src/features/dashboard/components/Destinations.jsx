@@ -196,7 +196,7 @@ function Destinations() {
         />
       </div>
 
-      <table className="drivers-table">
+      <table className="destinations-table">
         <thead>
           <tr>
             <th onClick={() => handleSort('country')} className={sortConfig.key === 'country' ? `sort-${sortConfig.direction}` : ''}>Kraj</th>
