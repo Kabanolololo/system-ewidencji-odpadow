@@ -52,7 +52,7 @@ def get_all_destinations(filters: DestinationFilterParams, db: Session):
     if not drivers:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Brak kierowców w systemie"
+            detail="Brak destynacji w systemie"
         )
     
     return drivers
