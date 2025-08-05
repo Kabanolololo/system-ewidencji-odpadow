@@ -1,78 +1,186 @@
-﻿import { useState } from 'react';
+﻿import { useState, useEffect } from 'react';
+import { fetchAllVehiclesWithStoredToken, createNewVehicle, updateVehicleById, deleteVehicleById } from '../../../api/Vehicles';
 import '../styles/Vehicles.css';
 import '../styles/Modals.css';
 
 function Vehicles() {
-  const [vehicles, setVehicles] = useState([
-    { id: 1, registration: 'ABC123', make: 'Toyota', model: 'Corolla' },
-    { id: 2, registration: 'XYZ789', make: 'Ford', model: 'Focus' },
-    { id: 3, registration: 'DEF456', make: 'Honda', model: 'Civic' },
-  ]);
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
+  // Stan do dodawania nowego pojazdu
   const [newVehicle, setNewVehicle] = useState({ registration: '', make: '', model: '' });
+  const [addError, setAddError] = useState('');
+
+  // Stany do wyszukiwania i sortowania
   const [searchRegistration, setSearchRegistration] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
+
+  // Stan do edycji pojazdu
   const [editingVehicle, setEditingVehicle] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
-  const handleAddVehicle = (e) => {
-    e.preventDefault();
-    if (!newVehicle.registration.trim() || !newVehicle.make.trim() || !newVehicle.model.trim()) return;
-
-    const newId = vehicles.length ? Math.max(...vehicles.map(v => v.id)) + 1 : 1;
-    setVehicles([...vehicles, { id: newId, ...newVehicle }]);
-    setNewVehicle({ registration: '', make: '', model: '' });
+  // Mapowanie kluczy sortowania do backendowych
+  const backendSortKeysMap = {
+    registration: 'registration_number',
+    make: 'brand',
+    model: 'model',
   };
 
-  const handleSort = () => {
+  // Ładowanie pojazdów z backendu
+  useEffect(() => {
+    const loadVehicles = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        // Mapowanie klucza sortowania do backendowego
+        const backendSortKey = backendSortKeysMap[sortConfig.key] || '';
+
+        const data = await fetchAllVehiclesWithStoredToken({
+          registration_number: searchRegistration,
+          sort_by: backendSortKey,
+          sort_order: sortConfig.direction,
+        });
+
+        // Mapowanie danych z API do formatu zgodnego z frontendem
+        const mappedVehicles = data.map(v => ({
+          id: v.id,
+          registration: v.registration_number,
+          make: v.brand,
+          model: v.model,
+        }));
+
+        setVehicles(mappedVehicles);
+      } catch (err) {
+        setError(err.message || 'Błąd podczas pobierania pojazdów');
+        setVehicles([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadVehicles();
+  }, [searchRegistration, sortConfig]);
+
+  // Obsługa sortowania
+  const allowedSortKeys = ['registration'];
+  const handleSort = (key) => {
+    if (!allowedSortKeys.includes(key)) {
+      return;
+    }
+
     let direction = 'asc';
-    if (sortConfig.key === 'registration' && sortConfig.direction === 'asc') {
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
     }
-    setSortConfig({ key: 'registration', direction });
+    setSortConfig({ key, direction });
   };
 
-  const sortedVehicles = [...vehicles].sort((a, b) => {
-    if (!sortConfig.key) return 0;
-    const aKey = a.registration.toLowerCase();
-    const bKey = b.registration.toLowerCase();
+  // Dodawanie nowego pojazdu
+  const handleAddVehicle = async (e) => {
+    e.preventDefault();
+    setAddError('');
 
-    if (aKey < bKey) return sortConfig.direction === 'asc' ? -1 : 1;
-    if (aKey > bKey) return sortConfig.direction === 'asc' ? 1 : -1;
-    return 0;
-  });
+    if (!newVehicle.registration.trim() || !newVehicle.make.trim() || !newVehicle.model.trim()) {
+      setAddError('Wszystkie pola są wymagane.');
+      return;
+    }
 
-  const filteredVehicles = sortedVehicles.filter(vehicle =>
-    vehicle.registration.toLowerCase().includes(searchRegistration.toLowerCase())
-  );
+    try {
+      const createdVehicle = await createNewVehicle({
+        registration_number: newVehicle.registration.trim(),
+        brand: newVehicle.make.trim(),
+        model: newVehicle.model.trim(),
+      });
 
-  const handleDeleteVehicle = (e, id) => {
+      setVehicles([...vehicles, {
+        id: createdVehicle.id,
+        registration: createdVehicle.registration_number,
+        make: createdVehicle.brand,
+        model: createdVehicle.model,
+      }]);
+
+      setNewVehicle({ registration: '', make: '', model: '' });
+    } catch (err) {
+      console.error(err);
+      setAddError(err.message || "Błąd podczas dodawania pojazdu");
+    }
+  };
+
+  // Usuwanie pojazdu
+  const handleDeleteVehicle = async (e, id) => {
     e.stopPropagation();
     if (window.confirm('Czy na pewno chcesz usunąć ten pojazd?')) {
-      setVehicles(vehicles.filter(v => v.id !== id));
-      if (editingVehicle?.id === id) {
-        setEditingVehicle(null);
+      try {
+        await deleteVehicleById(id);
+        setVehicles(vehicles.filter(v => v.id !== id));
+        if (editingVehicle?.id === id) setEditingVehicle(null);
+      } catch (err) {
+        alert(err.message || 'Błąd podczas usuwania pojazdu');
       }
     }
   };
 
+  // Obsługa zmiany danych edytowanego pojazdu
   const handleChangeEditing = (e) => {
     const { name, value } = e.target;
     setEditingVehicle({ ...editingVehicle, [name]: value });
   };
 
-  const handleSaveEdit = () => {
-    setVehicles(vehicles.map(v => (v.id === editingVehicle.id ? editingVehicle : v)));
-    setEditingVehicle(null);
+  // Zapisanie zmian w edytowanym pojeździe
+  const handleSaveEdit = async () => {
+    setSaveError('');
+    setSaving(true);
+
+    if (
+      !editingVehicle.registration.trim() ||
+      !editingVehicle.make.trim() ||
+      !editingVehicle.model.trim()
+    ) {
+      setSaveError('Wszystkie pola są wymagane.');
+      setSaving(false);
+      return;
+    }
+
+    try {
+      const updatedVehicle = await updateVehicleById(editingVehicle.id, {
+        registration_number: editingVehicle.registration.trim(),
+        brand: editingVehicle.make.trim(),
+        model: editingVehicle.model.trim(),
+      });
+
+      setVehicles(vehicles.map(v =>
+        v.id === updatedVehicle.id
+          ? {
+              id: updatedVehicle.id,
+              registration: updatedVehicle.registration_number,
+              make: updatedVehicle.brand,
+              model: updatedVehicle.model,
+            }
+          : v
+      ));
+      
+      setEditingVehicle(null);
+    } catch (err) {
+      console.error(err);
+      setSaveError(err.message || 'Błąd podczas zapisywania pojazdu');
+    } finally {
+      setSaving(false);
+    }
   };
 
+  // Anulowanie edycji
   const handleCancelEdit = () => {
     setEditingVehicle(null);
+    setSaveError('');
   };
 
   return (
     <div className="vehicles-container">
       <h1>Lista Pojazdów</h1>
 
+      {/* Formularz dodawania pojazdu */}
       <form onSubmit={handleAddVehicle} className="add-vehicle-form">
         <div className="form-row">
           <label>
@@ -107,9 +215,11 @@ function Vehicles() {
           </label>
         </div>
         <button type="submit" className="add-button">Dodaj</button>
+        {addError && <p className="error">{addError}</p>}
       </form>
 
-      <div className="search-inputs">
+      {/* Filtr po rejestracji */}
+      <div className="search-inputs" style={{ marginBottom: '1rem' }}>
         <input
           type="text"
           placeholder="Szukaj po rejestracji"
@@ -118,54 +228,79 @@ function Vehicles() {
         />
       </div>
 
-      <table className="vehicles-table">
-        <thead>
-          <tr>
-            <th
-              onClick={handleSort}
-              className={sortConfig.key === 'registration' ? `sort-${sortConfig.direction}` : ''}
-            >
-              Numer rejestracyjny
-            </th>
-            <th>Marka</th>
-            <th>Model</th>
-            <th>Akcje</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredVehicles.map(vehicle => (
-            <tr key={vehicle.id}>
-              <td>{vehicle.registration}</td>
-              <td>{vehicle.make}</td>
-              <td>{vehicle.model}</td>
-              <td>
-                <button
-                  onClick={() => setEditingVehicle(vehicle)}
-                  className="edit-button"
-                  title="Edytuj pojazd"
-                >
-                  Edytuj
-                </button>
-                <button
-                  onClick={(e) => handleDeleteVehicle(e, vehicle.id)}
-                  className="delete-button"
-                  title="Usuń pojazd"
-                >
-                  ×
-                </button>
-              </td>
-            </tr>
-          ))}
-          {filteredVehicles.length === 0 && (
-            <tr>
-              <td colSpan="4" style={{ textAlign: 'center', fontStyle: 'italic' }}>
-                Brak wyników
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      {error && <p className="error">{error}</p>}
 
+      {/* Tabela pojazdów */}
+      <div style={{ position: 'relative' }}>
+        {vehicles.length > 0 ? (
+          <table className="vehicles-table">
+            <thead>
+              <tr>
+                <th
+                  onClick={() => handleSort('registration')}
+                  className={sortConfig.key === 'registration' ? `sort-${sortConfig.direction}` : ''}
+                  style={{ cursor: 'pointer' }}
+                >
+                  Numer rejestracyjny
+                </th>
+                <th
+                  onClick={() => handleSort('make')}
+                  className={sortConfig.key === 'make' ? `sort-${sortConfig.direction}` : ''}
+                  style={{ cursor: 'pointer' }}
+                >
+                  Marka
+                </th>
+                <th
+                  onClick={() => handleSort('model')}
+                  className={sortConfig.key === 'model' ? `sort-${sortConfig.direction}` : ''}
+                  style={{ cursor: 'pointer' }}
+                >
+                  Model
+                </th>
+                <th>Akcje</th>
+              </tr>
+            </thead>
+            <tbody>
+              {vehicles.map(vehicle => (
+                <tr key={vehicle.id}>
+                  <td>{vehicle.registration}</td>
+                  <td>{vehicle.make}</td>
+                  <td>{vehicle.model}</td>
+                  <td>
+                    <button
+                      onClick={() => {
+                        console.log('Edytowany pojazd:', vehicle);
+                        setEditingVehicle(vehicle);
+                      }}
+                      className="edit-button"
+                    >
+                      Edytuj
+                    </button>
+                    <button
+                      onClick={(e) => handleDeleteVehicle(e, vehicle.id)}
+                      className="delete-button"
+                    >
+                      ×
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          !loading && !error && (
+            <p style={{ textAlign: 'center', fontStyle: 'italic' }}>Brak wyników.</p>
+          )
+        )}
+
+        {loading && (
+          <div className="loading-overlay">
+            <div className="spinner"></div>
+          </div>
+        )}
+      </div>
+
+      {/* Modal edycji */}
       {editingVehicle && (
         <div className="modal-overlay" onClick={handleCancelEdit}>
           <div className="edit-panel" onClick={e => e.stopPropagation()}>
@@ -201,9 +336,13 @@ function Vehicles() {
                 required
               />
             </label>
+
+            {saveError && <p className="error">{saveError}</p>}
+            {saving && <p className="loading">Zapisywanie zmian...</p>}
+
             <div className="buttons">
-              <button onClick={handleSaveEdit}>Zapisz</button>
-              <button onClick={handleCancelEdit}>Anuluj</button>
+              <button onClick={handleSaveEdit} disabled={saving}>Zapisz</button>
+              <button onClick={handleCancelEdit} disabled={saving}>Anuluj</button>
             </div>
           </div>
         </div>
