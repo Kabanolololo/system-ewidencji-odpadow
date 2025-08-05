@@ -5,9 +5,9 @@ from fastapi import Query
 
 # Schematy podstawowy do odpadów
 class WasteBase(BaseModel):
-    code: str = "150101"
-    name: str = "Opakowania z papieru i tektury"
-    notes: Optional[str] = "łącznie z selektywnie gromadzonymi komunalnymi odpadami opakowaniowymi"
+    code: str 
+    name: str 
+    notes: Optional[str]
 
 # schemat tworzenie odpadu
 class WasteCreate(WasteBase):
@@ -15,8 +15,8 @@ class WasteCreate(WasteBase):
 
 # schemat aktualizacja odpadu
 class WasteUpdate(BaseModel):
-    code: str = "150102"
-    name: str = "Folia"
+    code: str
+    name: str
     notes: Optional[str] = None
 
 # Schemat do zwracania na GET

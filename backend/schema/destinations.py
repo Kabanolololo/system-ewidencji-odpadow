@@ -5,11 +5,11 @@ from fastapi import Query
 
 # Schematy podstawowy dla destynacji
 class DestinationBase(BaseModel):
-    country: str = "Polska"
-    voivodeship: Optional[str] = "NULL"
-    city: str = "Wieluń"
-    postal_code: str = "98-300"
-    address: str = "18-go stycznia 30"
+    country: str
+    voivodeship: Optional[str]
+    city: str 
+    postal_code: str
+    address: str 
 
 # schemat tworzenia destynacji
 class DestinationCreate(DestinationBase):
@@ -17,11 +17,11 @@ class DestinationCreate(DestinationBase):
 
 # schemat aktualizacja destynacji
 class DestinationUpdate(DestinationBase):
-    country: Optional[str] = "Polska"
-    voivodeship: Optional[str] = "Łodzkie"
-    city: Optional[str] = "Gaszyn"
-    postal_code: Optional[str] = "98-300"
-    address: Optional[str] = "Źródlana 9"
+    country: Optional[str] 
+    voivodeship: Optional[str]
+    city: Optional[str]
+    postal_code: Optional[str]
+    address: Optional[str]
 
 # Schemat do zwracania na GET
 class DestinationOut(DestinationBase):

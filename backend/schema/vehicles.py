@@ -5,9 +5,9 @@ from fastapi import Query
 
 # Schemat podstawowy dla samochodu
 class VehicleBase(BaseModel):
-    registration_number: str = "EZD1111J"
-    brand: str = "Iveco"
-    model: str = "Daily"
+    registration_number: str
+    brand: str 
+    model: str 
 
 # schemat tworzenia samochodu
 class VehicleCreate(VehicleBase):
@@ -15,9 +15,9 @@ class VehicleCreate(VehicleBase):
 
 # schemat aktualizacja samochodu
 class VehicleUpdate(VehicleBase):
-    registration_number: Optional[str] = "EZD1111J"
-    brand: Optional[str] = "Citroen"
-    model: Optional[str] = "Jumper"
+    registration_number: Optional[str] 
+    brand: Optional[str] 
+    model: Optional[str] 
 
 # Schemat do zwracania na GET
 class VechicleOut(VehicleBase):
