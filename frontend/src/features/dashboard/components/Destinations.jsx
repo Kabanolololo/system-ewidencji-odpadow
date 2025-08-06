@@ -256,6 +256,7 @@ function Destinations() {
         ) : null}
 
         {error && <p className="error">{error}</p>}
+        {loading && <p className="loading">Wczytywanie destynacji...</p>}
 
         {loading && (
           <div className="loading-overlay">

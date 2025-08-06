@@ -173,6 +173,8 @@ function Waste() {
       </div>
 
       {error && <p className="error">{error}</p>}
+      {loading && <p className="loading">Wczytywanie odpadów...</p>}
+
 
       {/* Tabela */}
       {wastes.length > 0 && !loading && (

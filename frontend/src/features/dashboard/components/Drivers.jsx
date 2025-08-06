@@ -177,6 +177,7 @@ function Drivers() {
       </div>
 
       {error && <p className="error">{error}</p>}
+      {loading && <p className="loading">Wczytywanie kierowców...</p>}
 
       {/* Tabela */}
       <div style={{ position: 'relative' }}>

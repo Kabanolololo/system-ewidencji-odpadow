@@ -202,6 +202,7 @@ function Users() {
       </div>
 
       {error && <p className="error">{error}</p>}
+      {loading && <p className="loading">Wczytywanie użytkowników...</p>}
 
       {/* --- Lista użytkowników --- */}
       <div style={{ position: 'relative' }}>

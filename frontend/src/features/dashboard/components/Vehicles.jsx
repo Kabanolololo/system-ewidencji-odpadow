@@ -229,6 +229,7 @@ function Vehicles() {
       </div>
 
       {error && <p className="error">{error}</p>}
+      {loading && <p className="loading">Wczytywanie pojazdów...</p>}
 
       {/* Tabela pojazdów */}
       <div style={{ position: 'relative' }}>
