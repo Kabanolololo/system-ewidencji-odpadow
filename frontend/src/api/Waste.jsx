@@ -13,7 +13,7 @@ export async function fetchAllWastesWithStoredToken({ code, sort_by, sort_order 
   if (sort_by) params.append("sort_by", sort_by);  // tylko "code"
   if (sort_order) params.append("sort_order", sort_order);  // "asc" lub "desc"
 
-  const url = `http://127.0.0.1:8000/waste/?${params.toString()}`;
+  const url = `http://192.168.0.33:8000/waste/?${params.toString()}`;
 
   const response = await fetch(url, {
     headers: {
@@ -43,7 +43,7 @@ export async function createNewWaste({ code, name, notes }) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const response = await fetch("http://127.0.0.1:8000/waste/", {
+  const response = await fetch("http://192.168.0.33:8000/waste/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export async function updateWasteById(waste_id, { code, name, notes }) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://127.0.0.1:8000/waste/${waste_id}`;
+  const url = `http://192.168.0.33:8000/waste/${waste_id}`;
 
   const response = await fetch(url, {
     method: "PUT",
@@ -101,7 +101,7 @@ export async function deleteWasteById(waste_id) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://127.0.0.1:8000/waste/${waste_id}`;
+  const url = `http://192.168.0.33:8000/waste/${waste_id}`;
 
   const response = await fetch(url, {
     method: "DELETE",

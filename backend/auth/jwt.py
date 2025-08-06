@@ -19,7 +19,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 def verify_token(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Nieprawidłowy token lub token wygasł",
+        detail="Nieprawidłowy token lub token wygasł. Wyloguj się z konta i zaloguj ponownie.",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
