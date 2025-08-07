@@ -7,7 +7,6 @@ from utils.waste_records import validate_id, get_by_id, parse_float, get_or_404,
 from crud.audit_log import create_audit_log
 
 # Funckja do pobrania wszystkich rekordów
-# Funckja do pobrania wszystkich rekordów
 def get_all_waste_records(filters: WasteRecordFilterParams, db: Session):
     query = db.query(WasteRecord).options(
         joinedload(WasteRecord.contractor),
@@ -67,17 +66,25 @@ def get_all_waste_records(filters: WasteRecordFilterParams, db: Session):
 
     # Sortowanie - ręczny wybór kolumny
     if filters.sort_by:
+        # Do sortowania po polach z relacji trzeba dołączyć odpowiedni join
         if filters.sort_by == "contractor_nip":
+            query = query.join(WasteRecord.contractor)
             column = Contractor.nip
         elif filters.sort_by == "user_username":
+            query = query.join(WasteRecord.user)
             column = User.username
         elif filters.sort_by == "waste_code":
+            query = query.join(WasteRecord.waste)
             column = Waste.code
         elif filters.sort_by == "vehicle_registration_number":
+            query = query.join(WasteRecord.vehicle)
             column = Vehicle.registration_number
         elif filters.sort_by == "driver_full_name":
-            column = Driver.name  # lub możesz wybrać inne pole do sortowania, np. imię
+            query = query.join(WasteRecord.driver)
+            # Sortowanie po nazwisku (można też po imieniu lub połączeniu)
+            column = Driver.surname
         elif filters.sort_by == "destination_name":
+            query = query.join(WasteRecord.destination)
             column = Destination.return_destination
         elif filters.sort_by == "transfer_date":
             column = WasteRecord.transfer_date

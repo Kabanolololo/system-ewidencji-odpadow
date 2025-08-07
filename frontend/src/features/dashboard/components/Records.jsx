@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import './styles/Records.css';
-import AddRecord from './components/AddRecord';
-import RecordTable from './components/RecordTable'; // <-- dodaj import
+import '../styles/Records.css';
+import AddRecord from './Records/AddRecord';
+import RecordTable from './Records/RecordTable';
 
 function Records() {
   const [showAddRecord, setShowAddRecord] = useState(false);
-  const [records, setRecords] = useState([]); // <-- stan na listę rekordów
+  const [records, setRecords] = useState([]); 
 
   const contractors = ['Firma A', 'Firma B', 'Firma C'];
   const vehicles = ['Samochód 1', 'Samochód 2'];
@@ -13,13 +13,14 @@ function Records() {
   const destinations = ['Miejsce 1', 'Miejsce 2'];
   const wasteTypes = ['Odpady 1', 'Odpady 2'];
 
+  // funkcja do wyswietlania panelu do dodawania rekordu
   const handleAddRecord = (record) => {
     console.log('Nowa ewidencja:', record);
-    // Dodaj nowy rekord do listy:
     setRecords((prev) => [...prev, { ...record, id: prev.length + 1 }]);
-    setShowAddRecord(false); // schowaj formularz
+    setShowAddRecord(false);
   };
 
+  // funkcja do chowania panelu do dodawania rekordu
   const handleCancel = () => {
     setShowAddRecord(false);
   };

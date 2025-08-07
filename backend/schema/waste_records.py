@@ -60,21 +60,30 @@ class WasteRecordBase(BaseModel):
     notes: Optional[str] = None
 
 # schemat tworzenia kierowcy
-class WasteRecordCreate(WasteRecordBase):
-    pass
+class WasteRecordCreate(BaseModel):
+    contractor_id: int = None
+    user_id: int = None
+    waste_id: int = None
+    vehicle_id: int = None
+    driver_id: int = None
+    destination_id: int = None
+    transfer_date: date = None
+    mass_kg: float = None
+    price_per_kg: float = None
+    notes: Optional[str] = None
 
 # schemat aktualizacja kierowcy
-class WasteRecordUpdate(WasteRecordBase):
-    contractor_id: Optional[int]
-    user_id: Optional[int]
-    waste_id: Optional[int]
-    vehicle_id: Optional[int]
-    driver_id: Optional[int]
-    destination_id: Optional[int]
-    transfer_date: Optional[date]
-    mass_kg: Optional[float]
-    price_per_kg: Optional[float]
-    total_price: Optional[float]
+class WasteRecordUpdate(BaseModel):
+    contractor_id: Optional[int] = None
+    user_id: Optional[int] = None
+    waste_id: Optional[int] = None
+    vehicle_id: Optional[int] = None
+    driver_id: Optional[int] = None
+    destination_id: Optional[int] = None
+    transfer_date: Optional[date] = None
+    mass_kg: Optional[float] = None
+    price_per_kg: Optional[float] = None
+    total_price: Optional[float] = None
     notes: Optional[str] = None
 
 # Schemat do zwracania na GET

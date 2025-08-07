@@ -15,7 +15,7 @@ import Waste from './features/dashboard/components/Waste';
 import Reports from './features/dashboard/components/Reports';
 import Account from './features/dashboard/components/Account';
 import LogOut from './features/dashboard/components/LogOut';
-import Records from './features/dashboard/Records';
+import Records from './features/dashboard/components/Records';
 import Users from './features/dashboard/components/Users';
 import AuditLog from './features/dashboard/components/AuditLog';
 
