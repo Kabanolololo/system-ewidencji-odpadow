@@ -29,9 +29,13 @@ export default function RecordTable() {
   const [error, setError] = useState(null);
   const [editingRecord, setEditingRecord] = useState(null); 
 
+  // stan ładowania
+  const [loading, setLoading] = useState(false);
+
   // Ładowanie rekordow przy pierwszym renderowaniu i przy zmianie wyszukiwania lub sortowania
   const fetchData = async () => {
     try {
+      setLoading(true);
       setError(null);
 
       const { transfer_date_from, transfer_date_to } = prepareDateRange(filters);
@@ -52,8 +56,11 @@ export default function RecordTable() {
       console.error(err);
       setError(err.message || "Brak danych w systemie.");
       setRecords([]);
+    } finally {
+      setLoading(false);
     }
   };
+
 
   const prepareDateRange = (filters) => {
     const { transfer_date_from, transfer_date_to } = filters;
@@ -173,7 +180,7 @@ export default function RecordTable() {
 
   return (
     <div className="record-table-wrapper">
-
+      {loading && <p className="loading">Wczytywanie rekordów...</p>}
       {/* Filtry ZAWSZE widoczne */}
       <div className="filters">
         {/* Pola filtrów */}
