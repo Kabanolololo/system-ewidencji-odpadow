@@ -13,7 +13,7 @@ router = APIRouter()
 ############################################################################## 
 
 # Endpointy wyświetlający lata
-@router.get("/api/reports/years", response_model=YearsResponse)
+@router.get("/years", response_model=YearsResponse)
 def get_years(
     db: Session = Depends(get_db), 
     current_user: dict = Depends(check_user_or_admin)
@@ -22,7 +22,7 @@ def get_years(
     return {"years": years}
 
 # Endpointy wyświetlający masę odpadów według miesiąca
-@router.get("/api/reports/waste-mass", response_model=List[WasteMassByMonth])
+@router.get("/waste-mass", response_model=List[WasteMassByMonth])
 def waste_mass_report(
     filters: FilterParameters = Depends(),
     db: Session = Depends(get_db), 
@@ -37,7 +37,7 @@ def waste_mass_report(
     return data
 
 # Endpointy wyświetlający liczbę odbiorów odpadów według miesiąca
-@router.get("/api/reports/pickup-counts", response_model=List[WastePickupCount])
+@router.get("/pickup-counts", response_model=List[WastePickupCount])
 def pickup_counts(
     filters: FilterParameters = Depends(),
     db: Session = Depends(get_db), 
@@ -46,7 +46,7 @@ def pickup_counts(
     return get_pickup_counts_by_month(db, filters.year, filters.month_from, filters.month_to)
 
 # Endpointy wyświetlający średnie przychody według miesiąca
-@router.get("/api/reports/average-revenue", response_model=List[WasteAverageRevenue])
+@router.get("/average-revenue", response_model=List[WasteAverageRevenue])
 def average_revenue(
     filters: FilterParameters = Depends(),
     db: Session = Depends(get_db), 
@@ -55,7 +55,7 @@ def average_revenue(
     return get_average_revenue_by_waste(db, filters.year, filters.month_from, filters.month_to)
 
 # Endpointy wyświetlający przychody według miesiąca
-@router.get("/api/reports/revenue-by-month", response_model=List[WasteRevenueByMonth])
+@router.get("/revenue-by-month", response_model=List[WasteRevenueByMonth])
 def revenue_by_month(
     filters: FilterParameters = Depends(),
     db: Session = Depends(get_db), 
@@ -64,7 +64,7 @@ def revenue_by_month(
     return get_revenue_by_month(db, filters.year, filters.month_from, filters.month_to)
 
 # Endpointy wyświetlający całkowite przychody według miesiąca
-@router.get("/api/reports/total-revenue-by-month", response_model=List[TotalRevenueByMonth])
+@router.get("/total-revenue-by-month", response_model=List[TotalRevenueByMonth])
 def total_revenue_by_month(
     filters: FilterParameters = Depends(),
     db: Session = Depends(get_db), 

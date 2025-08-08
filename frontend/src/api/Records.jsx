@@ -88,7 +88,7 @@ export async function createNewWasteRecord({
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const response = await fetch("http://127.0.0.1:8000/records/", {
+  const response = await fetch("http://192.168.0.33:8000/records/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
