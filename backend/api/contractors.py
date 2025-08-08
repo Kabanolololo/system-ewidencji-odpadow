@@ -46,7 +46,7 @@ def create_contractor_offline(
         db: Session = Depends(get_db), 
         current_user: dict = Depends(check_user_or_admin)
     ):
-    return created_contractor_offline(contractor=contractor, db=db)
+    return created_contractor_offline(contractor=contractor, user_id=current_user["user_id"], db=db)
 
 # Endpoint do aktualizacji pojedynczego elementu
 @router.put("/{contractor_id}", response_model=ContractorOut)

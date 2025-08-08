@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models.users import User
 from schema.users import UserBase, UserCreate, UserUpdate, UserAdminUpdate, UserOut, UserFilterParams
-from utils.users import validate_id, get_by_id, generate_unique_username, validate_name_surname, validate_password
+from utils.users import validate_id, get_by_id, generate_unique_username, validate_name_surname, validate_password, format_name_surname
 from auth.hash import hash_password
 from crud.audit_log import create_audit_log
 
@@ -66,6 +66,9 @@ def get_one_user(user_id: int, db: Session):
 def create_user(user: UserCreate, user_id: int, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawne dane
     validate_name_surname(user.name, user.surname)
+    
+    # FUNKCJA: Formatowanie imienia i nazwiska
+    user.name, user.surname = format_name_surname(user.name, user.surname)
 
     # FUNKCJA: Generowanie username do logowania
     username = generate_unique_username(user.name, user.surname, db)
@@ -102,16 +105,24 @@ def create_user(user: UserCreate, user_id: int, db: Session):
 def update_user(user_id: int, user_data: UserUpdate, db: Session):
     # FUNKCJA: Walidacja czy podajemy poprawną liczbę
     validate_id(user_id)
-
+    
     # FUNKCJA: Pobieranie użytkownika po id
     db_user = get_by_id(user_id, db)
+    
+    # FUNKCJA: Tworzy kopię starych danych
+    old_data = db_user.__dict__.copy()
+    old_data.pop('_sa_instance_state', None)
 
     if user_data.name or user_data.surname:
         # FUNKCJA: Walidacja czy podajemy poprawne dane
         new_name = user_data.name or db_user.name
         new_surname = user_data.surname or db_user.surname
 
+        # Funkcja: Walidacja imienia i nazwiska
         validate_name_surname(new_name, new_surname)
+        
+        # FUNKCJA: Formatowanie imienia i nazwiska
+        new_name, new_surname = format_name_surname(new_name, new_surname)
 
         # FUNKCJA: Generowanie username do logowania
         username = generate_unique_username(new_name, new_surname, db, exclude_id=user_id)
@@ -120,7 +131,9 @@ def update_user(user_id: int, user_data: UserUpdate, db: Session):
         db_user.name = new_name
         db_user.surname = new_surname
 
-    db_user.role = "user"
+    # Jeśli rola jest podana, sprawdź czy jest poprawna
+    if db_user.role not in ["admin", "user"]:
+        db_user.role = "user"
 
     if user_data.password_hash:
         # Waliduj podane nowe hasło
@@ -132,6 +145,10 @@ def update_user(user_id: int, user_data: UserUpdate, db: Session):
     try:
         db.commit()
         db.refresh(db_user)
+        
+        # FUNKCJA: Tworzy i zapisuje log audytu w bazie
+        create_audit_log(db=db, user_id=user_id, table_name="users", record_id=db_user.id, operation="update", old_data=old_data, new_data=db_user)
+        
     except Exception:
         db.rollback()
         raise HTTPException(
@@ -158,7 +175,13 @@ def update_user_admin(user_id: int, user: UserAdminUpdate, db: Session):
         new_name = user.name or db_user.name
         new_surname = user.surname or db_user.surname
 
+        # FUNKCJA: Walidacja imienia i nazwiska
         validate_name_surname(new_name, new_surname)
+        
+        # FUNKCJA: Formatowanie imienia i nazwiska
+        new_name, new_surname = format_name_surname(new_name, new_surname)
+        
+        # FUNKCJA: Generowanie username do logowania
         username = generate_unique_username(new_name, new_surname, db, exclude_id=user_id)
         db_user.username = username
 
@@ -188,18 +211,38 @@ def update_user_admin(user_id: int, user: UserAdminUpdate, db: Session):
     return db_user
 
 
-# Funkcja do usunięcia users
-def delete_user(user_id: int, db: Session):
-    # FUNKCJA: Walidacja czy podajemy poprawną liczbę
+def delete_user(user_id: int, current_user_id: int, db: Session):
+    # Walidacja czy podajemy poprawną liczbę
     validate_id(user_id)
     
-    # FUNKCJA: Pobieranie destynacji po id
+    # Pobieranie użytkownika po id
     db_user = get_by_id(user_id, db)
     
-    #FUNKCJA: tworzy i zapisuje log audytu w bazie  
-    create_audit_log(db=db, user_id=user_id, table_name="users", record_id=db_user.id, operation="delete", old_data=db_user, new_data=None)
+    # Zachowanie danych użytkownika przed usunięciem do logu
+    user_data = db_user.__dict__.copy()
+    user_data.pop('_sa_instance_state', None)
     
-    # Usunięcie kierowcy
-    db.delete(db_user)
-    db.commit()
-    return {"message": f"Usunięto użytkownika o id {user_id}"}
+    try:
+        # Utworzenie logu audytu przed commitem
+        create_audit_log(
+            db=db,
+            user_id=current_user_id,
+            table_name="users",
+            record_id=user_id,
+            operation="delete",
+            old_data=user_data,
+            new_data=None
+        )
+        
+        # Usunięcie użytkownika
+        db.delete(db_user)
+
+        db.commit()
+        return {"message": f"Usunięto użytkownika o id {user_id}"}
+        
+    except Exception:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Wystąpił błąd podczas usuwania użytkownika"
+        )

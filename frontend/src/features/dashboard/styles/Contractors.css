@@ -1,6 +1,7 @@
 .contractors-container {
 	margin: 20px auto;
 	margin-top: 100px;
+	margin-bottom: 50px;
 	font-family: Arial, sans-serif;
 }
 
@@ -71,6 +72,8 @@ h1 {
 	border-radius: 6px;
 	box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
 	border: 2px solid #a5d6a7;
+	transition: all 0.3s ease;
+	overflow: hidden;
 }
 
 .form-row {
@@ -160,7 +163,7 @@ h1 {
 .contractors-table th,
 .contractors-table td {
 	padding: 12px 15px;
-	text-align: left;
+	text-align: left !important;
 	border-bottom: 1px solid #eee;
 	user-select: none;
 	color: #2e7d32;

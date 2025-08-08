@@ -1,0 +1,17 @@
+1. YearSelector.jsx
+Wyświetla dropdown do wyboru roku z podaną etykietą. Służy do wyboru roku np. dla wykresów lub tabel.
+
+2. MonthRangeSelector.jsx
+Pozwala wybrać zakres miesięcy — dwa dropdowny (start i koniec). Używany do filtrowania danych po miesiącach.
+
+3. ChartSection.jsx
+Opakowuje sekcję z wykresem, pokazuje tytuł i rok. Miejsce na wykresy (tu placeholdery).
+
+4. DataTable.jsx
+Generuje tabelę na podstawie nagłówków i wierszy danych przekazanych w propsach. Uniwersalny komponent do wyświetlania dowolnych tabel.
+
+5. utils.js
+Zawiera funkcje pomocnicze: generowanie zakresu miesięcy oraz pobieranie etykiety miesiąca po jego wartości.
+
+6. Reports.jsx (główny komponent)
+Łączy wszystko razem, trzyma stany dla filtrów, przygotowuje dane, wyświetla wybory roku i zakresu miesięcy, pokazuje wykresy oraz różne tabele z danymi.

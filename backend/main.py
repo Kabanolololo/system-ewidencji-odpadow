@@ -9,6 +9,7 @@ from api.contractors import router as contractors_router
 from api.waste_records import router as wasterecords_router
 from api.auth import router as auth_router
 from api.log import router as log_router
+from api.reports import router as reports_router
 from database import SessionLocal, engine, Base
 import models
 
@@ -31,7 +32,10 @@ origins = [
     "http://localhost:8081",  
     "http://127.0.0.1:8081",
     "http://localhost:8080",
-    "http://127.0.01:8080"
+    "http://127.0.0.1:8080",
+    "http://localhost:5173",
+    "http://192.168.0.33:5173",
+    "http://192.168.56.1:5173",
 ]
 
 app.add_middleware(
@@ -44,6 +48,7 @@ app.add_middleware(
 
 # Routers dla zapytań API
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
+app.include_router(reports_router, prefix="/reports", tags=["reports"])
 app.include_router(log_router, prefix="/log", tags=["log"])
 app.include_router(wasterecords_router, prefix="/records", tags=["records"])
 app.include_router(contractors_router, prefix="/contractors", tags=["contractors"])

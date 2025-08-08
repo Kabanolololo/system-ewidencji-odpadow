@@ -21,3 +21,16 @@ def get_by_id(destination_id: int, db: Session) -> Destination:
             detail=f"Nie znaleziono destynacji o id {destination_id}"
         )
     return contractor
+
+# Funkcja do formatowania pól lokalizacji
+def format_location_fields(country: str, voivodeship: str, city: str) -> tuple[str, str, str]:
+    def format_field(field: str) -> str:
+        if field:
+            return field.strip().lower().capitalize()
+        return field 
+    
+    return (
+        format_field(country),
+        format_field(voivodeship),
+        format_field(city),
+    )

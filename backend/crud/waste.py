@@ -32,7 +32,7 @@ def get_all_waste(filters: WasteFilterParams,db: Session):
     waste = query.all()
     
     if not waste:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brak pojazdów w systemie")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Brak odpadów w systemie")
     return waste
 
 # Funckja do pobrania konkretnego odpadu

@@ -1,20 +1,36 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/LoginForm.css';
+import { loginUser } from '../api/auth';
 
 function LoginForm({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Username:', username);
-    console.log('Password:', password);
-    alert(`Zalogowano jako: ${username}`);
-    onLogin();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError(null);
+
+  try {
+    const data = await loginUser(username, password);
+    
+    // Zapis do localStorage
+    localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("token_type", data.token_type);
+    localStorage.setItem("user_id", data.user_id.toString());
+    localStorage.setItem("role", data.role);
+
+    // Wypisz w konsoli
+    console.log("Zalogowano, dane użytkownika:", data);
+
+    onLogin(data);
     navigate('/dashboard');
-  };
+  } catch (err) {
+    setError(err.message);
+  }
+};
 
   const handleInfoClick = (message) => {
     alert(message);
@@ -49,6 +65,8 @@ function LoginForm({ onLogin }) {
           />
 
           <button type="submit">Zaloguj się</button>
+
+          {error && <p className="login-error">{error}</p>}
 
           <div className="login-links">
             <span onClick={() => handleInfoClick('Skontaktuj się z administratorem.')}>Nie masz konta?</span>

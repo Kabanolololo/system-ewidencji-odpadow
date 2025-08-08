@@ -3,10 +3,17 @@ from typing import Optional, Literal
 from datetime import datetime
 from fastapi import Query
 
+# Schemat do zwracania użytkownika
+class UserOut(BaseModel):
+    username: str
+    
+    class Config:
+        orm_mode = True
+
 # Schemat do zwracania na GET
 class AuditLogOut(BaseModel):
     id: int
-    user_id: int
+    user: UserOut
     table_name: str
     record_id: int
     operation: str
@@ -21,5 +28,5 @@ class AuditLogOut(BaseModel):
 class AuditLogParams(BaseModel):
     table_name: Optional[Literal["wastes","waste_records","vehicles","users","drivers","destinations","contractors"]] = Query(None)
     operation: Optional[Literal["create","update","delete"]] = Query(None)
-    sort_by: Optional[Literal["table_name","operation","created_at"]] = Query("table_name")
-    sort_order: Optional[Literal["asc", "desc"]] = Query("asc")
+    sort_by: Optional[Literal["table_name","operation","created_at"]] = Query("created_at")
+    sort_order: Optional[Literal["asc", "desc"]] = Query("desc")

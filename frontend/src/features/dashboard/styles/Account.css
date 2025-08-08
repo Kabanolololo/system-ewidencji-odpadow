@@ -23,3 +23,10 @@
   margin: 10px 0;
   color: #2e7d32;
 }
+
+/* Komunikaty błędów */
+.error {
+  color: #d32f2f;
+  font-weight: bold;
+  text-align: center;
+}

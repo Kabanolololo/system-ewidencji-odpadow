@@ -1,30 +1,73 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { fetchAllUsersWithStoredToken, createNewUser ,updateUserById, deleteUserById } from '../../../api/Users';
 import '../styles/Users.css';
 import '../styles/Modals.css';
 
 function Users() {
-  const [users, setUsers] = useState([
-    { id: 1, name: 'Jan', surname: 'Kowalski', password_hash: 'abc123', role: 'admin' },
-    { id: 2, name: 'Anna', surname: 'Nowak', password_hash: 'def456', role: 'user' },
-    { id: 3, name: 'Piotr', surname: 'Zieliński', password_hash: 'ghi789', role: 'user' },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const [newUser, setNewUser] = useState({ name: '', surname: '', password_hash: '', role: 'user' });
+  // Stany dla formularza dodawania użytkownika
+  const [newUser, setNewUser] = useState({ name: '', surname: '', password_hash: 'Pa$$w0rd', role: 'user' });
+
+  // Stany dla filtrów i sortowania
   const [searchName, setSearchName] = useState('');
   const [searchSurname, setSearchSurname] = useState('');
   const [searchRole, setSearchRole] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: 'surname', direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: '' });
   const [editingUser, setEditingUser] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [addError, setAddError] = useState('');
 
-  const handleAddUser = (e) => {
-    e.preventDefault();
-    if (!newUser.name.trim() || !newUser.surname.trim() || !newUser.password_hash.trim()) return;
+  // Ładowanie użytkowników przy pierwszym renderze i przy zmianie filtrów
+  useEffect(() => {
+    async function loadUsers() {
+      setLoading(true);
+      setError('');
+      try {
+        const data = await fetchAllUsersWithStoredToken({
+          name: searchName,
+          surname: searchSurname,
+          role: searchRole,
+          sort_by: sortConfig.key,
+          sort_order: sortConfig.direction,
+        });
+        setUsers(data);
+      } catch (err) {
+        console.error(err);
+        setError(err.message || "Błąd podczas pobierania użytkowników");
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-    const newId = users.length ? Math.max(...users.map(u => u.id)) + 1 : 1;
-    setUsers([...users, { id: newId, ...newUser }]);
+    loadUsers();
+  }, [searchName, searchSurname, searchRole, sortConfig]);
+
+  // Funkcja do dodawania nowego użytkownika
+  const handleAddUser = async (e) => {
+  e.preventDefault();
+  setAddError('');
+
+  if (!newUser.name.trim() || !newUser.surname.trim() || !newUser.password_hash.trim()) {
+    setAddError('Wszystkie pola są wymagane.');
+    return;
+  }
+
+  try {
+    const createdUser = await createNewUser(newUser);
+    setUsers([...users, createdUser]);
     setNewUser({ name: '', surname: '', password_hash: '', role: 'user' });
+  } catch (err) {
+    console.error(err);
+    setAddError(err.message || "Błąd podczas tworzenia użytkownika");
+    }
   };
 
+  // Funkcje do sortowania
   const handleSort = (key) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -33,49 +76,62 @@ function Users() {
     setSortConfig({ key, direction });
   };
 
-  const sortedUsers = [...users].sort((a, b) => {
-    const aKey = a[sortConfig.key].toLowerCase();
-    const bKey = b[sortConfig.key].toLowerCase();
-
-    if (aKey < bKey) return sortConfig.direction === 'asc' ? -1 : 1;
-    if (aKey > bKey) return sortConfig.direction === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  const filteredUsers = sortedUsers.filter(user =>
-    user.name.toLowerCase().includes(searchName.toLowerCase()) &&
-    user.surname.toLowerCase().includes(searchSurname.toLowerCase()) &&
-    (searchRole === '' || user.role === searchRole)
-  );
-
-  const handleDeleteUser = (e, id) => {
+  // Funkcja do usuwania użytkownika
+  const handleDeleteUser = async (e, id) => {
     e.stopPropagation();
     if (window.confirm('Czy na pewno chcesz usunąć tego użytkownika?')) {
-      setUsers(users.filter(u => u.id !== id));
-      if (editingUser?.id === id) {
-        setEditingUser(null);
+      try {
+        await deleteUserById(id);
+        setUsers(users.filter(u => u.id !== id));
+        if (editingUser?.id === id) {
+          setEditingUser(null);
+        }
+      } catch (err) {
+        console.error(err);
+        alert(err.message || "Błąd podczas usuwania użytkownika");
       }
     }
   };
 
+  // Funkcje do edycji użytkownika
   const handleChangeEditing = (e) => {
     const { name, value } = e.target;
     setEditingUser({ ...editingUser, [name]: value });
   };
 
-  const handleSaveEdit = () => {
-    setUsers(users.map(u => (u.id === editingUser.id ? editingUser : u)));
-    setEditingUser(null);
+  // Funkcja do zapisywania zmian w edycji użytkownika
+  const handleSaveEdit = async () => {
+    setSaving(true);
+    setSaveError('');
+    try {
+      const updatedUser = await updateUserById(editingUser.id, {
+        name: editingUser.name,
+        surname: editingUser.surname,
+        password_hash: editingUser.password_hash,
+        role: editingUser.role,
+      });
+
+      setUsers(users.map(u => (u.id === updatedUser.id ? updatedUser : u)));
+      setEditingUser(null);
+    } catch (err) {
+      console.error(err);
+      setSaveError(err.message || "Błąd podczas zapisywania zmian");
+    } finally {
+      setSaving(false);
+    }
   };
 
+  // Funkcja do anulowania edycji
   const handleCancelEdit = () => {
     setEditingUser(null);
+    setSaveError('');
   };
 
   return (
     <div className="users-container">
       <h1>Lista Użytkowników</h1>
 
+      {/* Formularz dodawania nowego użytkownika */}
       <form onSubmit={handleAddUser} className="add-user-form">
         <div className="form-row">
           <label>
@@ -99,13 +155,11 @@ function Users() {
             />
           </label>
           <label>
-            Hasło:
+            Hasło (domyślne):
             <input
               type="text"
               value={newUser.password_hash}
-              onChange={e => setNewUser({ ...newUser, password_hash: e.target.value })}
-              placeholder="Wpisz hasło"
-              required
+              readOnly
             />
           </label>
           <label>
@@ -120,8 +174,13 @@ function Users() {
           </label>
         </div>
         <button type="submit" className="add-button">Dodaj</button>
+        {addError && <p className="error">{addError}</p>}
+        <p className="info">
+          Hasło domyślne: <strong>Pa$$w0rd</strong>. Użytkownik powinien od razu je zmienić po pierwszym logowaniu.
+        </p>
       </form>
 
+      {/* --- Filtry i wyszukiwanie --- */}
       <div className="search-inputs">
         <input
           type="text"
@@ -142,64 +201,71 @@ function Users() {
         </select>
       </div>
 
-      <table className="users-table">
-        <thead>
-          <tr>
-            <th
-              onClick={() => handleSort('name')}
-              className={sortConfig.key === 'name' ? `sort-${sortConfig.direction}` : ''}
-            >
-              Imię
-            </th>
-            <th
-              onClick={() => handleSort('surname')}
-              className={sortConfig.key === 'surname' ? `sort-${sortConfig.direction}` : ''}
-            >
-              Nazwisko
-            </th>
-            <th
-              onClick={() => handleSort('role')}
-              className={sortConfig.key === 'role' ? `sort-${sortConfig.direction}` : ''}
-            >
-              Rola
-            </th>
-            <th>Akcje</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredUsers.map(user => (
-            <tr key={user.id}>
-              <td>{user.name}</td>
-              <td>{user.surname}</td>
-              <td>{user.role}</td>
-              <td>
-                <button
-                  onClick={() => setEditingUser(user)}
-                  className="edit-button"
-                  title="Edytuj użytkownika"
-                >
-                  Edytuj
-                </button>
-                <button
-                  onClick={(e) => handleDeleteUser(e, user.id)}
-                  className="delete-button"
-                  title="Usuń użytkownika"
-                >
-                  ×
-                </button>
-              </td>
-            </tr>
-          ))}
-          {filteredUsers.length === 0 && (
-            <tr>
-              <td colSpan="4" style={{ textAlign: 'center', fontStyle: 'italic' }}>
-                Brak wyników
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      {error && <p className="error">{error}</p>}
+      {loading && <p className="loading">Wczytywanie użytkowników...</p>}
 
+      {/* --- Lista użytkowników --- */}
+      <div style={{ position: 'relative' }}>
+        {users.length > 0 ? (
+          <table className="users-table">
+            <thead>
+              <tr>
+                <th
+                  onClick={() => handleSort('name')}
+                  className={sortConfig.key === 'name' ? `sort-${sortConfig.direction}` : ''}
+                >
+                  Imię
+                </th>
+                <th
+                  onClick={() => handleSort('surname')}
+                  className={sortConfig.key === 'surname' ? `sort-${sortConfig.direction}` : ''}
+                >
+                  Nazwisko
+                </th>
+                <th>
+                  Rola
+                </th>
+                <th>
+                  Username
+                </th>
+                <th>Akcje</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map(user => (
+                <tr key={user.id}>
+                  <td>{user.name}</td>
+                  <td>{user.surname}</td>
+                  <td>{user.role}</td>
+                  <td>{user.username || '-'}</td>
+                  <td>
+                    <button onClick={() => setEditingUser(user)} className="edit-button">
+                      Edytuj
+                    </button>
+                    <button onClick={(e) => handleDeleteUser(e, user.id)} className="delete-button">
+                      ×
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          !loading && !error && (
+            <p style={{ textAlign: 'center', fontStyle: 'italic' }}>
+              Brak wyników.
+            </p>
+          )
+        )}
+
+        {loading && (
+          <div className="loading-overlay">
+            <div className="spinner"></div>
+          </div>
+        )}
+      </div>
+
+      {/* --- Edycja użytkownika --- */}
       {editingUser && (
         <div className="modal-overlay" onClick={handleCancelEdit}>
           <div className="edit-panel" onClick={e => e.stopPropagation()}>
@@ -247,9 +313,13 @@ function Users() {
                 <option value="admin">admin</option>
               </select>
             </label>
+
+            {saveError && <p className='error'>{saveError}</p>}
+            {saving && <p className='loading'>Zapisywanie zmian...</p>}
+
             <div className="buttons">
-              <button onClick={handleSaveEdit}>Zapisz</button>
-              <button onClick={handleCancelEdit}>Anuluj</button>
+              <button onClick={handleSaveEdit} disabled={saving}>Zapisz</button>
+              <button onClick={handleCancelEdit} disabled={saving}>Anuluj</button>
             </div>
           </div>
         </div>

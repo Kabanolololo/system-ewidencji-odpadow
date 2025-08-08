@@ -21,6 +21,29 @@ h1 {
 	border-radius: 6px;
 	box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
 	border: 2px solid #a5d6a7;
+	transition: all 0.3s ease;
+	overflow: hidden;
+}
+
+.add-user-form .info {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #2e7d32;
+  background: #e8f5e9;
+  padding: 8px 12px;
+  border-left: 4px solid #66bb6a;
+  border-radius: 4px;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .form-row {
@@ -45,6 +68,7 @@ h1 {
 	margin-top: 4px;
 	font-size: 1rem;
 	border: 1px solid #a5d6a7;
+	color: #388e3c;
 	border-radius: 4px;
 	transition: border-color 0.3s ease;
 	width: 100%;
@@ -74,26 +98,19 @@ h1 {
 	background-color: #388e3c;
 }
 
-/* Wyszukiwanie */
-.search-inputs {
-	display: flex;
-	gap: 15px;
-	margin-bottom: 15px;
-	justify-content: center;
-}
+/* Wyszukiwanie dla select*/
 
-.search-inputs input,
 .search-inputs select {
 	padding: 6px 12px;
 	border-radius: 4px;
 	border: 1px solid #a5d6a7;
 	background-color: #F9FDF4;
+	color: #2e7d32;
 	width: 200px;
 	font-size: 1rem;
 	transition: border-color 0.3s ease;
 }
 
-.search-inputs input:focus,
 .search-inputs select:focus {
 	outline: none;
 	border-color: #4caf50;
@@ -150,4 +167,16 @@ h1 {
 
 .users-table tr:hover {
 	background-color: #dcedc8;
+}
+
+/* Modal */
+.modal-overlay select {
+	padding: 6px 10px;
+	margin-top: 4px;
+	font-size: 1rem;
+	border: 1px solid #a5d6a7;
+	border-radius: 4px;
+	transition: border-color 0.3s ease;
+	width: 100%;
+	box-sizing: border-box;
 }

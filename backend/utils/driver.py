@@ -29,3 +29,9 @@ def validate_name_surname(name: str, surname: str):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Imię i nazwisko powinny zawierać tylko litery"
         )
+
+# Funkcja do formatowania imienia i nazwiska
+def format_driver_name_surname(name: str, surname: str) -> tuple[str, str]:
+    formatted_name = name.strip().lower().capitalize()
+    formatted_surname = surname.strip().lower().capitalize()
+    return formatted_name, formatted_surname

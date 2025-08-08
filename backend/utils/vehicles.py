@@ -37,3 +37,7 @@ def validate_registration_number(registration_number: str, db: Session, exclude_
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Podana tablica rejestracyjna o numerze {registration_number} jest już w systemie"
         )
+
+# Formatowanie numeru rejestracyjnego
+def format_registration_number(reg_number: str) -> str:
+    return reg_number.replace(" ", "").upper()

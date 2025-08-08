@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import LoginForm from './components/LoginForm';
@@ -14,14 +14,24 @@ import Contractors from './features/dashboard/components/Contractors';
 import Waste from './features/dashboard/components/Waste';
 import Reports from './features/dashboard/components/Reports';
 import Account from './features/dashboard/components/Account';
-import LogOut from './features/dashboard/LogOut';
-import Records from './features/dashboard/Records';
+import LogOut from './features/dashboard/components/LogOut';
+import Records from './features/dashboard/components/Records';
 import Users from './features/dashboard/components/Users';
 import AuditLog from './features/dashboard/components/AuditLog';
 
 function App() {
-  // domyślnie true, żeby symulować "zalogowanego" użytkownika
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  // Zmieniamy startowy stan na null
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    setIsLoggedIn(!!token);
+  }, []);
+
+  // Dopóki nie wiemy czy jest zalogowany, nie renderujemy routingu
+  if (isLoggedIn === null) {
+    return console.log("Ładowanie podstrony...");
+  }
 
   return (
     <Router>
@@ -41,7 +51,7 @@ function App() {
 
           {/* Chroniony dashboard */}
           <Route
-            path="/dashboard"
+            path="/dashboard/*"
             element={
               isLoggedIn ? (
                 <Dashboard />
@@ -63,7 +73,7 @@ function App() {
             <Route path="records" element={<Records />} />
             <Route path="reports" element={<Reports />} />
             <Route path="account" element={<Account />} />
-            <Route path="logout" element={<LogOut />} />
+            <Route path="logout" element={<LogOut onLogout={() => setIsLoggedIn(false)} />} />
           </Route>
 
           {/* Wszystko inne na login */}

@@ -5,10 +5,10 @@ from fastapi import Query
 
 # Schematy podstawowy dla firmy
 class ContractorBase(BaseModel):
-    nip: str = "1234567890"
-    regon: str = "123456789"
-    name: str = "Example Company Sp. z o.o."
-    address: str = "ul. Przykładowa 1, 00-000 Warszawa"
+    nip: str 
+    regon: str 
+    name: str 
+    address: str 
 
 # schemat tworzenia firmy
 class ContractorCreate(ContractorBase):
@@ -20,10 +20,10 @@ class ContractorOnlineCreate(BaseModel):
     
 # schemat aktualizacja firmy
 class ContractorUpdate(BaseModel):
-    nip: Optional[str]  = "0987654321"
-    regon: Optional[str] = "0987654321"
-    name: Optional[str] = "NotExample Company Sp. z o.o."
-    address: Optional[str] = "ul. Aktualizacji 1, 00-000 Warszawa"
+    nip: Optional[str] 
+    regon: Optional[str]
+    name: Optional[str] 
+    address: Optional[str]
 
 # Schemat do zwracania na GET
 class ContractorOut(ContractorBase):

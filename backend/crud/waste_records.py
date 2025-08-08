@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from models import WasteRecord, Contractor, User, Waste, Vehicle, Driver, Destination
@@ -8,21 +8,40 @@ from crud.audit_log import create_audit_log
 
 # Funckja do pobrania wszystkich rekordów
 def get_all_waste_records(filters: WasteRecordFilterParams, db: Session):
-    query = db.query(WasteRecord)
+    query = db.query(WasteRecord).options(
+        joinedload(WasteRecord.contractor),
+        joinedload(WasteRecord.user),
+        joinedload(WasteRecord.waste),
+        joinedload(WasteRecord.vehicle),
+        joinedload(WasteRecord.driver),
+        joinedload(WasteRecord.destination)
+    )
 
-    # Filtry dokładne (równe)
-    if filters.contractor_id is not None:
-        query = query.filter(WasteRecord.contractor_id == filters.contractor_id)
-    if filters.user_id is not None:
-        query = query.filter(WasteRecord.user_id == filters.user_id)
-    if filters.waste_id is not None:
-        query = query.filter(WasteRecord.waste_id == filters.waste_id)
-    if filters.vehicle_id is not None:
-        query = query.filter(WasteRecord.vehicle_id == filters.vehicle_id)
-    if filters.driver_id is not None:
-        query = query.filter(WasteRecord.driver_id == filters.driver_id)
-    if filters.destination_id is not None:
-        query = query.filter(WasteRecord.destination_id == filters.destination_id)
+    # Filtry tekstowe (LIKE)
+    if filters.contractor_nip is not None:
+        query = query.join(WasteRecord.contractor).filter(
+            Contractor.nip.ilike(f"%{filters.contractor_nip}%")
+        )
+    if filters.user_username is not None:
+        query = query.join(WasteRecord.user).filter(
+            User.username.ilike(f"%{filters.user_username}%")
+        )
+    if filters.waste_code is not None:
+        query = query.join(WasteRecord.waste).filter(
+            Waste.code.ilike(f"%{filters.waste_code}%")
+        )
+    if filters.vehicle_registration_number is not None:
+        query = query.join(WasteRecord.vehicle).filter(
+            Vehicle.registration_number.ilike(f"%{filters.vehicle_registration_number}%")
+        )
+    if filters.driver_full_name is not None:
+        query = query.join(WasteRecord.driver).filter(
+            (Driver.name + ' ' + Driver.surname).ilike(f"%{filters.driver_full_name}%")
+        )
+    if filters.destination_name is not None:
+        query = query.join(WasteRecord.destination).filter(
+            Destination.return_destination.ilike(f"%{filters.destination_name}%")
+        )
 
     # Filtry zakresowe
     if filters.transfer_date_from is not None:
@@ -47,18 +66,26 @@ def get_all_waste_records(filters: WasteRecordFilterParams, db: Session):
 
     # Sortowanie - ręczny wybór kolumny
     if filters.sort_by:
-        if filters.sort_by == "contractor_id":
-            column = WasteRecord.contractor_id
-        elif filters.sort_by == "user_id":
-            column = WasteRecord.user_id
-        elif filters.sort_by == "waste_id":
-            column = WasteRecord.waste_id
-        elif filters.sort_by == "vehicle_id":
-            column = WasteRecord.vehicle_id
-        elif filters.sort_by == "driver_id":
-            column = WasteRecord.driver_id
-        elif filters.sort_by == "destination_id":
-            column = WasteRecord.destination_id
+        # Do sortowania po polach z relacji trzeba dołączyć odpowiedni join
+        if filters.sort_by == "contractor_nip":
+            query = query.join(WasteRecord.contractor)
+            column = Contractor.nip
+        elif filters.sort_by == "user_username":
+            query = query.join(WasteRecord.user)
+            column = User.username
+        elif filters.sort_by == "waste_code":
+            query = query.join(WasteRecord.waste)
+            column = Waste.code
+        elif filters.sort_by == "vehicle_registration_number":
+            query = query.join(WasteRecord.vehicle)
+            column = Vehicle.registration_number
+        elif filters.sort_by == "driver_full_name":
+            query = query.join(WasteRecord.driver)
+            # Sortowanie po nazwisku (można też po imieniu lub połączeniu)
+            column = Driver.surname
+        elif filters.sort_by == "destination_name":
+            query = query.join(WasteRecord.destination)
+            column = Destination.return_destination
         elif filters.sort_by == "transfer_date":
             column = WasteRecord.transfer_date
         elif filters.sort_by == "mass_kg":
