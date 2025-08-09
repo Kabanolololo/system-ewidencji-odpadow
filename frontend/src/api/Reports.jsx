@@ -1,4 +1,6 @@
-// Pobieranie wszystkich lat
+import { customFetch, BASE_URL } from "../api/fetchWrapper";
+
+// Pobieranie wszystkich dat
 export async function fetchReportYears() {
   const token = localStorage.getItem("access_token");
   const tokenType = localStorage.getItem("token_type") || "Bearer";
@@ -7,22 +9,14 @@ export async function fetchReportYears() {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = "http://192.168.0.33:8000/reports/years";
+  const url = `${BASE_URL}/reports/years`;
 
-  const response = await fetch(url, {
+  const response = await customFetch(url, {
     headers: {
       "Accept": "application/json",
       "Authorization": `${tokenType} ${token}`,
     },
   });
-
-  if (!response.ok) {
-    let errorData = {};
-    try {
-      errorData = await response.json();
-    } catch (_) {}
-    throw new Error(errorData.detail || `Błąd ${response.status} podczas pobierania lat raportów`);
-  }
 
   console.log("Pobrano listę lat raportów");
   return response.json();

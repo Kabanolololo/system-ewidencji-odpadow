@@ -1,4 +1,6 @@
-// Obsługa pobierania wszystkich użytkowników z backendem
+import { customFetch, BASE_URL } from "../api/fetchWrapper";
+
+// Pobieranie wszystkich użytkowników
 export async function fetchAllUsersWithStoredToken({ name, surname, role, sort_by, sort_order } = {}) {
   const token = localStorage.getItem("access_token");
   const tokenType = localStorage.getItem("token_type") || "Bearer";
@@ -8,36 +10,26 @@ export async function fetchAllUsersWithStoredToken({ name, surname, role, sort_b
   }
 
   const params = new URLSearchParams();
-
   if (name) params.append("name", name);
   if (surname) params.append("surname", surname);
   if (role) params.append("role", role);
   if (sort_by) params.append("sort_by", sort_by);
   if (sort_order) params.append("sort_order", sort_order);
 
-  const url = `http://192.168.0.33:8000/users/?${params.toString()}`;
+  const url = `${BASE_URL}/users/?${params.toString()}`;
 
-  const response = await fetch(url, {
+  const response = await customFetch(url, {
     headers: {
       "Accept": "application/json",
       "Authorization": `${tokenType} ${token}`,
     },
   });
 
-  if (!response.ok) {
-    let errorData = {};
-    try {
-      errorData = await response.json();
-    } catch (_) {
-      // fallback
-    }
-    throw new Error(errorData.detail || `Błąd ${response.status} podczas pobierania listy użytkowników`);
-  }
-  console.log('Pobrano listę użytkowników');
+  console.log("Pobrano listę użytkowników");
   return response.json();
 }
 
-// Obsługa tworzenia nowego użytkownika z backendem
+// Tworzenie nowego użytkownika
 export async function createNewUser({ name, surname, password_hash, role }) {
   const token = localStorage.getItem("access_token");
   const tokenType = localStorage.getItem("token_type") || "Bearer";
@@ -46,9 +38,9 @@ export async function createNewUser({ name, surname, password_hash, role }) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/users/`;
+  const url = `${BASE_URL}/users/`;
 
-  const response = await fetch(url, {
+  const response = await customFetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -58,14 +50,7 @@ export async function createNewUser({ name, surname, password_hash, role }) {
     body: JSON.stringify({ name, surname, password_hash, role }),
   });
 
-  if (!response.ok) {
-    let errorData = {};
-    try {
-      errorData = await response.json();
-    } catch (_) {}
-    throw new Error(errorData.detail || `Błąd ${response.status} podczas tworzenia użytkownika`);
-  }
-  console.log('Dodano nowego użytkownika:', name, surname, role);
+  console.log("Dodano nowego użytkownika:", name, surname, role);
   return response.json();
 }
 

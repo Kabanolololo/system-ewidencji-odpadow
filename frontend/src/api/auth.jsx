@@ -1,15 +1,17 @@
+import { customFetch, createFormBody, BASE_URL, DEFAULT_HEADERS } from './fetchWrapper';
+
+// Obsługa logowania się
 export async function loginUser(username, password) {
-  const formBody = new URLSearchParams();
-  formBody.append("username", username);
-  formBody.append("password", password);
+  const formBody = createFormBody({
+    username,
+    password
+  });
 
   // Endpoint do logowania
   try {
-    const response = await fetch("http://192.168.0.33:8000/auth/login", {
+    const response = await customFetch(`${BASE_URL}/auth/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+      headers: DEFAULT_HEADERS,
       body: formBody.toString(),
     });
 
@@ -28,6 +30,7 @@ export async function loginUser(username, password) {
     }
 
     const data = await response.json();
+    console.log("Pomyślnie zalogowano się")
     return data;
   } catch (error) {
     throw new Error(error.message);
