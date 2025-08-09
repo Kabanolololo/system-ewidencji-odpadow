@@ -1,4 +1,6 @@
-// Obsługa pobierania wszystkich kierowców z backendem
+import { customFetch, BASE_URL } from "../api/fetchWrapper";
+
+// Pobieranie wszystkich kierowców
 export async function fetchAllDriversWithStoredToken({ name, surname, sort_by, sort_order } = {}) {
   const token = localStorage.getItem("access_token");
   const tokenType = localStorage.getItem("token_type") || "Bearer";
@@ -14,29 +16,20 @@ export async function fetchAllDriversWithStoredToken({ name, surname, sort_by, s
   if (sort_by) params.append("sort_by", sort_by);
   if (sort_order) params.append("sort_order", sort_order);
 
-  const url = `http://192.168.0.33:8000/driver/?${params.toString()}`;
+  const url = `${BASE_URL}/driver/?${params.toString()}`;
 
-  const response = await fetch(url, {
+  const response = await customFetch(url, {
     headers: {
       "Accept": "application/json",
       "Authorization": `${tokenType} ${token}`,
     },
   });
 
-  if (!response.ok) {
-    let errorData = {};
-    try {
-      errorData = await response.json();
-    } catch (_) {
-      // fallback
-    }
-    throw new Error(errorData.detail || `Błąd ${response.status} podczas pobierania listy kierowców`);
-  }
   console.log('Pobrano listę kierowców');
   return response.json();
 }
 
-// Obsługa tworzenia nowego kierowcy z backendem
+// Tworzenie nowego kierowcy
 export async function createNewDriver({ name, surname }) {
   const token = localStorage.getItem("access_token");
   const tokenType = localStorage.getItem("token_type") || "Bearer";
@@ -45,7 +38,7 @@ export async function createNewDriver({ name, surname }) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const response = await fetch("http://192.168.0.33:8000/driver/", {
+  const response = await customFetch(`${BASE_URL}/driver/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -55,10 +48,6 @@ export async function createNewDriver({ name, surname }) {
     body: JSON.stringify({ name, surname }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `Błąd ${response.status} podczas tworzenia kierowcy`);
-  }
   console.log('Dodano nowego kierowcę:', name, surname);
   return response.json();
 }

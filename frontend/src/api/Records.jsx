@@ -1,4 +1,6 @@
-// Obsługa pobierania wszystkich rekordów odpadów z backendem
+import { customFetch, BASE_URL } from "../api/fetchWrapper";
+
+// Pobieranie rekordów odpadów z tokenem i filtrami
 export async function fetchAllWasteRecordsWithStoredToken(filters = {}) {
   const token = localStorage.getItem("access_token");
   const tokenType = localStorage.getItem("token_type") || "Bearer";
@@ -45,30 +47,20 @@ export async function fetchAllWasteRecordsWithStoredToken(filters = {}) {
   if (sort_by) params.append("sort_by", sort_by);
   if (sort_order) params.append("sort_order", sort_order);
 
-  const url = `http://192.168.0.33:8000/records/?${params.toString()}`;
+  const url = `${BASE_URL}/records/?${params.toString()}`;
 
-  const response = await fetch(url, {
+  const response = await customFetch(url, {
     headers: {
       "Accept": "application/json",
       "Authorization": `${tokenType} ${token}`,
     },
   });
 
-  if (!response.ok) {
-    let errorData = {};
-    try {
-      errorData = await response.json();
-    } catch (_) {
-      // fallback
-    }
-    throw new Error(errorData.detail || `Błąd ${response.status} podczas pobierania rekordów odpadów`);
-  }
-
   console.log("Pobrano rekordy odpadów");
   return response.json();
 }
 
-// Obsługa tworzenia nowego rekordu odpadu z backendem
+// Tworzenie nowego rekordu odpadu
 export async function createNewWasteRecord({
   contractor_id,
   user_id,
@@ -79,7 +71,7 @@ export async function createNewWasteRecord({
   transfer_date,
   mass_kg,
   price_per_kg,
-  notes
+  notes,
 }) {
   const token = localStorage.getItem("access_token");
   const tokenType = localStorage.getItem("token_type") || "Bearer";
@@ -88,7 +80,7 @@ export async function createNewWasteRecord({
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const response = await fetch("http://192.168.0.33:8000/records/", {
+  const response = await customFetch(`${BASE_URL}/records/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -105,14 +97,9 @@ export async function createNewWasteRecord({
       transfer_date,
       mass_kg,
       price_per_kg,
-      notes
+      notes,
     }),
   });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `Błąd ${response.status} podczas tworzenia rekordu waste`);
-  }
 
   console.log("Dodano nowy rekord waste:", {
     contractor_id,
@@ -124,7 +111,7 @@ export async function createNewWasteRecord({
     transfer_date,
     mass_kg,
     price_per_kg,
-    notes
+    notes,
   });
 
   return response.json();

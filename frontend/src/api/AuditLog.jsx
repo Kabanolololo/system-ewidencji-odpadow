@@ -1,3 +1,6 @@
+import { customFetch, BASE_URL } from "../api/fetchWrapper";
+
+// Wyswietlenie logow audytu z backendu
 export async function fetchAuditLogs({ table_name, operation, sort_by, sort_order, token }) {
   if (!token) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
@@ -10,20 +13,15 @@ export async function fetchAuditLogs({ table_name, operation, sort_by, sort_orde
   if (sort_by) params.append("sort_by", sort_by);
   if (sort_order) params.append("sort_order", sort_order);
 
-  const url = `http://192.168.0.33:8000/log/?${params.toString()}`;
+  const url = `${BASE_URL}/log/?${params.toString()}`;
 
-  const response = await fetch(url, {
+  const response = await customFetch(url, {
     headers: {
       "Accept": "application/json",
       "Authorization": `Bearer ${token}`,
     },
   });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || "Błąd podczas pobierania logów");
-  }
-
+  console.log("Pobrano liste audytową")
   return response.json();
 }
 

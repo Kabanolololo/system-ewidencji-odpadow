@@ -24,6 +24,10 @@
   color: #2e7d32;
 }
 
+.account-details p strong {
+  color: #1b5e20;
+  font-weight: 600;
+}
 /* Komunikaty błędów */
 .error {
   color: #d32f2f;

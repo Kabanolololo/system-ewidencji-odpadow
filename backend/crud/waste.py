@@ -63,7 +63,7 @@ def created_waste(waste: WasteCreate, user_id: int, db: Session):
         db.refresh(db_waste)
 
         #FUNKCJA: tworzy i zapisuje log audytu w bazie  
-        create_audit_log(db=db, user_id=user_id, table_name="waste", record_id=db_waste.id, operation="create", old_data=None, new_data=db_waste)
+        create_audit_log(db=db, user_id=user_id, table_name="wastes", record_id=db_waste.id, operation="create", old_data=None, new_data=db_waste)
 
         return db_waste
     except IntegrityError as e:

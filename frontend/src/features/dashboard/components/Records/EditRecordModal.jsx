@@ -19,12 +19,12 @@ function EditRecordModal({
   onCancel
 }) {
   const [formData, setFormData] = useState({
-    id: record.id,           // <-- dodaj tutaj ID rekordu
+    id: record.id,  
     contractor_id: record.contractor_id || null,
     user_id: localStorage.getItem("user_id")|| null,
-    waste_id: record.waste_id || null,  // poprawione z record.wasteType na record.waste_id
-    vehicle_id: record.vehicle_id || null, // poprawione z record.vehicle na record.vehicle_id
-    driver_id: record.driver_id || null, // analogicznie
+    waste_id: record.waste_id || null,
+    vehicle_id: record.vehicle_id || null,
+    driver_id: record.driver_id || null, 
     destination_id: record.destination_id || null,
     transfer_date: record.transfer_date || "",
     mass_kg: record.mass_kg || "",
@@ -163,7 +163,7 @@ function EditRecordModal({
       });
       const uniqueAddresses = [...new Set(result.map(d => d.address))];
       setDestinationSuggestions((prev) => ({ ...prev, address: uniqueAddresses }));
-      setDestinationResults(result);  // <--- Zapisz wynik całej listy miejsc
+      setDestinationResults(result);
     } catch (err) {
       console.error(err);
       setDestinationResults([]);

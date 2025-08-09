@@ -1,53 +1,53 @@
 ﻿import { useState, useEffect } from 'react';
-import { fetchAllWastesWithStoredToken, createNewWaste, updateWasteById, deleteWasteById } from '../../../api/Waste';
+import {
+  fetchAllWastesWithStoredToken,
+  createNewWaste,
+  updateWasteById,
+  deleteWasteById
+} from '../../../api/Waste';
 
 import '../styles/Waste.css';
 import '../styles/Modals.css';
 
 function Waste() {
   const [wastes, setWastes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
   const [newWaste, setNewWaste] = useState({ code: '', name: '', notes: '' });
-  const [addError, setAddError] = useState('');
-
-  const [searchCode, setSearchCode] = useState('');
-  const [sortOrder, setSortOrder] = useState(null); // 'asc' | 'desc' | null
+  const [search, setSearch] = useState({ code: '' });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
   const [editingWaste, setEditingWaste] = useState(null);
-  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [addError, setAddError] = useState('');
   const [saveError, setSaveError] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  // Ładowanie danych
+  // Pobieranie danych
   useEffect(() => {
-    async function loadWastes() {
+    const loadWastes = async () => {
       setLoading(true);
       setError('');
+
       try {
         const data = await fetchAllWastesWithStoredToken({
-          code: searchCode,
-          sort_by: sortOrder ? 'code' : null,
-          sort_order: sortOrder,
+          ...search,
+          sort_by: sortConfig.key,
+          sort_order: sortConfig.direction,
         });
         setWastes(data);
       } catch (err) {
+        console.error('Błąd podczas pobierania odpadów:', err.message);
         setError(err.message || 'Błąd podczas pobierania odpadów');
         setWastes([]);
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     loadWastes();
-  }, [searchCode, sortOrder]);
+  }, [search, sortConfig]);
 
-  const handleSort = () => {
-    if (sortOrder === 'asc') setSortOrder('desc');
-    else if (sortOrder === 'desc') setSortOrder(null);
-    else setSortOrder('asc');
-  };
-
+  // Dodawanie nowego odpadu
   const handleAddWaste = async (e) => {
     e.preventDefault();
     setAddError('');
@@ -72,6 +72,16 @@ function Waste() {
     }
   };
 
+  // Sortowanie
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Edycja
   const handleChangeEditing = (e) => {
     const { name, value } = e.target;
     setEditingWaste({ ...editingWaste, [name]: value });
@@ -108,6 +118,7 @@ function Waste() {
     setSaveError('');
   };
 
+  // Usuwanie
   const handleDeleteWaste = async (e, id) => {
     e.stopPropagation();
     if (window.confirm('Czy na pewno chcesz usunąć ten odpad?')) {
@@ -163,35 +174,32 @@ function Waste() {
       </form>
 
       {/* Filtr */}
+      <h2 className='filters-sorting'>Filtry i wyszukiwanie</h2>
+
       <div className="search-inputs">
         <input
           type="text"
           placeholder="Szukaj po kodzie"
-          value={searchCode}
-          onChange={e => setSearchCode(e.target.value)}
+          value={search.code}
+          onChange={e => setSearch({ ...search, code: e.target.value })}
         />
       </div>
 
-      {error && <p className="error">{error}</p>}
-      {loading && <p className="loading">Wczytywanie odpadów...</p>}
-
-
       {/* Tabela */}
-      {wastes.length > 0 && !loading && (
-        <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative' }}>
+        {wastes.length > 0 ? (
           <table className="waste-table">
             <thead>
               <tr>
                 <th
-                  onClick={handleSort}
-                  className={sortOrder ? `sort-${sortOrder}` : ''}
-                  style={{ cursor: 'pointer' }}
+                  onClick={() => handleSort('code')}
+                  className={sortConfig.key === 'code' ? `sort-${sortConfig.direction}` : ''}
                 >
                   Kod odpadu
                 </th>
-                <th>Nazwa</th>
-                <th>Notatki</th>
-                <th>Akcje</th>
+                <th className='dont-sort'>Nazwa</th>
+                <th className='dont-sort'>Notatki</th>
+                <th className="dont-sort">Akcje</th>
               </tr>
             </thead>
             <tbody>
@@ -202,25 +210,25 @@ function Waste() {
                   <td>{w.notes}</td>
                   <td>
                     <button onClick={() => setEditingWaste(w)} className="edit-button">Edytuj</button>
-                    <button onClick={(e) => handleDeleteWaste(e, w.id)} className="delete-button">×</button>
+                    <button onClick={(e) => handleDeleteWaste(e, w.id)} className="delete-button">🗑</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-      )}
+        ) : !loading && !error ? (
+          <p style={{ textAlign: 'center', fontStyle: 'italic' }}></p>
+        ) : null}
 
-      {!loading && wastes.length === 0 && (
-        <p style={{ textAlign: 'center', fontStyle: 'italic' }}></p>
-      )}
+        {error && <p className="error">{error}</p>}
+        {loading && <p className="loading">Wczytywanie odpadów...</p>}
 
-      {loading && (
-        <div className="loading-overlay">
-          <div className="spinner"></div>
-        </div>
-      )}
-
+        {loading && (
+          <div className="loading-overlay">
+            <div className="spinner"></div>
+          </div>
+        )}
+      </div>
 
       {/* Edycja */}
       {editingWaste && (

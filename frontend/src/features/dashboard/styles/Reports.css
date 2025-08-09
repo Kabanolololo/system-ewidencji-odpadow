@@ -52,7 +52,6 @@
   color: #2e3a2f;
 }
 
-/* Margines między kolejnymi kartami */
 .card + .card {
   margin-top: 1.5rem;
 }
@@ -83,9 +82,11 @@
   background: #e3f2fd;
   border: 2px dashed #90caf9;
   padding: 2rem;
-  text-align: center;
   color: #1e88e5;
   font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* === Tables === */
@@ -107,19 +108,16 @@ th, td {
   border-bottom: 1px solid #a5d6a7;
 }
 
-/* Wyrównanie liczb do prawej (wszystkie kolumny poza pierwszą) */
 th:nth-child(n+2),
 td:nth-child(n+2) {
   text-align: center;
 }
 
-/* Lepsze wyrównanie nagłówków tabel */
 thead th {
   padding-top: 0.8rem;
   padding-bottom: 0.8rem;
 }
 
-/* Podświetlenie wiersza przy hover */
 tbody tr:hover {
   background: #dcedc8;
 }
@@ -128,17 +126,54 @@ tbody tr:hover {
 @media (max-width: 768px) {
   .filter-row {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
-  .filter-row label,
+  .filter-row label {
+    margin-bottom: 0.2rem;
+  }
+
   .filter-row select {
     width: 100%;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    min-width: unset;
+  }
+
+  .card {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    box-shadow: none;
+    border: 1px solid #a5d6a7;
+  }
+
+  .sub-card {
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   th, td {
+    white-space: nowrap;
     font-size: 0.9rem;
-    padding: 0.4rem 0.5rem;
+    padding: 0.5rem 0.7rem;
+  }
+
+  th:nth-child(n+2),
+  td:nth-child(n+2) {
+    text-align: center;
+  }
+
+  .card h2 {
+    font-size: 1.25rem;
+  }
+
+  .sub-card h3 {
+    font-size: 1rem;
   }
 }

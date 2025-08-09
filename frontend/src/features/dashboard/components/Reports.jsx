@@ -457,7 +457,7 @@ export default function Reports() {
   return (
     <div className="reports-container">
       <section className="card">
-        <h2>Filtry dla całej zakładki</h2>
+        <h2>Filtry dostępne dla całej zakładki</h2>
           <YearSelector label="Rok:" value={globalYear} years={years} onChange={setGlobalYear} />
           <MonthRangeSelector
             months={months}
@@ -469,7 +469,7 @@ export default function Reports() {
       </section>
 
       {years.length === 0 ? (
-        <p>Ładowanie lat...</p>
+        <p>Wczytywanie zakładki...</p>
       ) : (
         <>
           {/* Tabela masy odpadów*/}
@@ -477,8 +477,8 @@ export default function Reports() {
           {errorWasteMass && <p className="error">{errorWasteMass}</p>}
           {!loadingWasteMass && !errorWasteMass && wasteMassRows.length > 0 && (
             <DataTable
-              title="Tabela masy odpadów"
-              headers={["Miesiąc", ...allWasteTypes.map((type) => `${type} (kg)`)]}
+              title="Tabela masy odpadów (kg)" year={globalYear}
+              headers={["Miesiąc", ...allWasteTypes.map((type) => `${type}`)]}
               dataRows={wasteMassRows}
             />
           )}
@@ -492,7 +492,7 @@ export default function Reports() {
           {errorPickupCounts && <p className="error">{errorPickupCounts}</p>}
           {!loadingPickupCounts && !errorPickupCounts && pickupCountRowsApi.length > 0 && (
             <DataTable
-              title="Tabela liczby odbiorów (API)"
+              title="Tabela liczby odbiorów"
               headers={["Miesiąc", ...allPickupWasteNames]}
               dataRows={pickupCountRowsApi}
             />
@@ -507,8 +507,8 @@ export default function Reports() {
           {errorAvgRevenue && <p className="error">{errorAvgRevenue}</p>}
           {!loadingAvgRevenue && !errorAvgRevenue && avgRevenueRows.length > 0 && (
             <DataTable
-              title="Tabela średnich przychodów (API)"
-              headers={["Miesiąc", ...allAvgRevenueWasteTypes.map(type => `${type} (zł)`)]}
+              title="Tabela średnich przychodów (zł)"
+              headers={["Miesiąc", ...allAvgRevenueWasteTypes.map(type => `${type} `)]}
               dataRows={avgRevenueRows}
             />
           )}
@@ -518,7 +518,7 @@ export default function Reports() {
           {errorRevenue && <p className="error">{errorRevenue}</p>}
           {!loadingRevenue && !errorRevenue && revenueTableRows.length > 0 && (
             <DataTable
-              title="Tabela przychodów (API)"
+              title="Tabela przychodów (zł)"
               headers={["Miesiąc", ...allWasteTypes.map(type => `${type} (zł)`)]}
               dataRows={revenueTableRows}
             />
@@ -529,7 +529,7 @@ export default function Reports() {
           {errorTotalRevenue && <p className="error">{errorTotalRevenue}</p>}
           {!loadingTotalRevenue && !errorTotalRevenue && totalRevenueTableRows.length > 0 && (
             <DataTable
-              title="Tabela całkowitych przychodów (API)"
+              title="Tabela całkowitych przychodów"
               headers={["Miesiąc", "Przychód (zł)"]}
               dataRows={totalRevenueTableRows}
             />

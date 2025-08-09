@@ -181,24 +181,33 @@ function Users() {
       </form>
 
       {/* --- Filtry i wyszukiwanie --- */}
-      <div className="search-inputs">
-        <input
-          type="text"
-          placeholder="Szukaj po imieniu"
-          value={searchName}
-          onChange={e => setSearchName(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Szukaj po nazwisku"
-          value={searchSurname}
-          onChange={e => setSearchSurname(e.target.value)}
-        />
-        <select value={searchRole} onChange={e => setSearchRole(e.target.value)}>
-          <option value="">Wszystkie role</option>
-          <option value="user">user</option>
-          <option value="admin">admin</option>
-        </select>
+      <div className="filters-section">
+        <h2>Filtry i wyszukiwanie</h2>
+        <div className="search-inputs">
+          <input
+            type="text"
+            placeholder="Szukaj po imieniu"
+            value={searchName}
+            onChange={e => setSearchName(e.target.value)}
+            aria-label="Szukaj po imieniu"
+          />
+          <input
+            type="text"
+            placeholder="Szukaj po nazwisku"
+            value={searchSurname}
+            onChange={e => setSearchSurname(e.target.value)}
+            aria-label="Szukaj po nazwisku"
+          />
+          <select
+            value={searchRole}
+            onChange={e => setSearchRole(e.target.value)}
+            aria-label="Filtruj po roli"
+          >
+            <option value="">Wszystkie role</option>
+            <option value="user">user</option>
+            <option value="admin">admin</option>
+          </select>
+        </div>
       </div>
 
       {error && <p className="error">{error}</p>}
@@ -207,59 +216,67 @@ function Users() {
       {/* --- Lista użytkowników --- */}
       <div style={{ position: 'relative' }}>
         {users.length > 0 ? (
-          <table className="users-table">
-            <thead>
-              <tr>
-                <th
-                  onClick={() => handleSort('name')}
-                  className={sortConfig.key === 'name' ? `sort-${sortConfig.direction}` : ''}
-                >
-                  Imię
-                </th>
-                <th
-                  onClick={() => handleSort('surname')}
-                  className={sortConfig.key === 'surname' ? `sort-${sortConfig.direction}` : ''}
-                >
-                  Nazwisko
-                </th>
-                <th>
-                  Rola
-                </th>
-                <th>
-                  Username
-                </th>
-                <th>Akcje</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map(user => (
-                <tr key={user.id}>
-                  <td>{user.name}</td>
-                  <td>{user.surname}</td>
-                  <td>{user.role}</td>
-                  <td>{user.username || '-'}</td>
-                  <td>
-                    <button onClick={() => setEditingUser(user)} className="edit-button">
-                      Edytuj
-                    </button>
-                    <button onClick={(e) => handleDeleteUser(e, user.id)} className="delete-button">
-                      ×
-                    </button>
-                  </td>
+          <>
+            <table className="users-table" role="grid" aria-label="Tabela użytkowników">
+              <thead>
+                <tr>
+                  <th
+                    title="Imię użytkownika"
+                    onClick={() => handleSort('name')}
+                    className={sortConfig.key === 'name' ? `sort-${sortConfig.direction}` : 'sortable'}
+                  >
+                    Imię
+                  </th>
+                  <th
+                    title="Nazwisko użytkownika"
+                    onClick={() => handleSort('surname')}
+                    className={sortConfig.key === 'surname' ? `sort-${sortConfig.direction}` : 'sortable'}
+                  >
+                    Nazwisko
+                  </th>
+                  <th title="Rola użytkownika (admin lub user)" className='dont-sort'>Rola</th>
+                  <th title="Nazwa użytkownika" className='dont-sort'>Nazwa użytkownika</th>
+                  <th className='dont-sort'>Akcje</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map(user => (
+                  <tr key={user.id}>
+                    <td>{user.name}</td>
+                    <td>{user.surname}</td>
+                    <td>{user.role}</td>
+                    <td>{user.username || '-'}</td>
+                    <td>
+                      <button
+                        onClick={() => setEditingUser(user)}
+                        className="edit-button"
+                        aria-label={`Edytuj użytkownika ${user.name} ${user.surname}`}
+                      >
+                        Edytuj
+                      </button>
+                      <button
+                        onClick={(e) => handleDeleteUser(e, user.id)}
+                        className="delete-button"
+                        aria-label={`Usuń użytkownika ${user.name} ${user.surname}`}
+                      >
+                        🗑
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         ) : (
           !loading && !error && (
             <p style={{ textAlign: 'center', fontStyle: 'italic' }}>
-              Brak wyników.
+              Brak wyników. Spróbuj zmienić kryteria wyszukiwania.
             </p>
           )
         )}
 
         {loading && (
-          <div className="loading-overlay">
+          <div className="loading-overlay" aria-live="assertive" aria-busy="true">
             <div className="spinner"></div>
           </div>
         )}
@@ -267,47 +284,62 @@ function Users() {
 
       {/* --- Edycja użytkownika --- */}
       {editingUser && (
-        <div className="modal-overlay" onClick={handleCancelEdit}>
+        <div
+          className="modal-overlay"
+          onClick={handleCancelEdit}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edit-user-title"
+        >
           <div className="edit-panel" onClick={e => e.stopPropagation()}>
-            <button className="close-button" onClick={handleCancelEdit}>×</button>
-            <h2>Edytuj Użytkownika</h2>
+            <button className="close-button" onClick={handleCancelEdit} aria-label="Zamknij edycję">×</button>
+            <h2 id="edit-user-title">Edytuj Użytkownika</h2>
+
             <label>
-              Imię:
+              Imię <span aria-hidden="true" style={{color: 'red'}}></span>
               <input
                 type="text"
                 name="name"
                 value={editingUser.name}
                 onChange={handleChangeEditing}
                 required
+                aria-required="true"
+                autoFocus
+                placeholder='Wpisz imię'
               />
             </label>
             <label>
-              Nazwisko:
+              Nazwisko <span aria-hidden="true" style={{color: 'red'}}></span>
               <input
                 type="text"
                 name="surname"
                 value={editingUser.surname}
                 onChange={handleChangeEditing}
                 required
+                aria-required="true"
+                placeholder='Wpisz nazwisko'
               />
             </label>
             <label>
-              Hasło:
+              Hasło <span aria-hidden="true" style={{color: 'red'}}></span>
               <input
                 type="text"
                 name="password_hash"
                 value={editingUser.password_hash}
                 onChange={handleChangeEditing}
                 required
+                aria-required="true"
+                placeholder='Wpisz hasło'
               />
             </label>
             <label>
-              Rola:
+              Rola
               <select
                 name="role"
                 value={editingUser.role}
                 onChange={handleChangeEditing}
                 required
+                aria-required="true"
               >
                 <option value="user">user</option>
                 <option value="admin">admin</option>
@@ -326,6 +358,7 @@ function Users() {
       )}
     </div>
   );
+
 }
 
 export default Users;

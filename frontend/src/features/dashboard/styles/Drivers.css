@@ -87,6 +87,10 @@ h1 {
 }
 
 /* Wyszukiwanie */
+.filters-sorting{
+	text-align: center;
+	color: #2C3E50;
+}
 .search-inputs {
 	display: flex;
 	gap: 15px;
@@ -120,7 +124,7 @@ h1 {
 .drivers-table th,
 .drivers-table td {
 	padding: 12px 15px;
-	text-align: left;
+	text-align: left !important;
 	border-bottom: 1px solid #eee;
 	user-select: none;
 	color: #2e7d32;
@@ -161,3 +165,86 @@ h1 {
 	background-color: #dcedc8;
 }
 
+@media (max-width: 768px) {
+  .drivers-container {
+    max-width: 600px;
+    margin: 100px auto 60px auto;
+    padding: 0 15px;
+  }
+
+  .add-driver-form {
+    max-width: 90% !important;
+    padding: 10px;
+  }
+
+  .form-row {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  /* Filtry - układają się pionowo i są wyśrodkowane */
+  .search-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 90%;
+    max-width: 400px;
+    margin: 0 auto 15px;
+    align-items: center;
+  }
+
+  .search-inputs input {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  /* Tabela - przewijanie poziome i wyśrodkowanie */
+  .drivers-table {
+    display: block;
+		margin: 0 auto !important;
+		max-width: 100%;
+		overflow-x: auto;
+		white-space: nowrap;
+  }
+
+  .drivers-table th,
+  .drivers-table td {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .drivers-container {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+
+  .add-driver-form {
+    padding: 8px;
+  }
+
+  .form-row label {
+    font-size: 0.85rem;
+  }
+
+  .form-row input {
+    font-size: 0.9rem;
+    padding: 5px 8px;
+  }
+
+  .add-button {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+
+  .search-inputs input {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+  }
+
+  .drivers-table th,
+  .drivers-table td {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+}

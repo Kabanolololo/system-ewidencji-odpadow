@@ -1,4 +1,6 @@
-// Obsługa pobierania wszystkich miejsc docelowych z backendu
+import { customFetch, BASE_URL } from "../api/fetchWrapper";
+
+// Pobieranie wszystkich miejsc docelowych z tokenem z localStorage
 export async function fetchAllDestinationsWithStoredToken({
   country,
   voivodeship,
@@ -25,29 +27,19 @@ export async function fetchAllDestinationsWithStoredToken({
   if (sort_by) params.append("sort_by", sort_by);
   if (sort_order) params.append("sort_order", sort_order);
 
-  const url = `http://192.168.0.33:8000/destination/?${params.toString()}`;
+  const url = `${BASE_URL}/destination/?${params.toString()}`;
 
-  const response = await fetch(url, {
+  const response = await customFetch(url, {
     headers: {
       "Accept": "application/json",
       "Authorization": `${tokenType} ${token}`,
     },
   });
-
-  if (!response.ok) {
-    let errorData = {};
-    try {
-      errorData = await response.json();
-    } catch (_) {
-      // fallback
-    }
-    throw new Error(errorData.detail || `Błąd ${response.status} podczas pobierania listy kierowców`);
-  }
-
-  return await response.json();
+  console.log("Pobrano wszystkie destynacje")
+  return response.json();
 }
 
-// Obsługa tworzenia nowej destynacji z backendem
+// Tworzenie nowej destynacji z backendem
 export async function createNewDestination({ country, voivodeship, city, postal_code, address }) {
   const token = localStorage.getItem("access_token");
   const tokenType = localStorage.getItem("token_type") || "Bearer";
@@ -56,7 +48,7 @@ export async function createNewDestination({ country, voivodeship, city, postal_
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const response = await fetch("http://192.168.0.33:8000/destination/", {
+  const response = await customFetch(`${BASE_URL}/destination/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -65,11 +57,6 @@ export async function createNewDestination({ country, voivodeship, city, postal_
     },
     body: JSON.stringify({ country, voivodeship, city, postal_code, address }),
   });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `Błąd ${response.status} podczas tworzenia destynacji`);
-  }
 
   console.log('Dodano nową destynację:', country, city, address);
   return response.json();

@@ -1,3 +1,5 @@
+import { customFetch, BASE_URL } from "../api/fetchWrapper";
+
 // Obsługa pobierania użytkownika z backendem
 export async function fetchUserByIdWithStoredToken(userId) {
   const token = localStorage.getItem("access_token");
@@ -7,25 +9,15 @@ export async function fetchUserByIdWithStoredToken(userId) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/users/${userId}`;
+  const url = `${BASE_URL}/users/${userId}`;
 
-  const response = await fetch(url, {
+  const response = await customFetch(url, {
     headers: {
       "Accept": "application/json",
       "Authorization": `${tokenType} ${token}`,
     },
   });
-
-  if (!response.ok) {
-    let errorData = {};
-    try {
-      errorData = await response.json();
-    } catch (_) {
-      // fallback
-    }
-    throw new Error(errorData.detail || `Błąd ${response.status} podczas pobierania użytkownika`);
-  }
-
+  console.log("Pomyślnie pobrano informacje o aktualnym użytkowniku")
   return response.json();
 }
 
@@ -54,6 +46,6 @@ export async function updateUserByIdWithStoredToken(userId, userData) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.detail || "Błąd podczas aktualizacji użytkownika");
   }
-
+  console.log("Pomyślnie zakutualizowano użytkownika o id", userId)
   return response.json();
 }

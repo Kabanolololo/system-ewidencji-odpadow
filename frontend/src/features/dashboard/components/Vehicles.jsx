@@ -219,6 +219,7 @@ function Vehicles() {
       </form>
 
       {/* Filtr po rejestracji */}
+      <h2 className='filters-sorting'>Filtry i wyszukiwanie</h2>
       <div className="search-inputs" style={{ marginBottom: '1rem' }}>
         <input
           type="text"
@@ -244,21 +245,9 @@ function Vehicles() {
                 >
                   Numer rejestracyjny
                 </th>
-                <th
-                  onClick={() => handleSort('make')}
-                  className={sortConfig.key === 'make' ? `sort-${sortConfig.direction}` : ''}
-                  style={{ cursor: 'pointer' }}
-                >
-                  Marka
-                </th>
-                <th
-                  onClick={() => handleSort('model')}
-                  className={sortConfig.key === 'model' ? `sort-${sortConfig.direction}` : ''}
-                  style={{ cursor: 'pointer' }}
-                >
-                  Model
-                </th>
-                <th>Akcje</th>
+                <th className='dont-sort'>Marka</th>
+                <th className='dont-sort'>Model</th>
+                <th className='dont-sort'>Akcje</th>
               </tr>
             </thead>
             <tbody>
@@ -281,7 +270,7 @@ function Vehicles() {
                       onClick={(e) => handleDeleteVehicle(e, vehicle.id)}
                       className="delete-button"
                     >
-                      ×
+                      🗑
                     </button>
                   </td>
                 </tr>
