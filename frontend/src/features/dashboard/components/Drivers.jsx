@@ -161,7 +161,9 @@ function Drivers() {
       </form>
 
       {/* Filtry */}
+      <h2 className='filters-sorting'>Filtry i wyszukiwanie</h2>
       <div className="search-inputs" style={{ marginBottom: '1rem' }}>
+        
         <input
           type="text"
           placeholder="Szukaj po imieniu"
@@ -182,7 +184,7 @@ function Drivers() {
       {/* Tabela */}
       <div style={{ position: 'relative' }}>
         {drivers.length > 0 ? (
-          <table className="users-table">
+          <table className="drivers-table">
             <thead>
               <tr>
                 <th
@@ -199,7 +201,7 @@ function Drivers() {
                 >
                   Nazwisko
                 </th>
-                <th>Akcje</th>
+                <th className='dont-sort'>Akcje</th>
               </tr>
             </thead>
             <tbody>
@@ -209,7 +211,7 @@ function Drivers() {
                   <td>{driver.surname}</td>
                   <td>
                     <button onClick={() => setEditingDriver(driver)} className="edit-button">Edytuj</button>
-                    <button onClick={(e) => handleDeleteDriver(e, driver.id)} className="delete-button">×</button>
+                    <button onClick={(e) => handleDeleteDriver(e, driver.id)} className="delete-button">🗑</button>
 
                   </td>
                 </tr>

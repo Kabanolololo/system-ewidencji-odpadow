@@ -3,8 +3,20 @@ import './styles/Default.css';
 function Default() {
   return (
     <div className="default-container">
+
       <h1>System Ewidencji Odpadów</h1>
+  
       <p>Witaj w panelu zarządzania! Poniżej znajdziesz krótki opis funkcjonalności systemu:</p>
+
+      <div className="default-section">
+        <h2>🔍 Filtrowanie i wyszukiwanie</h2>
+        <p>
+          Wszystkie tabele obsługują sortowanie i filtrowanie. Aby posortować lub przefiltrować,
+          kliknij w pierwszy wiersz nagłówkowy (nazwa kolumny). Jeśli kursor myszy zmienia się na
+          wskaźnik "kliknięcia" (pointer), oznacza to, że sortowanie jest możliwe. Jeśli kursor to
+          "not-allowed", sortowanie jest niedostępne dla tej kolumny.
+        </p>
+      </div>
 
       <div className="default-section">
         <h2>🛠️ Panel Administratora</h2>

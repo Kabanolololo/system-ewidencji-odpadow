@@ -213,6 +213,7 @@ function Destinations() {
     </form>
 
       {/* Wyszukiwanie i sortowanie */}
+      <h2 className='filters-sorting'>Filtry i wyszukiwanie</h2>
       <div className="search-inputs">
         <input type="text" placeholder="Szukaj kraj" value={search.country} onChange={e => setSearch({ ...search, country: e.target.value })} />
         <input type="text" placeholder="Szukaj województwo" value={search.voivodeship} onChange={e => setSearch({ ...search, voivodeship: e.target.value })} />
@@ -232,7 +233,7 @@ function Destinations() {
                 <th onClick={() => handleSort('city')} className={sortConfig.key === 'city' ? `sort-${sortConfig.direction}` : ''}>Miasto</th>
                 <th onClick={() => handleSort('postal_code')} className={sortConfig.key === 'postal_code' ? `sort-${sortConfig.direction}` : ''}>Kod pocztowy</th>
                 <th onClick={() => handleSort('address')} className={sortConfig.key === 'address' ? `sort-${sortConfig.direction}` : ''}>Adres</th>
-                <th>Akcje</th>
+                <th className='dont-sort'>Akcje</th>
               </tr>
             </thead>
             <tbody>
@@ -245,7 +246,7 @@ function Destinations() {
                   <td>{dest.address}</td>
                   <td>
                     <button onClick={() => setEditingDestination(dest)} className="edit-button">Edytuj</button>
-                    <button onClick={(e) => handleDeleteDestination(e, dest.id)} className="delete-button">×</button>
+                    <button onClick={(e) => handleDeleteDestination(e, dest.id)} className="delete-button">🗑</button>
                   </td>
                 </tr>
               ))}

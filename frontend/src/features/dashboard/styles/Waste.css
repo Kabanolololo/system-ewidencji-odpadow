@@ -163,3 +163,12 @@ h1 {
 	font-size: 0.9rem;
 	user-select: none;
 }
+
+@media (max-width: 768px) {
+  .waste-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+}

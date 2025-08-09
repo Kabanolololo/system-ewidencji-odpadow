@@ -99,6 +99,9 @@ h1 {
 }
 
 /* Wyszukiwanie dla select*/
+.filters-section h2{
+	text-align: center;
+}
 
 .search-inputs select {
 	padding: 6px 12px;
@@ -140,7 +143,9 @@ h1 {
 	font-weight: 700;
 	position: relative;
 }
-
+.dont-sort{
+	cursor: not-allowed !important;
+}
 .users-table th::after {
 	content: ' ';
 	font-size: 0.7rem;
@@ -179,4 +184,76 @@ h1 {
 	transition: border-color 0.3s ease;
 	width: 100%;
 	box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .add-user-form {
+    max-width: 90% !important;
+    padding: 10px;
+  }
+
+  .form-row {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  /* Filtry - układają się pionowo */
+  .filters-section .search-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  .filters-section .search-inputs input,
+  .filters-section .search-inputs select {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* Tabela - dodaj przewijanie poziome */
+  .users-table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .users-table th,
+  .users-table td {
+    white-space: nowrap; 
+  }
+}
+
+@media (max-width: 480px) {
+  .add-user-form {
+    padding: 8px;
+  }
+
+  .form-row label {
+    font-size: 0.85rem;
+  }
+
+  .form-row input,
+  .form-row select {
+    font-size: 0.9rem;
+    padding: 5px 8px;
+  }
+
+  .add-button {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+
+  .filters-section .search-inputs input,
+  .filters-section .search-inputs select {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
 }

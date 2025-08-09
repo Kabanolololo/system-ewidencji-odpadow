@@ -237,3 +237,11 @@
 .record-table th.sortable:hover::after {
   color: #2e7d32;
 }
+@media (max-width: 768px) {
+  .record-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+}

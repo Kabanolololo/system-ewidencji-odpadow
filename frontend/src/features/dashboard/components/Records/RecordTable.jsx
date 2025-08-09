@@ -180,6 +180,7 @@ export default function RecordTable() {
 
   return (
     <div className="record-table-wrapper">
+      <h3 className='filters-sorting'>Filtry i wyszukiwanie</h3>
       {loading && <p className="loading">Wczytywanie rekordów...</p>}
       {/* Filtry ZAWSZE widoczne */}
       <div className="filters">
@@ -382,8 +383,8 @@ export default function RecordTable() {
               >
                 Cena łączna (PLN) {renderSortIcon("total_price")}
               </th>
-              <th>Notatki</th>
-              <th>Akcje</th>
+              <th className='dont-sort'>Notatki</th>
+              <th className='dont-sort'>Akcje</th>
             </tr>
           </thead>
           <tbody>
@@ -411,7 +412,7 @@ export default function RecordTable() {
                     className="delete-button"
                     onClick={() => handleDelete(record.id)}
                   >
-                    x
+                    🗑
                   </button>
                 </td>
               </tr>
