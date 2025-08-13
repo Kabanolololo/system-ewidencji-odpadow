@@ -359,7 +359,7 @@ export default function Reports() {
   // wykres masa odpadow
   const wasteMassChartData = wasteMassApiData.map(item => {
     const totalMass = Object.values(item.waste_masses).reduce((sum, val) => sum + val, 0);
-    const monthNumber = parseInt(item.month.split("-")[1], 10); // np. 4
+    const monthNumber = parseInt(item.month.split("-")[1], 10);
     const fullMonthLabel = `${item.month} (${getMonthLabel(months, item.month.split("-")[1])})`;
 
     return {

@@ -171,25 +171,25 @@ function Contractors() {
 
         <div className="form-row">
           <label>NIP:
-            <input type="text" value={newContractor.nip} onChange={e => setNewContractor({ ...newContractor, nip: e.target.value })} required />
+            <input type="text" placeholder='Wpisz NIP' value={newContractor.nip} onChange={e => setNewContractor({ ...newContractor, nip: e.target.value })} required />
           </label>
 
           {!isOnline && (
             <>
               <label>REGON:
-                <input type="text" value={newContractor.regon} onChange={e => setNewContractor({ ...newContractor, regon: e.target.value })} required />
+                <input type="text" placeholder='Wpisz NIP' value={newContractor.regon} onChange={e => setNewContractor({ ...newContractor, regon: e.target.value })} required />
               </label>
               <label>Nazwa:
-                <input type="text" value={newContractor.name} onChange={e => setNewContractor({ ...newContractor, name: e.target.value })} required />
+                <input type="text" placeholder='Wpisz REGON' value={newContractor.name} onChange={e => setNewContractor({ ...newContractor, name: e.target.value })} required />
               </label>
               <label>Miasto:
-                <input type="text" value={newContractor.city} onChange={e => setNewContractor({ ...newContractor, city: e.target.value })} required />
+                <input type="text" placeholder='Wpisz miasto' value={newContractor.city} onChange={e => setNewContractor({ ...newContractor, city: e.target.value })} required />
               </label>
               <label>Kod pocztowy:
-                <input type="text" value={newContractor.postalCode} onChange={e => setNewContractor({ ...newContractor, postalCode: e.target.value })} required />
+                <input type="text" placeholder='Wpisz kod pocztowy' value={newContractor.postalCode} onChange={e => setNewContractor({ ...newContractor, postalCode: e.target.value })} required />
               </label>
               <label>Ulica:
-                <input type="text" value={newContractor.street} onChange={e => setNewContractor({ ...newContractor, street: e.target.value })} required />
+                <input type="text" placeholder='Wpisz ulicę' value={newContractor.street} onChange={e => setNewContractor({ ...newContractor, street: e.target.value })} required />
               </label>
             </>
           )}
