@@ -483,6 +483,7 @@ function AddRecord({ onAddRecord, onCancel }) {
           Masa (kg):
           <input
             type="number"
+            placeholder="Wpisz masę"
             value={newRecord.mass}
             onChange={e => setNewRecord(prev => ({ ...prev, mass: e.target.value }))}
             min="0"
@@ -495,6 +496,7 @@ function AddRecord({ onAddRecord, onCancel }) {
         <label>
           Cena za kg:
           <input
+            placeholder="Wpisz cenę"
             type="number"
             value={newRecord.pricePerKg}
             onChange={e => setNewRecord(prev => ({ ...prev, pricePerKg: e.target.value }))}

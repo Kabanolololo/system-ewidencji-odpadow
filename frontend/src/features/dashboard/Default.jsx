@@ -14,7 +14,7 @@ function Default() {
           Wszystkie tabele obsługują sortowanie i filtrowanie. Aby posortować lub przefiltrować,
           kliknij w pierwszy wiersz nagłówkowy (nazwa kolumny). Jeśli kursor myszy zmienia się na
           wskaźnik "kliknięcia" (pointer), oznacza to, że sortowanie jest możliwe. Jeśli kursor to
-          "not-allowed", sortowanie jest niedostępne dla tej kolumny.
+          "not-allowed" (🚫), sortowanie jest niedostępne dla tej kolumny.
         </p>
       </div>
 

@@ -60,7 +60,7 @@ function Users() {
   try {
     const createdUser = await createNewUser(newUser);
     setUsers([...users, createdUser]);
-    setNewUser({ name: '', surname: '', password_hash: '', role: 'user' });
+    setNewUser({ name: '', surname: '', password_hash: 'Pa$$w0rd', role: 'user' });
   } catch (err) {
     console.error(err);
     setAddError(err.message || "Błąd podczas tworzenia użytkownika");
