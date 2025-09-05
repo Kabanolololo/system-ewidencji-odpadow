@@ -57,7 +57,7 @@ export async function updateWasteById(waste_id, { code, name, notes }) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/waste/${waste_id}`;
+  const url = `${BASE_URL}/waste/${waste_id}`;
 
   const response = await fetch(url, {
     method: "PUT",
@@ -87,7 +87,7 @@ export async function deleteWasteById(waste_id) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/waste/${waste_id}`;
+  const url = `${BASE_URL}/waste/${waste_id}`;
 
   const response = await fetch(url, {
     method: "DELETE",

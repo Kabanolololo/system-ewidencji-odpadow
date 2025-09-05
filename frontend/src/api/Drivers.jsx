@@ -61,7 +61,7 @@ export async function updateDriverById(driver_id, { name, surname }) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/driver/${driver_id}`;
+  const url = `${BASE_URL}/driver/${driver_id}`;
 
   const response = await fetch(url, {
     method: "PUT",
@@ -90,7 +90,7 @@ export async function deleteDriverById(driver_id) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/driver/${driver_id}`;
+  const url = `${BASE_URL}/driver/${driver_id}`;
 
   const response = await fetch(url, {
     method: "DELETE",

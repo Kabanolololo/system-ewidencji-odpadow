@@ -36,7 +36,7 @@ export async function fetchWasteMassByMonth({ year, month_from, month_to }) {
   if (month_from) params.append("month_from", month_from);
   if (month_to) params.append("month_to", month_to);
 
-  const url = `http://192.168.0.33:8000/reports/waste-mass?${params.toString()}`;
+  const url = `${BASE_URL}/reports/waste-mass?${params.toString()}`;
 
   const response = await fetch(url, {
     headers: {
@@ -71,7 +71,7 @@ export async function fetchPickupCountsByMonth({ year, month_from, month_to }) {
   if (month_from) params.append("month_from", month_from);
   if (month_to) params.append("month_to", month_to);
 
-  const url = `http://192.168.0.33:8000/reports/pickup-counts?${params.toString()}`;
+  const url = `${BASE_URL}/reports/pickup-counts?${params.toString()}`;
 
   const response = await fetch(url, {
     headers: {
@@ -106,7 +106,7 @@ export async function fetchAverageRevenueByMonth({ year, month_from, month_to })
   if (month_from) params.append("month_from", month_from);
   if (month_to) params.append("month_to", month_to);
 
-  const url = `http://192.168.0.33:8000/reports/average-revenue?${params.toString()}`;
+  const url = `${BASE_URL}/reports/average-revenue?${params.toString()}`;
 
   const response = await fetch(url, {
     headers: {
@@ -141,7 +141,7 @@ export async function fetchRevenueByMonth({ year, month_from, month_to }) {
   if (month_from) params.append("month_from", month_from);
   if (month_to) params.append("month_to", month_to);
 
-  const url = `http://192.168.0.33:8000/reports/revenue-by-month?${params.toString()}`;
+  const url = `${BASE_URL}/reports/revenue-by-month?${params.toString()}`;
 
   const response = await fetch(url, {
     headers: {
@@ -176,7 +176,7 @@ export async function fetchTotalRevenueByMonth({ year, month_from, month_to }) {
   if (month_from) params.append("month_from", month_from);
   if (month_to) params.append("month_to", month_to);
 
-  const url = `http://192.168.0.33:8000/reports/total-revenue-by-month?${params.toString()}`;
+  const url = `${BASE_URL}/reports/total-revenue-by-month?${params.toString()}`;
 
   const response = await fetch(url, {
     headers: {

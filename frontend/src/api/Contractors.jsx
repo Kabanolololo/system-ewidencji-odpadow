@@ -85,7 +85,7 @@ export async function updateContractorById(contractor_id, { nip, regon, name, ad
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/contractors/${contractor_id}`;
+  const url = `${BASE_URL}/contractors/${contractor_id}`;
 
   const response = await fetch(url, {
     method: "PUT",
@@ -115,7 +115,7 @@ export async function deleteContractorById(contractor_id) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/contractors/${contractor_id}`;
+  const url = `${BASE_URL}/contractors/${contractor_id}`;
 
   const response = await fetch(url, {
     method: "DELETE",

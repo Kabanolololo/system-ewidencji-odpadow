@@ -30,7 +30,7 @@ export async function updateUserByIdWithStoredToken(userId, userData) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/users/${userId}`;
+  const url = `${BASE_URL}/users/${userId}`;
 
   const response = await fetch(url, {
     method: "PUT",

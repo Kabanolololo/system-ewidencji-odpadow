@@ -126,7 +126,7 @@ export async function updateWasteRecordById(waste_record_id, updateData) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/records/${waste_record_id}`;
+  const url = `${BASE_URL}/records/${waste_record_id}`;
 
   const response = await fetch(url, {
     method: "PUT",
@@ -157,7 +157,7 @@ export async function deleteWasteRecordById(waste_record_id) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/records/${waste_record_id}`;
+  const url = `${BASE_URL}/records/${waste_record_id}`;
 
   const response = await fetch(url, {
     method: "DELETE",

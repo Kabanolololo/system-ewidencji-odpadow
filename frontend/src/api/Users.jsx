@@ -63,7 +63,7 @@ export async function updateUserById(user_id, { name, surname, password_hash, ro
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/users/admin/${user_id}`;
+  const url = `${BASE_URL}/users/admin/${user_id}`;
 
   const response = await fetch(url, {
     method: "PUT",
@@ -95,7 +95,7 @@ export async function deleteUserById(user_id) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/users/${user_id}`;
+  const url = `${BASE_URL}/users/${user_id}`;
 
   const response = await fetch(url, {
     method: "DELETE",

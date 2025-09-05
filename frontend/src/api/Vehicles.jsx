@@ -57,7 +57,7 @@ export async function updateVehicleById(vehicle_id, { registration_number, brand
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/vehicle/${vehicle_id}`;
+  const url = `${BASE_URL}/vehicle/${vehicle_id}`;
 
   const response = await fetch(url, {
     method: "PUT",
@@ -87,7 +87,7 @@ export async function deleteVehicleById(vehicle_id) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/vehicle/${vehicle_id}`;
+  const url = `${BASE_URL}/vehicle/${vehicle_id}`;
 
   const response = await fetch(url, {
     method: "DELETE",

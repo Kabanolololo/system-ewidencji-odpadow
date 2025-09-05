@@ -71,7 +71,7 @@ export async function updateDestinationById(destination_id, { country, voivodesh
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/destination/${destination_id}`;
+  const url = `${BASE_URL}/destination/${destination_id}`;
 
   const response = await fetch(url, {
     method: "PUT",
@@ -101,7 +101,7 @@ export async function deleteDestinationById(destination_id) {
     throw new Error("Brak tokena. Zaloguj się ponownie.");
   }
 
-  const url = `http://192.168.0.33:8000/destination/${destination_id}`;
+  const url = `${BASE_URL}/destination/${destination_id}`;
 
   const response = await fetch(url, {
     method: "DELETE",
